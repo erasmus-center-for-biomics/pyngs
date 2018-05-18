@@ -13,7 +13,7 @@ class AlignmentTest(unittest.TestCase):
 
     def setUp(self):
         """Prepare the test cases."""
-        self.alignment_a = pyngs.interval.Alignment(
+        self.alignment_a = pyngs.alignment.Alignment(
             "HISEQ:351:HCG3TBCXX:2:2113:6295:13667:sC2_r18_c39:AATTAGCGTC",
             16, 1, 24217, 60,
             "86M",
@@ -27,7 +27,7 @@ class AlignmentTest(unittest.TestCase):
                 ("NH", "i", "1"), ("um", "Z", "AATTAGCGTC"),
                 ("wb", "Z", "sC2_r18_c39"), ("RG", "Z", "chip")]
         )
-        self.alignment_b = pyngs.interval.Alignment(
+        self.alignment_b = pyngs.alignment.Alignment(
             "HISEQ:351:HCG3TBCXX:2:2113:6295:13667:sC2_r18_c39:AATTAGCGTC",
             0, 1, 24217, 60,
             "86M",

@@ -4,21 +4,26 @@
     //
     "python.pythonPath": "C:/Users/135001/Application/Continuum/Anaconda3_5.1.0/python.exe",    
     
+    // linting options
     "python.linting.enabled": true,
-    
     "python.linting.pep8Enabled": true,
-    
-    "python.linting.pydocstyleEnabled": true,
-    
+    "python.linting.pydocstyleEnabled": true,    
     "python.linting.pylintPath": "C:/Users/135001/Application/Continuum/Anaconda3_5.1.0/Scripts/pylint.exe",
-    
-    "python.linting.pydocStylePath": "C:/Users/135001/Application/Continuum/Anaconda3_5.1.0/Scripts/pydocstyle.exe",
-    
+    "python.linting.pydocStylePath": "C:/Users/135001/Application/Continuum/Anaconda3_5.1.0/Scripts/pydocstyle.exe",    
     "python.linting.pep8Path": "C:/Users/135001/Application/Continuum/Anaconda3_5.1.0/Scripts/pep8.exe",
+    
+    // enable unit test
+    "python.unitTest.unittestEnabled": false,
+    "python.unitTest.pyTestEnabled": false,
+    "python.unitTest.nosetestsEnabled": false,
+
+    // look in the tests directory for *test*.py files
+    "python.unitTest.unittestArgs":["-v", "-s", ".", "-p", "*test*.py"],
+    "python.unitTest.promptToConfigure": false,
+    "python.unitTest.debugPort": 3000,
     
     // Editor settings
     //
     "files.insertFinalNewline": true,
-    
     "trailing-spaces.trimOnSave": true
 }
