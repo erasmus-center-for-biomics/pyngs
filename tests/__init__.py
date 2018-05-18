@@ -1,10 +1,11 @@
 """Test the current package."""
 
 import sys
-import os.path
 import unittest
-from tests.test_interval import IntervalTest
-from tests.test_gff import GFFTest
+
+from .interval import IntervalTest
+from .gff import GFFTest
+from .alignment import AlignmentTest, AlignmentParserTest
 
 if __name__ == "__main__":
     print(sys.version)
