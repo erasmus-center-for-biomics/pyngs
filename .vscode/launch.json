@@ -12,6 +12,9 @@
             "args": [],
             "program": "${workspaceRoot}/tests/__init__.py",
             "cwd": "${workspaceRoot}",
+            "env": {
+                "PYTHONPATH": "${workspaceRoot}"
+            },
             "debugOptions": [
                 "WaitOnAbnormalExit",
                 "WaitOnNormalExit",

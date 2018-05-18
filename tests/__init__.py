@@ -3,9 +3,9 @@
 import sys
 import unittest
 
-from .interval import IntervalTest
-from .gff import GFFTest
-from .alignment import AlignmentTest, AlignmentParserTest
+from tests.interval import IntervalTest
+from tests.gff import GFFTest
+from tests.alignment import AlignmentTest, AlignmentParserTest
 
 if __name__ == "__main__":
     print(sys.version)
