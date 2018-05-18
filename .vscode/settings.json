@@ -1,0 +1,24 @@
+// Place your settings in this file to overwrite default and user settings.
+{
+    // Python specific settings
+    //
+    "python.pythonPath": "C:/Users/135001/Application/Continuum/Anaconda3_5.1.0/python.exe",    
+    
+    "python.linting.enabled": true,
+    
+    "python.linting.pep8Enabled": true,
+    
+    "python.linting.pydocstyleEnabled": true,
+    
+    "python.linting.pylintPath": "C:/Users/135001/Application/Continuum/Anaconda3_5.1.0/Scripts/pylint.exe",
+    
+    "python.linting.pydocStylePath": "C:/Users/135001/Application/Continuum/Anaconda3_5.1.0/Scripts/pydocstyle.exe",
+    
+    "python.linting.pep8Path": "C:/Users/135001/Application/Continuum/Anaconda3_5.1.0/Scripts/pep8.exe",
+    
+    // Editor settings
+    //
+    "files.insertFinalNewline": true,
+    
+    "trailing-spaces.trimOnSave": true
+}

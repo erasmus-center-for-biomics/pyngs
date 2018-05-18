@@ -1,0 +1,23 @@
+{
+    "version": "1.0",
+    "configurations": [
+        {
+            "name": "Run tests",
+            "type": "python",
+            "pythonPath":"${config:python.pythonPath}",
+            "request": "launch",
+            "stopOnEntry": true,
+            "externalConsole":false,
+            "runtimeArgs": ["-B"],
+            "args": [],
+            "program": "${workspaceRoot}/tests/__init__.py",
+            "cwd": "${workspaceRoot}",
+            "debugOptions": [
+                "WaitOnAbnormalExit",
+                "WaitOnNormalExit",
+                "RedirectOutput"
+            ],
+            "env": {"name":"value"}
+        }
+    ]    
+}
