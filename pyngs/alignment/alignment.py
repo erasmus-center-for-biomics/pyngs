@@ -201,3 +201,41 @@ class SAMParser(object):
             return self.chromosome_list.index(name)
         except ValueError:
             return -1
+
+
+class SAMWriter(object):
+    """A class to write SAM files."""
+
+    def __init__(self, outstream=sys.stdout, header=None):
+        """Initialize a new SAMWriter."""
+        self.outstream = outstream
+
+    def write_header(self, header=None):
+        """Write the header."""
+        if header is not None:
+            for line in header:
+                self.outstream.write("{line}\n".format(line=line))
+
+    @classmethod
+    def format_tag(cls, tag):
+        """Format a tag."""
+        return tag[0] + ":" + tag[1] + ":" + tag[2]
+
+    def write(self, aln):
+        """Write a new alignment to the SAM file."""
+        tags = "\t".join([self.format_tag(tag) for tag in aln.tag])
+        self.outstream(
+            "{name}\t{flag}\t{chromosome}\t{position}\t{mapq}\t{cigar}\t{mate_chr}\t{mate_pos}\t{tlen}\t{sequence}\t{quality}\t{tags}".format(
+                name=aln.name,
+                flag=aln.flag,
+                chromosome=aln.chromosome,
+                position=aln.position + 1,
+                mapq=aln.mapping_quality,
+                cigar=aln.cigar,
+                mate_chr=aln.mate_chromosome,
+                mate_pos=aln.mate_position + 1,
+                tlen=aln.tlen,
+                sequence=aln.sequence,
+                quality=aln.quality,
+                tags=tags))
+
