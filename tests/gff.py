@@ -40,37 +40,37 @@ class GFFTest(unittest.TestCase):
         # Get the first entry
         parser = pyngs.interval.gff_file(self.handle)
         entry = list(next(parser))
-        self.assertEquals(entry[0][0], "chromosome")
-        self.assertEquals(entry[0][1], "1")
-        self.assertEquals(entry[1][0], "source")
-        self.assertEquals(entry[1][1], "havana")
-        self.assertEquals(entry[2][0], "type")
-        self.assertEquals(entry[2][1], "gene")
-        self.assertEquals(entry[3][0], "start")
-        self.assertEquals(entry[3][1], 11869)
-        self.assertEquals(entry[4][0], "end")
-        self.assertEquals(entry[4][1], 14409)
-        self.assertEquals(entry[5][0], "score")
-        self.assertEquals(entry[5][1], ".")
-        self.assertEquals(entry[6][0], "strand")
-        self.assertEquals(entry[6][1], "+")
-        self.assertEquals(entry[7][0], "frame")
-        self.assertEquals(entry[7][1], ".")
-        self.assertEquals(entry[8][0], "comment")
+        self.assertEqual(entry[0][0], "chromosome")
+        self.assertEqual(entry[0][1], "1")
+        self.assertEqual(entry[1][0], "source")
+        self.assertEqual(entry[1][1], "havana")
+        self.assertEqual(entry[2][0], "type")
+        self.assertEqual(entry[2][1], "gene")
+        self.assertEqual(entry[3][0], "start")
+        self.assertEqual(entry[3][1], 11869)
+        self.assertEqual(entry[4][0], "end")
+        self.assertEqual(entry[4][1], 14409)
+        self.assertEqual(entry[5][0], "score")
+        self.assertEqual(entry[5][1], ".")
+        self.assertEqual(entry[6][0], "strand")
+        self.assertEqual(entry[6][1], "+")
+        self.assertEqual(entry[7][0], "frame")
+        self.assertEqual(entry[7][1], ".")
+        self.assertEqual(entry[8][0], "comment")
 
         # Parse the comment
         commentfields = pyngs.interval.gff_parse_comment(entry[8][1])
-        self.assertEquals(len(commentfields), 5)
-        self.assertEquals(commentfields[0][0], "gene_id")
-        self.assertEquals(commentfields[0][1], "ENSG00000223972")
-        self.assertEquals(commentfields[1][0], "gene_version")
-        self.assertEquals(commentfields[1][1], "5")
-        self.assertEquals(commentfields[2][0], "gene_name")
-        self.assertEquals(commentfields[2][1], "DDX11L1")
-        self.assertEquals(commentfields[3][0], "gene_source")
-        self.assertEquals(commentfields[3][1], "havana")
-        self.assertEquals(commentfields[4][0], "gene_biotype")
-        self.assertEquals(commentfields[4][1], "transcribed_unprocessed_pseudogene")
+        self.assertEqual(len(commentfields), 5)
+        self.assertEqual(commentfields[0][0], "gene_id")
+        self.assertEqual(commentfields[0][1], "ENSG00000223972")
+        self.assertEqual(commentfields[1][0], "gene_version")
+        self.assertEqual(commentfields[1][1], "5")
+        self.assertEqual(commentfields[2][0], "gene_name")
+        self.assertEqual(commentfields[2][1], "DDX11L1")
+        self.assertEqual(commentfields[3][0], "gene_source")
+        self.assertEqual(commentfields[3][1], "havana")
+        self.assertEqual(commentfields[4][0], "gene_biotype")
+        self.assertEqual(commentfields[4][1], "transcribed_unprocessed_pseudogene")
 
         # convert to Interval test
         chromosomes = []
@@ -85,15 +85,15 @@ class GFFTest(unittest.TestCase):
             entry,
             chromosomes=chromosomes,
             allow_add=True)
-        self.assertEquals(interval.chromosome, 0)
-        self.assertEquals(interval.start, 11869)
-        self.assertEquals(interval.end, 14409)
+        self.assertEqual(interval.chromosome, 0)
+        self.assertEqual(interval.start, 11869)
+        self.assertEqual(interval.end, 14409)
 
         # Count the rest of the entries
         count = 0
         for _ in parser:
             count += 1
-        self.assertEquals(count, 12)
+        self.assertEqual(count, 12)
 
 
 

@@ -8,7 +8,6 @@
             "request": "launch",
             "stopOnEntry": true,
             "externalConsole":false,
-            "runtimeArgs": ["-B"],
             "args": [],
             "program": "${workspaceRoot}/tests/__init__.py",
             "cwd": "${workspaceRoot}",
@@ -19,8 +18,30 @@
                 "WaitOnAbnormalExit",
                 "WaitOnNormalExit",
                 "RedirectOutput"
-            ],
-            "env": {"name":"value"}
+            ]
+        },
+        {
+            "name": "AddUMI",
+            "type": "python",
+            "pythonPath":"${config:python.pythonPath}",
+            "request": "launch",
+            "stopOnEntry": true,
+            "externalConsole":false,
+            "args": [
+                "--fastq", "data/I18-1199-01-NIST_S1_L001_R1_001.fastq.gz",
+                "--umi", "data/I18-1199-01-NIST_S1_L001_I2_001.fastq.gz",
+                "--output", "data/I18-1199-01-NIST_S1_L001_R1_001.umi.fastq.gz"
+                ],
+            "program": "${workspaceRoot}/scripts/add_umi_to_readname.py",
+            "cwd": "${workspaceRoot}",
+            "env": {
+                "PYTHONPATH": "${workspaceRoot}"
+            },
+            "debugOptions": [
+                "WaitOnAbnormalExit",
+                "WaitOnNormalExit",
+                "RedirectOutput"
+            ]
         }
     ]    
 }

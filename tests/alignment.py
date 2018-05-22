@@ -6,16 +6,16 @@ try:
 except ImportError:
     from io import StringIO
 import pyngs.interval
-
+import pyngs.alignment
 
 class AlignmentTest(unittest.TestCase):
     """A class to test the Alignment class."""
 
     def setUp(self):
         """Prepare the test cases."""
-        self.alignment_a = pyngs.alignment.Alignment(
+        self.alignment_a = pyngs.alignment.SAMAlignment(
             "HISEQ:351:HCG3TBCXX:2:2113:6295:13667:sC2_r18_c39:AATTAGCGTC",
-            16, 1, 24217, 60,
+            16, "chr1", 24217, 60,
             "86M",
             "*", 0, 0,
             "GGTTGTGTACTGTTTATATGAATATTAGTGATTACAAAATATTATCAATAGATCTTTTCACATCTGTTATTGAAGAACTAATCATC",
@@ -27,9 +27,9 @@ class AlignmentTest(unittest.TestCase):
                 ("NH", "i", "1"), ("um", "Z", "AATTAGCGTC"),
                 ("wb", "Z", "sC2_r18_c39"), ("RG", "Z", "chip")]
         )
-        self.alignment_b = pyngs.alignment.Alignment(
+        self.alignment_b = pyngs.alignment.SAMAlignment(
             "HISEQ:351:HCG3TBCXX:2:2113:6295:13667:sC2_r18_c39:AATTAGCGTC",
-            0, 1, 24217, 60,
+            0, "chr1", 24217, 60,
             "86M",
             "*", 0, 0,
             "GGTTGTGTACTGTTTATATGAATATTAGTGATTACAAAATATTATCAATAGATCTTTTCACATCTGTTATTGAAGAACTAATCATC",
@@ -72,10 +72,10 @@ HISEQ:352:HCFVCBCXX:2:2115:5066:18397:sA1_r38_c58:ACGGGGGGCC\t272\t1\t12069\t1\t
 
     def test_parser(self):
         """Parse the SAM file."""
-        factory = pyngs.interval.AlignmentFactory()
+        factory = pyngs.alignment.SAMParser(self.handle)
 
         entries = 0
-        for _ in factory.iterator(self.handle):
+        for _ in factory:
             entries += 1
 
         self.assertEqual(len(factory.header), 6)

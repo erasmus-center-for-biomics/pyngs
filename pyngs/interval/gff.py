@@ -1,7 +1,7 @@
 """GFF reader classes."""
 
 import sys
-import BioInterval
+from .interval import Interval
 
 
 def gff_file(gffstream=sys.stdin):
@@ -19,20 +19,23 @@ def gff_file(gffstream=sys.stdin):
               "start", "end", "score", "strand",
               "frame", "comment"]
     while True:
-        line = next(gffstream).rstrip()
+        try:
+            line = next(gffstream).rstrip()
 
-        # skip empty lines and comments
-        if len(line) == 0:
-            continue
-        if line[0] == "#":
-            continue
+            # skip empty lines and comments
+            if len(line) == 0:
+                continue
+            if line[0] == "#":
+                continue
 
-        # return the data fields annotated
-        # with the header
-        fields = line.split("\t")
-        fields[3] = int(fields[3])
-        fields[4] = int(fields[4])
-        yield zip(header, fields)
+            # return the data fields annotated
+            # with the header
+            fields = line.split("\t")
+            fields[3] = int(fields[3])
+            fields[4] = int(fields[4])
+            yield zip(header, fields)
+        except StopIteration:
+            break
     return
 
 
@@ -87,7 +90,7 @@ def gff_entry_to_interval(entry, chromosomes=None, allow_add=True):
         chromosomes - a list with chromosomes
 
     Returns:
-        An BioInterval.Interval from the entry
+        An Interval from the entry
 
     """
     try:
@@ -98,7 +101,7 @@ def gff_entry_to_interval(entry, chromosomes=None, allow_add=True):
             chridx = len(chromosomes) - 1
         else:
             raise err
-    return BioInterval.Interval(
+    return Interval(
         chridx,
         entry[3][1],
         entry[4][1])

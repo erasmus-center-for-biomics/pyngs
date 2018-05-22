@@ -9,7 +9,7 @@ def next_operation(cigar):
     """Get the next operation in the CIGAR string."""
     cstart = 0
     cend = 0
-    for idx in xrange(len(cigar)):
+    for idx in range(len(cigar)):
         if cigar[idx] in CIGAR_OPERATIONS:
             nop = int(cigar[cstart:(cend+1)])
             cstart = idx + 1
@@ -17,7 +17,7 @@ def next_operation(cigar):
             yield nop, cigar[idx]
         else:
             cend = idx
-    raise StopIteration
+    return
 
 
 class Cigar(object):
@@ -47,4 +47,3 @@ class Cigar(object):
     def __repr__(self):
         """Return the CIGAR as a string."""
         return "".join([str(o) + str(n) for n, o in self.operations])
-

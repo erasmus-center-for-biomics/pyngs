@@ -1,8 +1,8 @@
 """This module contains functions to parse and compare alignments."""
 
 import sys
-import BioInterval
-
+import pyngs.interval
+from .cigar import CIGAR_OPERATIONS, CIGAR_OPERATIONS_ON_REFERENCE
 
 # SAM flag bits
 IS_PAIRED = 0x0001
@@ -19,23 +19,20 @@ DUPLICATE = 0x0400
 SUPPLEMENTARY = 0x0800
 
 
-class Alignment(object):
+class SAMAlignment(object):
     """A class to represent an alignment."""
 
     __slots__ = [
-        "name", "flag", "chridx", "position",
+        "name", "flag", "chromosome", "position",
         "mapping_quality", "cigar", "mate_chromosome",
         "mate_position", "tlen", "sequence", "quality",
         "tags"]
-
-    cigar_operations = ("M", "I", "D", "N", "S", "H", "P", "=", "X")
-    cigar_operations_on_reference = ("M", "D", "N", "P", "=", "X")
 
     def __init__(self, *args):
         """Create a new alignment."""
         self.name = args[0]
         self.flag = args[1]
-        self.chridx = args[2]
+        self.chromosome = args[2]
         self.position = args[3]
         self.mapping_quality = args[4]
         self.cigar = args[5]
@@ -91,7 +88,7 @@ class Alignment(object):
         sl_start = 0
         sl_end = 0
         for idx in range(len(self.cigar)):
-            if self.cigar[idx] in Alignment.cigar_operations:
+            if self.cigar[idx] in CIGAR_OPERATIONS:
                 nop = int(self.cigar[sl_start:(sl_end+1)])
                 sl_start = idx + 1
                 sl_end = idx + 1
@@ -105,30 +102,42 @@ class Alignment(object):
         delta = 0
         cdelta = 0
         for nop, operation in self.cigar_iterator():
-            if operation in self.cigar_operations_on_reference:
+            if operation in CIGAR_OPERATIONS_ON_REFERENCE:
                 cdelta = delta
                 delta += nop
-            yield BioInterval.interval.DataInterval(
-                self.chridx,
+            yield pyngs.interval.DataInterval(
+                self.chromosome,
                 self.position + cdelta,
                 self.position + delta,
                 operation)
         return
 
+    def get_tag(self, code):
+        """Get a tag with a specific code."""
+        for tag in self.tags:
+            if tag[0] == code:
+                return tag
 
-class AlignmentFactory(object):
+
+class SAMParser(object):
     """Create alignments from strings."""
 
-    def __init__(self, chromosome_list=None, allow_append=True):
+    def __init__(self,
+                 handle=sys.stdin,
+                 chromosome_list=None,
+                 allow_append=True):
         """Initialize a new alignment factory."""
-        assert chromosome_list is not None
-        self.chromosome_list = chromosome_list
+        if chromosome_list is None:
+            self.chromosome_list = []
+        else:
+            self.chromosome_list = chromosome_list
         self.header = []
         self.allow_append = allow_append
+        self.handle = handle
 
-    def from_string(self, sam_string=""):
+    def from_string(self, sam_string="", sep="\t"):
         """Interpret a SAM string."""
-        fields = sam_string.rstrip().split("\t")
+        fields = sam_string.rstrip().split(sep)
         readname = fields[0]
         flag = int(fields[1])
         chromosome_name = fields[2]
@@ -142,20 +151,11 @@ class AlignmentFactory(object):
         quality = fields[10]
         tags = self.process_tags(fields[11:])
 
-        # add the chromosome to the chromosome list
-        chridx = len(self.chromosome_list)
-        try:
-            chridx = self.chromosome_list.index(chromosome_name)
-        except ValueError:
-            if self.allow_append:
-                self.chromosome_list.append(chromosome_name)
-            else:
-                raise ValueError("Unknown chromosome %s" % chromosome_name)
-
         # return the interpreted Alignment fields
-        return Alignment(readname, flag, chridx, position, mqual, cigar,
-                         mate_chromosome, mate_position, tlen,
-                         sequence, quality, tags)
+        return SAMAlignment(
+            readname, flag, chromosome_name, position, mqual, cigar,
+            mate_chromosome, mate_position, tlen,
+            sequence, quality, tags)
 
     def process_tags(self, tags):
         """Process the tags."""
@@ -170,18 +170,34 @@ class AlignmentFactory(object):
         """Add a chromosome to the chromosome list."""
         if line.startswith("@SQ"):
             fields = line.split("\t")
-            name = fields[1].replace("SN:", "")
+            namefld = [fld for fld in fields if fld.startswith("SN:")]
+            if not namefld:
+                raise ValueError(
+                    "Improperly formatted header: {0}".format(line))
+            name = namefld[0].replace("SN:", "")
             if name not in self.chromosome_list:
                 self.chromosome_list.append(name)
 
-    def iterator(self, handle=sys.stdin):
-        """Iterate over the lines of a stream."""
-        while True:
-            line = next(handle)
-            if len(line) == 0:
+    def __iter__(self):
+        """Mark this object as an iterator."""
+        return self
+
+    def __next__(self):
+        """Get the next entry in the file."""
+        for line in self.handle:
+            line = line.rstrip()
+            if not line:
                 continue
             if line[0] == '@':
                 self.header.append(line)
                 self.parse_seq_header(line)
                 continue
-            yield self.from_string(line)
+            return self.from_string(line)
+        raise StopIteration
+
+    def chromosome_index(self, name):
+        """Get the chromosome index."""
+        try:
+            return self.chromosome_list.index(name)
+        except ValueError:
+            return -1

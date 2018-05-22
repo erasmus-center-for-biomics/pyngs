@@ -2,9 +2,6 @@
 import sys
 import operator
 import itertools
-import functools
-from collections import deque
-from .segment import next_segment
 from .cigar import Cigar
 
 
@@ -15,9 +12,12 @@ def segment(alignment=None, aid=0):
     Args:
         alignment - an alignment to segments
     Yields:
-        a tuple with the 
-        reference position [0], query position [1], operator [2], 
-        sequence [3], and quality [4]
+        a tuple with the
+            [0] reference position
+            [1] query position
+            [2] operator
+            [3] sequence
+            [4] quality
     """
     cigar = Cigar(alignment.cigar)
     rpos = alignment.position
@@ -25,7 +25,7 @@ def segment(alignment=None, aid=0):
     for nbase, cop in cigar.operations:
         seq = None
         qual = None
-        for _ in xrange(nbase):
+        for _ in range(nbase):
             if Cigar.on_query(cop):
                 seq = alignment.sequence[qpos]
                 qual = alignment.quality[qpos]
@@ -68,73 +68,80 @@ class Consensus(object):
 
     qual = sum(qual|base_max) - sum(qual|base_other)
 
-    WARNING: 
-        Due to the method used, (left-most) soft-clipped bases can have a 
+    WARNING:
+        Due to the method used, (left-most) soft-clipped bases can have a
         lower quality than the actual alignment content.
     """
 
-    def __init__(self, qualityoffset=32, remove_internal_S=True):
+    def __init__(self, qualityoffset=32, remove_internal_s=True):
         """
         Initialize the MergeAlignment object.
-        
+
         Args:
             self - reference to self
-            qualityoffset - the quality offset, default 32
-        
-        Returns:
-            nothing    
+            qualityoffset - the offset of the quality score
+            remove_internal_s - remove the softclipped bases
+                                that fall within an alignment.
         """
         self.qualityoffset = qualityoffset
-        self.remove_internal_S = remove_internal_S
+        self.remove_internal_s = remove_internal_s
 
-    def __merge_insertions__(self, group=None):
+    @classmethod
+    def __merge_insertions__(cls, group=None):
         """
         Merge the insertions prior to further analysis.
-        
+
         Args:
             self
 
         Returns:
-            reference position [0], query position* [1], operator [2], 
+            reference position [0], query position* [1], operator [2],
             sequence** [3], and quality** [4]
 
             * First encountered base
             ** Can be multiple
+
         """
         retval = []
         for _, grp in itertools.groupby(group, key=operator.itemgetter(0)):
-            
+
             # get the segments per read at this position
             segments = [aln for aln in grp]
-            if len(segments ) == 1:
+            if len(segments) == 1:
                 retval.append(segments[0])
                 continue
-            
+
             # merge insertions with the subsequent real character
             temp = [segments[0][0], segments[0][1], segments[0][2], "", "", ""]
-            for segment in segments:                
-                temp[3] += segment[3]
-                temp[4] += segment[4]
-                temp[5] += segment[5]
+            for seg in segments:
+                temp[3] += seg[3]
+                temp[4] += seg[4]
+                temp[5] += seg[5]
             retval.append(tuple(temp))
-        
+
         # return the cleaned segment
         return retval
 
-    def __score_segments__(self, segments=[], qualdefault=32):
+    def __score_segments__(self, segments=None, qualdefault=32):
         """
         Score the segments.
 
         Args:
             self - self
-            segments - a list of segments sorted by cigar and sequence
-            qualoffset - the quality code offset
-            qualdefault - the default quality of a cigar without its own quality
+            segments    - a list of segments sorted by cigar and sequence
+            qualoffset  - the quality code offset
+            qualdefault - the default quality of a cigar without its own
+                          quality
 
         Return:
             a list with scored segment tuples that are formed as follows
-            reference coordinate [0], cigar [1], sequence [2], depth [3], 
-            quality [4], and ids [5]
+            [0] reference coordinate
+            [1] cigar
+            [2] sequence
+            [3] depth
+            [4] quality
+            [5] ids
+
         """
         retval = []
 
@@ -143,19 +150,21 @@ class Consensus(object):
             qual = 0
             ids = []
             base = None
-            for segment in grp:
+            for seg in grp:
                 if base is None:
-                    base = [segment[1], segment[3], segment[4]]
-                ids.append(segment[0])
+                    base = [seg[1], seg[3], seg[4]]
+                ids.append(seg[0])
                 depth += 1
-                if segment[5] is None:
+                if seg[5] is None:
                     qual += qualdefault
                 else:
+                    score = sum([ord(char) - self.qualityoffset for char in seg[5]])
                     qual += operator.truediv(
-                        sum([ord(char) - self.qualityoffset for char in segment[5]]),
-                        len(segment[5]))
+                        score,
+                        len(seg[5]))
             scored_segment = (base[0], base[1], base[2], depth, qual, ids)
             retval.append(scored_segment)
+
         # return the score
         return retval
 
@@ -168,33 +177,37 @@ class Consensus(object):
             if pchar is not None and char != pchar:
                 parts.append((cnt, pchar))
                 cnt = 0
-            cnt += 1 
+            cnt += 1
             pchar = char
         parts.append((cnt, pchar))
 
-        return "".join(["%d%s" % p  for p in parts])
+        return "".join(["%d%s" % p for p in parts])
 
     def __top_score__(self, scored_segments=None):
         """Select the top scoring segments."""
         scored_segments.sort(key=operator.itemgetter(3, 4))
-        
+
         # select the top scoring hit
         hsegment = list(scored_segments.pop())
         for segm in scored_segments:
-            hsegment[4] -= segm[4]            
+            hsegment[4] -= segm[4]
         return hsegment
 
     def __consensus__(self, segments=None):
         """
         Calculate the consensus from a set of singular scored segments.
-        
+
         Args:
             self - reference to self
             segments - the top segments
-        
+
         Returns:
             a continuous consensus sequence in the form
-            start[0], end[1], sequence[2], quality[3], and cigar[4]
+            [0]start
+            [1] end
+            [2] sequence
+            [3] quality
+            [4] cigar
         """
         retval = []
         seq, qual, cigar = "", "", ""
@@ -204,26 +217,28 @@ class Consensus(object):
         ascii_threshold = 126 - self.qualityoffset
 
         # iterate over the segments
-        for segment in segments:
+        for seg in segments:
 
             # report non connected part separately
-            if prev - segment[0] > 1:
+            if prev - seg[0] > 1:
                 retval.append([start, prev, seq, qual, self.__rle__(cigar)])
-                start = segment[0]
+                start = seg[0]
                 seq, qual, cigar = "", "", ""
-            
+
             # add the next base
-            cigar += segment[1]
-            seq += segment[2] if segment[2] is not None else ""
-            qtmp = "~" if segment[4] > ascii_threshold else chr(int(segment[4]) + self.qualityoffset) 
-            qual += qtmp * len(segment[2]) if segment[2] is not None else ""
-            
+            cigar += seg[1]
+            seq += seg[2] if seg[2] is not None else ""
+            qtmp = "~"
+            if seg[4] <= ascii_threshold:
+                qtmp = chr(int(seg[4]) + self.qualityoffset)
+            qual += qtmp * len(seg[2]) if seg[2] is not None else ""
+
             # add the real qualities
-            rqual.append(segment[4])
+            rqual.append(seg[4])
 
             # set the previous for the next iteration
-            prev = segment[0]
-        
+            prev = seg[0]
+
         # add the current entry
         retval.append([start, prev, seq, qual, self.__rle__(cigar), rqual])
         if len(retval) == 1:
@@ -231,9 +246,9 @@ class Consensus(object):
         else:
             pidx = 0
             base = retval[0]
-            for idx in xrange(1,len(retval)):
+            for idx in range(1, len(retval)):
                 # determine the number of n's to add
-                couple = "%dN" % (retval[idx][1] - retval[pidx][1]) 
+                couple = "%dN" % (retval[idx][1] - retval[pidx][1])
                 base[1] = retval[idx][1]
                 base[2] += retval[idx][2]
                 base[3] += couple + retval[idx][3]
@@ -249,19 +264,26 @@ class Consensus(object):
             self - a reference to self
             alignments -
         Returns:
-            a consensus sequence represented as a list with the following fields:
-            reference start [0], reference end [1], sequence [2], quality string [3], 
-            cigar [4], and real qualities* [5]
+            a consensus sequence represented as a list with
+            the following fields:
+                [0] reference start
+                [1] reference end
+                [2] sequence
+                [3] quality string
+                [4] cigar
+                [5] real qualities*
 
-            * the real qualities are number and include values over the ascii encoding. The maximum
-            quality in Sanger is 94 (126 - 32).
+            * the real qualities are numbers and include values
+            over the ascii encoding. The maximum quality in Sanger
+            ascii encoding is 94 (126 - 32).
+
         """
         # create segments for each reference/query base in the alignments
         segments = []
-        for idx in xrange(len(alignments)):
+        for idx in range(len(alignments)):
             segments.extend([x for x in segment(alignments[idx], aid=idx)])
         segments.sort(key=operator.itemgetter(1, 0, 2))
-        
+
         # remove H and N CIGAR operations prior to the procedure
         segments = [x for x in segments if x[3] not in ("H", "N")]
 
@@ -273,16 +295,16 @@ class Consensus(object):
             # merge the segments for insertions and softclips
             msegments = self.__merge_insertions__(osegments)
             msegments.sort(key=operator.itemgetter(3, 4))
-        
+
             # score the segments
             ssegments = self.__score_segments__(msegments)
             parts.append(ssegments)
-        
+
         # Filter S CIGARS that are not at the end
         fltsegment = parts
-        if self.remove_internal_S and len(parts) > 2:
+        if self.remove_internal_s and len(parts) > 2:
             fltsegment = [parts[0]]
-            for idx in xrange(1, len(parts)-1):
+            for idx in range(1, len(parts)-1):
                 entry = [x for x in parts[idx] if "S" not in x[1]]
                 fltsegment.append(entry)
             fltsegment.append(parts[-1])
@@ -293,5 +315,3 @@ class Consensus(object):
         # determine the consensus sequence
         consensus = self.__consensus__(tophits)
         return consensus
-        
-
