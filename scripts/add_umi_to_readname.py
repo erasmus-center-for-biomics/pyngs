@@ -21,16 +21,13 @@ class AddUMI(object):
 
     def __next__(self):
         """Get the next reads."""
-        try:
-            _, useq, _ = next(self.umis)
-            aname, aseq, aqual = next(self.reads)
+        _, useq, _ = next(self.umis)
+        aname, aseq, aqual = next(self.reads)
 
-            # add the UMI to the read name
-            aname = aname.split(" ", 1)[0]
-            aname += ":{tag}={seq}".format(tag=self.tag, seq=useq)
-            return aname, aseq, aqual
-        except StopIteration:
-            return
+        # add the UMI to the read name
+        aname = aname.split(" ", 1)[0]
+        aname += ":{tag}={seq}".format(tag=self.tag, seq=useq)
+        return aname, aseq, aqual
 
     def __call__(self, outstream=None):
         """Convert all the reads and write to the output stream."""

@@ -145,7 +145,7 @@ class Consensus(object):
         """
         retval = []
 
-        for k, grp in itertools.groupby(segments, key=operator.itemgetter(3, 4)):
+        for _, grp in itertools.groupby(segments, key=operator.itemgetter(3, 4)):
             depth = 0
             qual = 0
             ids = []
