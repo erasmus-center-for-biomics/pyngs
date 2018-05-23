@@ -75,7 +75,7 @@ if __name__ == "__main__":
                 instream = open(args.fastq, "r")
 
         outstream = sys.stdout
-        if args.fastq != "stdout":
+        if args.output != "stdout":
             if args.output.endswith(".gz"):
                 outstream = gzip.open(args.output, "wt")
             else:
