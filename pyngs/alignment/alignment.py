@@ -66,10 +66,10 @@ class SAMAlignment(object):
     def is_mate_reverse(self):
         return self.is_set(MATE_IS_REVERSE)
 
-    def is_first_in_template(self):
+    def is_first_in_pair(self):
         return self.is_set(FIRST_IN_PAIR)
 
-    def is_last_in_template(self):
+    def is_last_in_pair(self):
         return self.is_set(LAST_IN_PAIR)
 
     def is_secondary_alignment(self):
@@ -118,6 +118,28 @@ class SAMAlignment(object):
         for tag in self.tags:
             if tag[0] == code:
                 return tag
+        return None
+    
+    @classmethod
+    def format_tag(cls, tag):
+        """Format a tag."""
+        return tag[0] + ":" + tag[1] + ":" + str(tag[2])
+    
+    def __str__(self):
+        tags = "\t".join([self.format_tag(tag) for tag in self.tags])
+        return "{name}\t{flag}\t{chromosome}\t{position}\t{mapq}\t{cigar}\t{mate_chr}\t{mate_pos}\t{tlen}\t{sequence}\t{quality}\t{tags}".format(
+            name=self.name,
+            flag=self.flag,
+            chromosome=self.chromosome,
+            position=self.position,
+            mapq=self.mapping_quality,
+            cigar=self.cigar,
+            mate_chr=self.mate_chromosome,
+            mate_pos=self.mate_position,
+            tlen=self.tlen,
+            sequence=self.sequence,
+            quality=self.quality,
+            tags=tags)
 
 
 class SAMParser(object):
@@ -154,11 +176,11 @@ class SAMParser(object):
         readname = fields[0]
         flag = int(fields[1])
         chromosome_name = fields[2]
-        position = int(fields[3]) - 1
+        position = int(fields[3])
         mqual = int(fields[4])
         cigar = fields[5]
         mate_chromosome = fields[6]
-        mate_position = int(fields[7]) - 1
+        mate_position = int(fields[7])
         tlen = int(fields[8])
         sequence = fields[9]
         quality = fields[10]
@@ -209,7 +231,7 @@ class SAMParser(object):
             return self.from_string(line)
         raise StopIteration
 
-    def next():
+    def next(self):
         """Be compatible with python 2."""
         return self.__next__()
 
@@ -234,26 +256,6 @@ class SAMWriter(object):
             for line in header:
                 self.outstream.write("{line}\n".format(line=line))
 
-    @classmethod
-    def format_tag(cls, tag):
-        """Format a tag."""
-        return tag[0] + ":" + tag[1] + ":" + tag[2]
-
     def write(self, aln):
         """Write a new alignment to the SAM file."""
-        tags = "\t".join([self.format_tag(tag) for tag in aln.tags])
-        self.outstream.write(
-            "{name}\t{flag}\t{chromosome}\t{position}\t{mapq}\t{cigar}\t{mate_chr}\t{mate_pos}\t{tlen}\t{sequence}\t{quality}\t{tags}\n".format(
-                name=aln.name,
-                flag=aln.flag,
-                chromosome=aln.chromosome,
-                position=aln.position + 1,
-                mapq=aln.mapping_quality,
-                cigar=aln.cigar,
-                mate_chr=aln.mate_chromosome,
-                mate_pos=aln.mate_position + 1,
-                tlen=aln.tlen,
-                sequence=aln.sequence,
-                quality=aln.quality,
-                tags=tags))
-
+        self.outstream.write("{aln}\n".format(aln=str(aln)))

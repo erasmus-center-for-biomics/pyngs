@@ -66,7 +66,7 @@ if __name__ == "__main__":
 
         # open the in and output streams for regular and compressed files
         instream = open(args.sam, "r") if args.sam != "stdin" else sys.stdin
-        outstream = open(args.out, "r") if args.out != "stdout" else sys.stdout
+        outstream = open(args.out, "w") if args.out != "stdout" else sys.stdout
 
         # add the UMI as a SAM tag
         add_umi_to_sam(instream, outstream, args.tag)
