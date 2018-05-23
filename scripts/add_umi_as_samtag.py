@@ -28,8 +28,9 @@ def add_umi_to_sam(instream=sys.stdin, outstream=sys.stdout, tag="um"):
         # this from the name and add it as
         # a tag in the alignment
         if umifld:
-            umi = umifld.split("=", 1)[1]
-            aln.name = ":".join(fields.remove(umifld))
+            umi = umifld[0].split("=", 1)[1]
+            fields.remove(umifld[0])
+            aln.name = ":".join(fields)
             aln.tags.append((tag, "Z", umi))
 
         # write the (modified) alignment to
