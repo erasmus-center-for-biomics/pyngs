@@ -242,8 +242,8 @@ class SAMWriter(object):
     def write(self, aln):
         """Write a new alignment to the SAM file."""
         tags = "\t".join([self.format_tag(tag) for tag in aln.tags])
-        self.outstream(
-            "{name}\t{flag}\t{chromosome}\t{position}\t{mapq}\t{cigar}\t{mate_chr}\t{mate_pos}\t{tlen}\t{sequence}\t{quality}\t{tags}".format(
+        self.outstream.write(
+            "{name}\t{flag}\t{chromosome}\t{position}\t{mapq}\t{cigar}\t{mate_chr}\t{mate_pos}\t{tlen}\t{sequence}\t{quality}\t{tags}\n".format(
                 name=aln.name,
                 flag=aln.flag,
                 chromosome=aln.chromosome,
