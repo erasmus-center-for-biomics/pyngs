@@ -5,9 +5,6 @@ import argparse
 import logging
 
 
-__version__ = "1.0"
-
-
 class TableWriter(object):
     """The TableWriter writes the output table."""
 
@@ -41,7 +38,7 @@ def overlap_processor(handle=sys.stdin):
     """Yield each line in the overlap file."""
     while True:
         line = next(handle).rstrip()
-        if len(line) == 0:
+        if line:
             continue
         if line[0] == "#":
             continue

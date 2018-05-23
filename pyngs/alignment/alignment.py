@@ -1,6 +1,7 @@
 """This module contains functions to parse and compare alignments."""
 
 import sys
+import re
 import pyngs.interval
 from .cigar import CIGAR_OPERATIONS, CIGAR_OPERATIONS_ON_REFERENCE
 
@@ -134,6 +135,18 @@ class SAMParser(object):
         self.header = []
         self.allow_append = allow_append
         self.handle = handle
+        self.count = 0
+
+    def sample_map(self):
+        """Get the sample map."""
+        matcher = re.compile("^.*ID:([^\t]+).*SM:([^\t]+).*$")
+        samples = {}
+        for line in self.header:
+            if line.startswith("@RG"):
+                regm = matcher.search(line)
+                if regm:
+                    samples[regm.group(1)] = regm.group(2)
+        return samples
 
     def from_string(self, sam_string="", sep="\t"):
         """Interpret a SAM string."""
@@ -185,6 +198,7 @@ class SAMParser(object):
     def __next__(self):
         """Get the next entry in the file."""
         for line in self.handle:
+            self.count += 1
             line = line.rstrip()
             if not line:
                 continue
@@ -194,6 +208,10 @@ class SAMParser(object):
                 continue
             return self.from_string(line)
         raise StopIteration
+
+    def next():
+        """Be compatible with python 2."""
+        return self.__next__()
 
     def chromosome_index(self, name):
         """Get the chromosome index."""
