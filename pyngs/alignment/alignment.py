@@ -125,7 +125,7 @@ class SAMAlignment(object):
         """Format a tag."""
         return tag[0] + ":" + tag[1] + ":" + str(tag[2])
     
-    def __str__(self):
+    def __repr__(self):
         tags = "\t".join([self.format_tag(tag) for tag in self.tags])
         return "{name}\t{flag}\t{chromosome}\t{position}\t{mapq}\t{cigar}\t{mate_chr}\t{mate_pos}\t{tlen}\t{sequence}\t{quality}\t{tags}".format(
             name=self.name,
@@ -258,4 +258,4 @@ class SAMWriter(object):
 
     def write(self, aln):
         """Write a new alignment to the SAM file."""
-        self.outstream.write("{aln}\n".format(aln=str(aln)))
+        self.outstream.write("{aln}\n".format(aln=repr(aln)))

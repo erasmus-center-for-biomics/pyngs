@@ -1,2 +1,3 @@
 from .consensus import consensus
-from .segment import Segment, segmenter
+from .utils import to_alignment
+from .segment import Segment

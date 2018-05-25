@@ -5,6 +5,7 @@ import argparse
 import itertools
 from functools import total_ordering
 import pyngs.alignment
+import pyngs.alignment.consensus
 
 
 """
@@ -13,7 +14,7 @@ file annotated with unique molecular indexes (UMIs).
 """
 
 
-def consensus_fragments(fragments, distance=20):
+def group_dna_fragments(fragments, distance=20):
     """Generate groups of fragments for the consensus calling."""
     def in_group(frga, frgb):
         """Determine whether a and b are of the same group."""
@@ -104,14 +105,14 @@ class DNAFragment(object):
 
     def __repr__(self):
         """Represent self as a string."""
-        # len(self.content)
         data = []
         for aln in self.content:
-            part = "{chrom}\t{pos}\t{sup}\t{sec}".format(
+            part = "{chrom}\t{pos}\t{sup}\t{sec}\t{name}".format(
                 chrom=aln.chromosome,
                 pos=aln.position,
                 sup=aln.is_supplementary_alignment(),
-                sec=aln.is_secondary_alignment())
+                sec=aln.is_secondary_alignment(),
+                name=aln.name)
             data.append(part)
         return "{n}\t{parts}".format(
             n=len(self.content),
@@ -129,7 +130,7 @@ class CreateConsensus(object):
         self.parser = pyngs.alignment.SAMParser(instream)
         self.writer = pyngs.alignment.SAMWriter(outstream)
 
-    def run(self):
+    def __call()__(self):
         """Create the consensus sequences."""
         # for each alignment
         for aln in self.parser:
@@ -148,17 +149,18 @@ class CreateConsensus(object):
 
             # process the buffer if the umi switches
             if umitag[2] != self.umi:
-                self.__paired_consensus__()
+                self.paired_consensus()
+                self.buffer.clear()
                 self.umi = umitag[2]
 
             # add the alignment for the current UMI
             self.buffer.append(aln)
 
         # process the last buffer entry
-        self.__paired_consensus__()
+        self.paired_consensus()
 
-    def __group_reads_per_fragment__(self):
-        """Group alignments per DNA fragment."""
+    def get_fragments(self):
+        """Group alignments in DNA fragment."""
         retval = []
 
         # group the read pairs
@@ -176,7 +178,12 @@ class CreateConsensus(object):
         # return the reads per DNA fragment
         return retval
 
-    def __paired_consensus__(self):
+    def write_alignments(self, alignments):
+        """Write alignments to the output."""
+        for aln in alignments:
+            self.writer.write(aln)
+
+    def paired_consensus(self):
         """
         Determine the consensus alignments.
 
@@ -188,6 +195,14 @@ class CreateConsensus(object):
 
         Groups are formed based on the position before the alignments
         are fed into the consensus calling.
+
+        If the alignments in a group are all the same, we can still not
+        simply report the alignment, as the base quality scores still need
+        to be summed*.
+
+        * The sum of the quality scores will likely exceed the maximum score
+        that can be encoded in ASCII based encoding. This needs to be taken
+        into account either in a tag or in the score itself.
         """
         def alignment_sorter(aln):
             """Sort alignments to based on their DNA fragment."""
@@ -196,13 +211,16 @@ class CreateConsensus(object):
                 aln.is_last_in_pair(),
                 not aln.is_secondary_alignment(),
                 not aln.is_supplementary_alignment())
+        #
+        # if self.umi not in (
+        #   "AAAAAGCTGC", "AAAAATTACG", "AAAACAGAAC",
+        #   "AAAAACGCCC", "AAAAGAACTA", "AAAAAAAACG"):
+        # if self.umi not in ("AAAAGAACTA", "AAAA"):
+        #     return
 
         # only the forward and reverse read can be handled quickly
         if len(self.buffer) == 2:
-            for aln in self.buffer:
-                aln.tags.append(("nr", "i", 1))
-                self.writer.write(aln)
-            self.buffer.clear()
+            self.write_alignments(self.buffer)
             return
 
         # sort the buffer first on the name
@@ -210,46 +228,42 @@ class CreateConsensus(object):
 
         # get the alignments for the same DNA fragments (read
         # pairs with supplementary/secondary alignments)
-        fragments = self.__group_reads_per_fragment__()
+        fragments = self.get_fragments()
 
         # only a single pair of reads are not
         # sufficient for consensus calling
         if len(fragments) == 1:
-            for aln in fragments[0].content:
-                aln.tags.append(("nr", "i", 1))
-                self.writer.write(aln)
-                self.buffer.clear()
-                return
+            self.write_alignments(fragments[0].content)
+            return
 
-        # make groups of DNA fragments which are close enough 
+        # make groups of DNA fragments which are close enough
         # on the genome for consensus calling.
-        sys.stderr.write("--{umi}--\n".format(umi=self.umi))
-
-        concnt = 0
-        for consen_frg in consensus_fragments(fragments):
-            concnt += 1
+        fragment_count = 0
+        for dna_fragment in group_dna_fragments(fragments):
+            fragment_count += 1
 
             # if only 1 fragment is in a group just write it
-            if len(consen_frg) == 1:
-                for aln in consen_frg[0].content:
-                    aln.tags.append(("nr", "i", 1))
-                    aln.tags.append(("gr", "i", concnt))
-                    self.writer.write(aln)
+            if len(dna_fragment) == 1:
+                self.write_alignments(dna_fragment[0].content)
                 continue
 
-            # otherwise do consensus calling
-            sys.stderr.write("{g} ({n}):\n".format(g=concnt, n=len(consen_frg)))
-            for frag in consen_frg:
-                sys.stderr.write("\t{frag}\n".format(frag=repr(frag)))
+            # write information on the consensus
+            sys.stderr.write("{umi} {frg}:\n".format(
+                umi=self.umi,
+                frg=fragment_count))
+            for fragment in dna_fragment:
+                sys.stderr.write(
+                    "\t{frag}\n".format(
+                        frag=repr(fragment)))
 
-            for aln in zip(*[frg.content for frg in consen_frg]):
-                if "S" in aln[0].cigar:
-                    consensus = pyngs.alignment.consensus(aln)
-            
-        # at the end empty the buffer for the next round
-        # (NOTE list clear is python 3 specific)
-        self.buffer.clear()
-
+            # get the consensusses of the first, second, etc
+            # alignments from the fragments in order.
+            alignment_sets = zip(*[frg.content for frg in dna_fragment])
+            for alignments in alignment_sets:
+                consensus = pyngs.alignment.consensus.to_alignment(
+                    pyngs.alignment.consensus.consensus(alignments))
+                sys.stderr.write("{0}\n".format(consensus))
+        
 
 if __name__ == "__main__":
 
@@ -282,7 +296,7 @@ if __name__ == "__main__":
 
         # create the consensus sequences per UMI
         consobj = CreateConsensus(instream, outstream, args.tag)
-        consobj.run()
+        consobj()
 
         # close opened files
         if not outstream.closed and outstream != sys.stdout:

@@ -4,10 +4,12 @@ from functools import total_ordering
 from itertools import groupby
 from operator import attrgetter, itemgetter
 from collections import namedtuple
+
+from .utils import decode_quality
 import pyngs.alignment
 
 
-def segmenter(alignment=None, quality_offset=32, content=None):
+def segmenter(alignment=None, quality_offset=32, content=None, default_quality=30):
     """
     Segment an alignment per base.
 
@@ -21,14 +23,14 @@ def segmenter(alignment=None, quality_offset=32, content=None):
     qpos = 0
     for nbase, cop in cigar.operations:
         seq = None
-        qual = None
+        qual = default_quality
 
         # return the bases in cigar operation separately
         for _ in range(nbase):
             # for operations on the query, calculate their quality
             if pyngs.alignment.Cigar.on_query(cop):
                 seq = alignment.sequence[qpos]
-                qual = ord(alignment.quality[qpos]) - quality_offset
+                qual = decode_quality(alignment.quality[qpos], quality_offset)
 
             yield Segment(rpos, qpos, cop, seq, qual, content=content)
 
@@ -50,6 +52,7 @@ class Segment(object):
         self.quality = quality
         self.qpos = qpos
         self.content = content
+        self.anchored = []
 
     def __eq__(self, other):
         """2 segments are equal."""
@@ -76,61 +79,12 @@ class Segment(object):
                 other.sequence)
 
     def __repr__(self):
-        return "{ref}:{op}:{qpos}:{seq}:{qual}:{content}".format(
+        return "{ref}:{op}:{qpos}:{seq}:{qual}:{content}:{anchored}".format(
             ref=self.refpos,
             op=self.operation,
             qpos=self.qpos,
             seq=self.sequence,
             qual=self.quality,
-            content=repr(self.content)
+            content=repr(self.content),
+            anchored=[repr(x) for x in self.anchored]
         )
-
-
-class Anchor(object):
-    """."""
-    def __init__(self, segments):
-        self.refpos = 
-
-def combine_segments(segments):
-    """Combine similar segments."""
-    def compare(seg):
-        return(
-            seg.refpos,
-            seg.operation,
-            seg.qpos,
-            seg.content,
-            seg.sequence,
-            seg.quality
-        )
-
-    # return object
-    alignedbase = namedtuple(
-        "alignedbase", ["refpos", "qpos", "sequence", "quality"])
-
-    # sort the segments based on comparator above
-    segments.sort(key=compare)
-    backbone = []
-    for key, grp in groupby(segments,
-                            key=attrgetter(
-                                "refpos",
-                                "operation")):
-        # skip cigar operations that we
-        # currently do not support
-        if key[1] in ("H", "P"):
-            continue
-        grp = list(grp)
-        grp.sort(key=attrgetter("content", "qpos"))
-        backbone.append((key, grp))
-
-    #
-    querypos = 0
-    for key, grp in backbone:
-
-        # process the M case
-        if key[1] in ("M"):
-            grp = list(grp)
-            grp.sort(key=attrgetter("sequence"))
-            seqs = []
-            for seq, seg in groupby(grp, key=attrgetter("sequence")):
-                seqs.append(seq, sum([x.quality for x in seg]))
-            seqs.sort(key, itemgetter(1))
