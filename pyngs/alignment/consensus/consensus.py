@@ -38,7 +38,7 @@ def consensus(alignments, quality_offset=32):
     for idx in range(len(aggregate)):
         if idx > 0 and idx < len(aggregate) - 1:
             for idb in reversed(range(len(aggregate[idx].anchored))):
-                if aggregate[idx].anchored[idb].operation == "S":
+                if aggregate[idx].anchored[idb].operation in ("S", "H", "P"):
                     del aggregate[idx].anchored[idb]
 
     # get the consensus sequence and operations
@@ -118,7 +118,7 @@ def segment_alignments(alignments, quality_offset=32):
                                  content=idx):
 
             # insertions and soft clips are added to the last entry
-            if segment.operation in ("S", "I"):
+            if segment.operation in ("S", "I", "H", "P", "N"):
                 if current:
                     current[-1].anchored.append(segment)
                 else:
