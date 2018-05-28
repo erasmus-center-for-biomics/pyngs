@@ -130,7 +130,7 @@ class CreateConsensus(object):
         self.parser = pyngs.alignment.SAMParser(instream)
         self.writer = pyngs.alignment.SAMWriter(outstream)
 
-    def __call()__(self):
+    def __call__(self):
         """Create the consensus sequences."""
         # for each alignment
         for aln in self.parser:
