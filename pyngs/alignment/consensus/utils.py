@@ -13,7 +13,7 @@ def rle(noncompressed=""):
     return retval
 
 
-def encode_quality(score, max_value=126, offset=32):
+def encode_quality(score, max_value=126, offset=33):
     """Encode a quality score."""
     val = int(score) + offset
     if val > max_value:
@@ -23,7 +23,7 @@ def encode_quality(score, max_value=126, offset=32):
     return chr(val)
 
 
-def decode_quality(char, offset=32):
+def decode_quality(char, offset=33):
     """Decode a quality character."""
     return ord(char) - offset
 
@@ -44,11 +44,12 @@ def aln_generator(cons):
     return
 
 
-def to_alignment(cons, offset=32, maxvalue=126):
+def to_alignment_info(cons, offset=32, maxvalue=126):
     """Convert the consensus to an alignment."""
     cigar = []
     sequence = []
     qualities = []
+    reads = []
     startpos = None
 
     # for each segment
@@ -64,11 +65,13 @@ def to_alignment(cons, offset=32, maxvalue=126):
         else:
             sequence.append(segment.sequence)
         qualities.append(segment.quality)
+        reads.append(segment.content)
 
     # prepare string representations
     qual = "".join([encode_quality(s, maxvalue, offset) for s in qualities])
+    reads = ";".join(["{0},{1}".format(x, y) for x, y in rle(reads)])
     seq = "".join(sequence)
     cig = "".join(["{0}{1}".format(x, y) for x, y in rle(cigar)])
 
     # return the alignment data.
-    return (startpos, cig, seq, qual, qualities)
+    return (startpos, cig, seq, qual, qualities, reads)

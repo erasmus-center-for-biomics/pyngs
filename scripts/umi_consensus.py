@@ -136,8 +136,8 @@ class CreateConsensus(object):
         for aln in self.parser:
 
             # write the header to the output SAM file
-            if self.parser.count == 1:
-                self.writer.write_header(self.parser.header)
+            if self.writer.header is None:
+                self.writer.set_header(self.parser.header)
 
             # get the UMI
             umitag = aln.get_tag(self.tag)
@@ -215,8 +215,8 @@ class CreateConsensus(object):
         # if self.umi not in (
         #   "AAAAAGCTGC", "AAAAATTACG", "AAAACAGAAC",
         #   "AAAAACGCCC", "AAAAGAACTA", "AAAAAAAACG"):
-        # if self.umi not in ("AAAAGAACTA", "AAAA"):
-        #     return
+        # if self.umi not in ("AAAAACCAAA ", "AAAA"):
+        #    return
 
         # only the forward and reverse read can be handled quickly
         if len(self.buffer) == 2:
@@ -260,7 +260,7 @@ class CreateConsensus(object):
             # alignments from the fragments in order.
             alignment_sets = zip(*[frg.content for frg in dna_fragment])
             for alignments in alignment_sets:
-                consensus = pyngs.alignment.consensus.to_alignment(
+                consensus = pyngs.alignment.consensus.to_alignment_info(
                     pyngs.alignment.consensus.consensus(alignments))
                 sys.stderr.write("{0}\n".format(consensus))
         

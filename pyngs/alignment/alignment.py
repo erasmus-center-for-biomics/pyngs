@@ -224,7 +224,7 @@ class SAMParser(object):
             line = line.rstrip()
             if not line:
                 continue
-            if line[0] == '@':
+            if line[0] == "@":
                 self.header.append(line)
                 self.parse_seq_header(line)
                 continue
@@ -249,13 +249,24 @@ class SAMWriter(object):
     def __init__(self, outstream=sys.stdout, header=None):
         """Initialize a new SAMWriter."""
         self.outstream = outstream
+        self.header = header
+        self.header_written = False
 
-    def write_header(self, header=None):
+    def set_header(self, header=None):
+        """Add the header to the object."""
+        self.header = header
+
+    def write_header(self):
         """Write the header."""
-        if header is not None:
-            for line in header:
+        if self.header is not None:
+            for line in self.header:
                 self.outstream.write("{line}\n".format(line=line))
+            self.header_written = True
 
     def write(self, aln):
         """Write a new alignment to the SAM file."""
+        # write the header if available
+        if not self.header_written and self.header is not None:
+            self.write_header()
+
         self.outstream.write("{aln}\n".format(aln=repr(aln)))

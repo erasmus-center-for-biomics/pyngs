@@ -66,7 +66,7 @@ def solve_consensus(segments):
         if len(choices) > 1:
             for cho in choices[1:]:
                 hit.quality -= cho.quality
-                hit.content -= cho.content
+                # hit.content -= cho.content
         retval.append(hit)
 
     # return the winning (modified) segments
