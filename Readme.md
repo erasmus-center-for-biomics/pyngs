@@ -18,6 +18,12 @@ errors introduced in the sample preparation or the sequencing.
 
 This tool generates consensus alignments from reads that align to the same
 locus and have the same UMI. The consensus alignments are fault tolerant and
-can merge alignments with different start positions. Alignments for molecules
-that are represented by only a single read are printed as is.
+can merge alignments with different start positions.
 
+The alignments to be merged are required to have the same flag as these properties
+cannot reliably be merged without performing a new alignment. Supplementary and
+secondary alignments are also merged, but from these the mate chromosome, position
+and tlen fields are not added.
+
+Alignments for molecules that are represented by only a single read or read-pair
+are printed as is.
