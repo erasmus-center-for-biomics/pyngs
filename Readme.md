@@ -27,3 +27,18 @@ and tlen fields are not added.
 
 Alignments for molecules that are represented by only a single read or read-pair
 are printed as is.
+
+The `umi_consensus` script can only be applied to SAM files or streams
+that are sorted on the UMI tag first and then on the alignment position. To sort
+alignments on the UMI tag (default: `um`), use the following command:
+
+```bash
+samtools sort -t um -o output.bam input.bam
+```
+
+To subsequently calculate the consensus from the UMIs using an inline BAM to
+SAM conversion, use the following command:
+
+```bash
+samtools view -h output.bam | python3 umi_consensus.py -t um --output consensus.sam
+```
