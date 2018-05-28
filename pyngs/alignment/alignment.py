@@ -119,12 +119,12 @@ class SAMAlignment(object):
             if tag[0] == code:
                 return tag
         return None
-    
+
     @classmethod
     def format_tag(cls, tag):
         """Format a tag."""
         return tag[0] + ":" + tag[1] + ":" + str(tag[2])
-    
+
     def __repr__(self):
         tags = "\t".join([self.format_tag(tag) for tag in self.tags])
         return "{name}\t{flag}\t{chromosome}\t{position}\t{mapq}\t{cigar}\t{mate_chr}\t{mate_pos}\t{tlen}\t{sequence}\t{quality}\t{tags}".format(

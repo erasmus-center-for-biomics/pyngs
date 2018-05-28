@@ -51,12 +51,13 @@ def to_alignment_info(cons, offset=32, maxvalue=126):
     qualities = []
     reads = []
     startpos = None
-
+    endpos = None
     # for each segment
     for segment in aln_generator(cons):
         # get the starting position of the alignment
         if startpos is None:
             startpos = segment.refpos
+        endpos = segment.refpos
 
         # append the list with the values per segment
         cigar.append(segment.operation)
@@ -64,7 +65,7 @@ def to_alignment_info(cons, offset=32, maxvalue=126):
             sequence.append("")
         else:
             sequence.append(segment.sequence)
-        qualities.append(segment.quality)
+        qualities.append(int(segment.quality))
         reads.append(segment.content)
 
     # prepare string representations
@@ -74,4 +75,4 @@ def to_alignment_info(cons, offset=32, maxvalue=126):
     cig = "".join(["{0}{1}".format(x, y) for x, y in rle(cigar)])
 
     # return the alignment data.
-    return (startpos, cig, seq, qual, qualities, reads)
+    return (startpos, endpos, cig, seq, qual, qualities, reads)

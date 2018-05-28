@@ -57,8 +57,8 @@ def group_dna_fragments(fragments, distance=20):
 def sort_alignments(aln):
     """Sort alignments in a fragment."""
     return (
-        not aln.is_supplementary_alignment(),
-        not aln.is_secondary_alignment(),
+        aln.is_supplementary_alignment(),
+        aln.is_secondary_alignment(),
         aln.chromosome,
         aln.position
     )
@@ -85,7 +85,6 @@ class DNAFragment(object):
                 return False
             if aln.sequence != bln.sequence:
                 return False
-        # yes
         return True
 
     def __lt__(self, other):
@@ -107,9 +106,10 @@ class DNAFragment(object):
         """Represent self as a string."""
         data = []
         for aln in self.content:
-            part = "{chrom}\t{pos}\t{sup}\t{sec}\t{name}".format(
+            part = "{chrom}\t{pos}\t{is_first}\t{sup}\t{sec}\t{name}".format(
                 chrom=aln.chromosome,
                 pos=aln.position,
+                is_first=aln.is_first_in_pair(),
                 sup=aln.is_supplementary_alignment(),
                 sec=aln.is_secondary_alignment(),
                 name=aln.name)
@@ -141,9 +141,11 @@ class CreateConsensus(object):
 
             # get the UMI
             umitag = aln.get_tag(self.tag)
+            if self.umi is None:
+                self.umi = umitag[2]
 
             # if the UMI is absent write the entry as is
-            if umitag is None:
+            if umitag is None or aln.is_unmapped():
                 self.writer.write(aln)
                 continue
 
@@ -178,10 +180,14 @@ class CreateConsensus(object):
         # return the reads per DNA fragment
         return retval
 
+    def write_alignment(self, aln):
+        """Write a single alignment to the output."""
+        self.writer.write(aln)
+
     def write_alignments(self, alignments):
         """Write alignments to the output."""
         for aln in alignments:
-            self.writer.write(aln)
+            self.write_alignment(aln)
 
     def paired_consensus(self):
         """
@@ -209,8 +215,8 @@ class CreateConsensus(object):
             return (
                 aln.name,
                 aln.is_last_in_pair(),
-                not aln.is_secondary_alignment(),
-                not aln.is_supplementary_alignment())
+                aln.is_secondary_alignment(),
+                aln.is_supplementary_alignment())
 
         # only the forward and reverse read can be handled quickly
         if len(self.buffer) == 2:
@@ -241,22 +247,58 @@ class CreateConsensus(object):
                 self.write_alignments(dna_fragment[0].content)
                 continue
 
-            # write information on the consensus
-            sys.stderr.write("{umi} {frg}:\n".format(
-                umi=self.umi,
-                frg=fragment_count))
-            for fragment in dna_fragment:
-                sys.stderr.write(
-                    "\t{frag}\n".format(
-                        frag=repr(fragment)))
-
             # get the consensusses of the first, second, etc
             # alignments from the fragments in order.
+            pairs = []
             alignment_sets = zip(*[frg.content for frg in dna_fragment])
             for alignments in alignment_sets:
+
+                # determine the consensus
                 consensus = pyngs.alignment.consensus.to_alignment_info(
                     pyngs.alignment.consensus.consensus(alignments))
-                sys.stderr.write("{0}\n".format(consensus))
+
+                # generate a consensus alignment
+                consname = "{0}:{1}".format(self.umi, fragment_count)
+                tags = [
+                    ("um", "Z", self.umi),
+                    ("rd", "i", len(list(alignments))),
+                    ("qu", "Z", ",".join([repr(q) for q in consensus[5]])),
+                    ("rp", "Z", consensus[6])]
+                consaln = pyngs.alignment.SAMAlignment(
+                    consname, alignments[0].flag,
+                    alignments[0].chromosome, consensus[0],
+                    alignments[0].mapping_quality, consensus[2],
+                    "*", 0, 0,
+                    consensus[3], consensus[4],
+                    tags)
+                pairs.append((consensus, consaln))
+
+            # correct the pair information
+            if len(pairs) >= 2:
+                if not pairs[0][1].is_unmapped() and not pairs[1][1].is_unmapped():
+                    if pairs[0][1].chromosome != pairs[1][1].chromosome:
+                        pairs[0][1].mate_chromosome = pairs[1][1].chromosome
+                        pairs[0][1].mate_position = pairs[1][1].position
+
+                        pairs[1][1].mate_chromosome = pairs[0][1].chromosome
+                        pairs[1][1].mate_position = pairs[0][1].position
+                    else:
+                        pairs[0][1].mate_chromosome = "="
+                        pairs[1][1].mate_chromosome = "="
+                        pairs[0][1].mate_position = pairs[1][1].position
+                        pairs[1][1].mate_position = pairs[0][1].position
+                        tlen = min(pairs[0][0][0], pairs[1][0][0]) - max(pairs[0][0][1], pairs[1][0][1])
+                        if pairs[0][1].position < pairs[1][1].position:
+                            pairs[0][1].tlen = tlen
+                            pairs[1][1].tlen = tlen * -1
+                        else:
+                            pairs[0][1].tlen = tlen * -1
+                            pairs[1][1].tlen = tlen
+            # write the paired consensus alignments
+            for _, aln in pairs:
+                self.write_alignment(aln)
+            
+            # sys.stderr.write("{0}\n".format(pairs))
         
 
 if __name__ == "__main__":
