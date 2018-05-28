@@ -211,12 +211,6 @@ class CreateConsensus(object):
                 aln.is_last_in_pair(),
                 not aln.is_secondary_alignment(),
                 not aln.is_supplementary_alignment())
-        #
-        # if self.umi not in (
-        #   "AAAAAGCTGC", "AAAAATTACG", "AAAACAGAAC",
-        #   "AAAAACGCCC", "AAAAGAACTA", "AAAAAAAACG"):
-        # if self.umi not in ("AAAAACCAAA ", "AAAA"):
-        #    return
 
         # only the forward and reverse read can be handled quickly
         if len(self.buffer) == 2:
@@ -303,4 +297,6 @@ if __name__ == "__main__":
             outstream.close()
         if not instream.closed and instream != sys.stdin:
             instream.close()
+
+    # run the main loop
     main()        
