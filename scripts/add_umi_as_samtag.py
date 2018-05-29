@@ -18,7 +18,7 @@ def add_umi_to_sam(instream=sys.stdin, outstream=sys.stdout, tag="um"):
         alncnt += 1
         # write header with the first alignment
         if alncnt == 1:
-            writer.write_header(parser.header)
+            writer.set_header(parser.header)
 
         # get the UMI field from the read name
         fields = aln.name.split(":")

@@ -2,15 +2,15 @@
 {
     // Python specific settings
     //
-    "python.pythonPath": "C:/Users/135001/Application/Continuum/Anaconda3_5.1.0/python.exe",    
+    "python.pythonPath": "C:/Users/rwwbr/Anaconda3/python.exe",    
     
     // linting options
     "python.linting.enabled": true,
     "python.linting.pep8Enabled": true,
     "python.linting.pydocstyleEnabled": true,    
-    "python.linting.pylintPath": "C:/Users/135001/Application/Continuum/Anaconda3_5.1.0/Scripts/pylint.exe",
-    "python.linting.pydocStylePath": "C:/Users/135001/Application/Continuum/Anaconda3_5.1.0/Scripts/pydocstyle.exe",    
-    "python.linting.pep8Path": "C:/Users/135001/Application/Continuum/Anaconda3_5.1.0/Scripts/pep8.exe",
+    "python.linting.pylintPath": "C:/Users/rwwbr/Anaconda3/Scripts/pylint.exe",
+    "python.linting.pydocStylePath": "C:/Users/rwwbr/Anaconda3/Scripts/pydocstyle.exe",    
+    "python.linting.pep8Path": "C:/Users/rwwbr/Anaconda3/Scripts/pep8.exe",
     
     // enable unit test
     "python.unitTest.unittestEnabled": false,
