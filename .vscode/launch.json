@@ -65,6 +65,33 @@
                 "WaitOnNormalExit",
                 "RedirectOutput"
             ]
+        },
+        {
+            "name": "Assign",
+            "type": "python",
+            "pythonPath":"${config:python.pythonPath}",
+            "request": "launch",
+            "stopOnEntry": true,
+            "externalConsole":false,
+            "args": [
+                "--file", "data/test_R1.fastq", "data/test_R2.fastq",
+                "--read", "0",
+                "--start", "0", 
+                "--end", "12",
+                "--prefix", "data/demux/",
+                "--suffix", "_R1.fastq", "_R2.fastq",
+                "--remove", "True"
+                ],
+            "program": "${workspaceRoot}/scripts/demultiplex.py",
+            "cwd": "${workspaceRoot}",
+            "env": {
+                "PYTHONPATH": "${workspaceRoot}"
+            },
+            "debugOptions": [
+                "WaitOnAbnormalExit",
+                "WaitOnNormalExit",
+                "RedirectOutput"
+            ]
         }
     ]    
 }
