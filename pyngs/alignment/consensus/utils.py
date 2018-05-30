@@ -63,7 +63,6 @@ def to_alignment_info(cons, offset=32, maxvalue=126):
         cigar.append(segment.operation)
         if segment.sequence is not None:
             sequence.append(segment.sequence)
-        if segment.operation != "D":
             qualities.append(int(segment.quality))
         reads.append(segment.content)
 
