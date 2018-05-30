@@ -297,9 +297,11 @@ class CreateConsensus(object):
             # write the paired consensus alignments
             for _, aln in pairs:
                 self.write_alignment(aln)
-            
-            # sys.stderr.write("{0}\n".format(pairs))
-        
+    
+    @classmethod    
+    def set_pairs(cls, data):
+        """."""
+        pass
 
 if __name__ == "__main__":
 

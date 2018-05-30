@@ -61,11 +61,10 @@ def to_alignment_info(cons, offset=32, maxvalue=126):
 
         # append the list with the values per segment
         cigar.append(segment.operation)
-        if segment.sequence is None:
-            sequence.append("")
-        else:
+        if segment.sequence is not None:
             sequence.append(segment.sequence)
-        qualities.append(int(segment.quality))
+        if segment.operation != "D":
+            qualities.append(int(segment.quality))
         reads.append(segment.content)
 
     # prepare string representations
