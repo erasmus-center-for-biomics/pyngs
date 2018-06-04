@@ -135,7 +135,6 @@ class SAMAlignment(object):
         # if other read maps to a different chromosome
         if self.chromosome != other.chromosome:
             chrom = other.chromosome
-            position = 0
             tlen = 0
         else:
             # get in the insert size
