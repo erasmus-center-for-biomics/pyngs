@@ -120,6 +120,47 @@ class SAMAlignment(object):
                 return tag
         return None
 
+    def set_mate(self, other):
+        """Set the mate of the current alignment."""
+        # set the position
+        chrom = "="
+        position = other.position
+        tlen = 0
+
+        # if the other read is unmapped
+        if other.is_unmapped():
+            chrom = "*"
+            position = 0
+            tlen = 0
+        # if other read maps to a different chromosome
+        if self.chromosome != other.chromosome:
+            chrom = other.chromosome
+            position = 0
+            tlen = 0
+        else:
+            # get in the insert size
+            if other.position > self.position:
+                lastpos = 0
+                for cig in other.cigar_regions():
+                    lastpos = cig.end
+                tlen = lastpos - self.position
+            else:
+                lastpos = 0
+                for cig in self.cigar_regions():
+                    lastpos = cig.end
+                tlen = lastpos - other.position
+
+            # correct the tlen
+            if self.position > other.position:
+                tlen *= -1
+            elif self.position == other.position and self.is_last_in_pair():
+                tlen *= -1
+
+        # set the mate pair chromosome, position and tlen fields
+        self.mate_chromosome = chrom
+        self.mate_position = position
+        self.tlen = tlen
+
     @classmethod
     def format_tag(cls, tag):
         """Format a tag."""

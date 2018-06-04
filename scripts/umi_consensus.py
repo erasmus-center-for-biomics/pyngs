@@ -271,37 +271,23 @@ class CreateConsensus(object):
                     "*", 0, 0,
                     consensus[3], consensus[4],
                     tags)
-                pairs.append((consensus, consaln))
+                pairs.append(consaln)
 
             # correct the pair information
             if len(pairs) >= 2:
-                if not pairs[0][1].is_unmapped() and not pairs[1][1].is_unmapped():
-                    if pairs[0][1].chromosome != pairs[1][1].chromosome:
-                        pairs[0][1].mate_chromosome = pairs[1][1].chromosome
-                        pairs[0][1].mate_position = pairs[1][1].position
+                pairs[0].set_mate(pairs[1])
+                pairs[1].set_mate(pairs[0])
 
-                        pairs[1][1].mate_chromosome = pairs[0][1].chromosome
-                        pairs[1][1].mate_position = pairs[0][1].position
-                    else:
-                        pairs[0][1].mate_chromosome = "="
-                        pairs[1][1].mate_chromosome = "="
-                        pairs[0][1].mate_position = pairs[1][1].position
-                        pairs[1][1].mate_position = pairs[0][1].position
-                        tlen = min(pairs[0][0][0], pairs[1][0][0]) - max(pairs[0][0][1], pairs[1][0][1])
-                        if pairs[0][1].position < pairs[1][1].position:
-                            pairs[0][1].tlen = tlen
-                            pairs[1][1].tlen = tlen * -1
-                        else:
-                            pairs[0][1].tlen = tlen * -1
-                            pairs[1][1].tlen = tlen
+                # mate any supplementary alignments to the primary
+                for idx in range(2, len(pairs), 2):
+                    pairs[idx].set_mate(pairs[0])
+                for idx in range(3, len(pairs), 2):
+                    pairs[idx].set_mate(pairs[1])
+
             # write the paired consensus alignments
-            for _, aln in pairs:
+            for aln in pairs:
                 self.write_alignment(aln)
-    
-    @classmethod    
-    def set_pairs(cls, data):
-        """."""
-        pass
+
 
 if __name__ == "__main__":
 
