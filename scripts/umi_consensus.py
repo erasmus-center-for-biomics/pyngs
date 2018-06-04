@@ -259,11 +259,13 @@ class CreateConsensus(object):
 
                 # generate a consensus alignment
                 consname = "{0}:{1}".format(self.umi, fragment_count)
+                rgtag = alignments[0].get_tag("RG")
                 tags = [
                     ("um", "Z", self.umi),
                     ("rd", "i", len(list(alignments))),
                     ("qu", "Z", ",".join([repr(q) for q in consensus[5]])),
-                    ("rp", "Z", consensus[6])]
+                    ("rp", "Z", consensus[6]),
+                    rgtag]
                 consaln = pyngs.alignment.SAMAlignment(
                     consname, alignments[0].flag,
                     alignments[0].chromosome, consensus[0],
