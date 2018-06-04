@@ -44,7 +44,7 @@ def aln_generator(cons):
     return
 
 
-def to_alignment_info(cons, offset=32, maxvalue=126):
+def to_alignment_info(cons, offset=33, maxvalue=126):
     """Convert the consensus to an alignment."""
     cigar = []
     sequence = []
