@@ -33,7 +33,7 @@ def aln_generator(cons):
     for segment in cons:
         # if the anchored segments are earlier in the sequence than the
         # segment itself, report these first
-        if segment.anchored and segment.anchored[0].qpos < segment.qpos:
+        if segment.anchored and segment.anchored[0].qpos <= segment.qpos:
             for aseg in segment.anchored:
                 yield aseg
             yield segment
