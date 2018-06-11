@@ -36,9 +36,8 @@ def cigar_operations_to_bed(samstream=sys.stdin,
     for aln in samfile:
 
         # parse the samples from the header
-        if samfile.count == 1:
+        if samfile.records == 1:
             samples = samfile.sample_map()
-            print(samples)
 
         # get the strand
         strand = "-" if aln.is_reverse() else "+"

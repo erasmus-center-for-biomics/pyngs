@@ -198,6 +198,7 @@ class SAMParser(object):
         self.allow_append = allow_append
         self.handle = handle
         self.count = 0
+        self.records = 0
 
     def sample_map(self):
         """Get the sample map."""
@@ -268,6 +269,7 @@ class SAMParser(object):
                 self.header.append(line)
                 self.parse_seq_header(line)
                 continue
+            self.records += 1
             return self.from_string(line)
         raise StopIteration
 
