@@ -140,8 +140,7 @@ if __name__ == "__main__":
 
         if args.output != "stdout":
             bedout = open(args.output, "w")
-        print(args.tags)
-        print(args.operations)
+
         # run the main program loop
         cigar_operations_to_bed(
             samin, bedout,
