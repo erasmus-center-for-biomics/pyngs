@@ -126,7 +126,8 @@ if __name__ == "__main__":
             "-t", "--tag", dest="tags",
             type=str, nargs="*",
             help="""The BAM tags to add to the comment column in the
-                    BED entries.""")
+                    BED entries. Use the keyword sample to add the 
+                    sample as a comment.""")
         args = parser.parse_args()
 
         # check that we will report CIGAR operations
