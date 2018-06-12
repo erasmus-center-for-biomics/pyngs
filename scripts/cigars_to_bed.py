@@ -43,11 +43,11 @@ def cigar_operations_to_bed(samstream=sys.stdin,
         strand = "-" if aln.is_reverse() else "+"
 
         # prepare the name from the taglist
-        tagslist = ["" for _ in tags_to_add]
+        tagslist = ["{0}=".format(l) for l in tags_to_add]
         if len(tags_to_add) > 0:
             for tag in aln.tags:
                 if tag[0] == "RG":
-                    aln.tags.append(("sample", ":", samples[tag[2]]))
+                    aln.tags.append(("sample", "Z", samples[tag[2]]))
                 try:
                     idx = tags_to_add.index(tag[0])
                     tagslist[idx] = "{label}={val}".format(
