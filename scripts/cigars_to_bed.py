@@ -142,8 +142,8 @@ if __name__ == "__main__":
         # run the main program loop
         cigar_operations_to_bed(
             samin, bedout,
-            tags_to_add=list(args.tags),
-            cigar_operations=list(args.operations))
+            tags_to_add=args.tags,
+            cigar_operations=args.operations)
 
         # close the in and output files
         if not bedout.closed and bedout != sys.stdout:
