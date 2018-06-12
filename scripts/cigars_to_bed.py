@@ -47,15 +47,16 @@ def cigar_operations_to_bed(samstream=sys.stdin,
         if len(tags_to_add) > 0:
             for tag in aln.tags:
                 if tag[0] == "RG":
-                    aln.tags.append(("__sample__", ":", samples[tag[2]]))
+                    aln.tags.append(("sample", ":", samples[tag[2]]))
                 try:
                     idx = tags_to_add.index(tag[0])
-                    tagslist[idx] = tag[2]
+                    tagslist[idx] = "{label}={val}".format(
+                        label=tags_to_add[idx], val=tag[2])
                 except ValueError:
                     pass
 
         # record data from the tags in the BED file name
-        name = ';'.join(tagslist)
+        name = ':'.join(tagslist)
 
         # get the cigar intervals and map these to the alignments
         for ival_cigar in aln.cigar_regions():
@@ -119,11 +120,11 @@ if __name__ == "__main__":
             help="The path to the output BED file.")
         parser.add_argument(
             "-c", "--cigar-operation", dest="operations",
-            type=str, nargs="+", default=[],
+            type=str, nargs="+",
             help="The CIGAR operations to convert to BED entries.")
         parser.add_argument(
             "-t", "--tag", dest="tags",
-            type=str, nargs="*", default=[],
+            type=str, nargs="*",
             help="""The BAM tags to add to the comment column in the
                     BED entries.""")
         args = parser.parse_args()
