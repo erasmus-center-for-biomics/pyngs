@@ -62,7 +62,7 @@ def cigar_operations_to_bed(samstream=sys.stdin,
         for ival_cigar in aln.cigar_regions():
             if ival_cigar.data in cigar_operations:
                 cigarcount += 1
-                outstream.write("%s\t%d\t%d\t%s;%s;%s\t%d\t%s\n" % (
+                outstream.write("%s\t%d\t%d\t%s:COP=%s:%s\t%d\t%s\n" % (
                     ival_cigar.chromosome,
                     ival_cigar.start,
                     ival_cigar.end,
