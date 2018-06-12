@@ -103,13 +103,13 @@
             "args": [
                 "--input", "data/intersect.txt",
                 "--output", "data/quant.txt",
-                "--strand", "any",
+                "--direction", "any",
                 "--partition", "sample", "bx",
                 "--type", "exon", "gene",
                 "--check-interval", "1000", 
                 "--grace", "10000000"
                 ],
-            "program": "${workspaceRoot}/scripts/quantify_transcript.py",
+            "program": "${workspaceRoot}/scripts/quantify_transcripts.py",
             "cwd": "${workspaceRoot}",
             "env": {
                 "PYTHONPATH": "${workspaceRoot}"

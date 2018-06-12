@@ -5,17 +5,17 @@ import sys
 
 def bed5(fields):
     """Parse the BED5 portion of the fields."""
-    return fields[:5], fields[5:]
+    return fields[:6], fields[6:]
 
 
 def bed3(fields):
     """Parse the BED3 portion of the fields."""
-    return fields[:2], fields[2:]
+    return fields[:3], fields[3:]
 
 
 def gtf(fields):
     """Parse the BED3 portion of the fields."""
-    return fields[:8], fields[8:]
+    return fields[:9], fields[9:]
 
 
 class Parser(object):
