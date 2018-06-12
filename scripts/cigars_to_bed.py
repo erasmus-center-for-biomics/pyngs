@@ -119,11 +119,11 @@ if __name__ == "__main__":
             help="The path to the output BED file.")
         parser.add_argument(
             "-c", "--cigar-operation", dest="operations",
-            type=str, nargs="+",
+            type=str, nargs="+", default=[],
             help="The CIGAR operations to convert to BED entries.")
         parser.add_argument(
             "-t", "--tag", dest="tags",
-            type=str, nargs="*",
+            type=str, nargs="*", default=[],
             help="""The BAM tags to add to the comment column in the
                     BED entries.""")
         args = parser.parse_args()
