@@ -113,7 +113,7 @@ def count_per_target(hin=sys.stdin, hout=sys.stdout,
 
             # otherwise count the read only if the strand is the same
             target_buffer[target].append(read[3])
-            
+
             # update the last encountered exon for the gene
             lasttarget[target] = target
         else:
