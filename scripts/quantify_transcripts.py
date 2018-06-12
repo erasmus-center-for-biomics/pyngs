@@ -2,8 +2,8 @@
 
 import sys
 import argparse
-import operator
 import itertools
+import logging
 import pyngs.intersect
 
 
@@ -133,21 +133,27 @@ class Quantify(object):
             if not self.strand_check(bedentry[5], gtfentry[6]):
                 continue
 
-            # increase the numbers records
-            self.records += 1
-
+            
             # process the buffer every n entries
             if self.records % self.ncheck == 0:
-                curpos = int(gtfentry[4])
+                curpos = int(gtfentry[3])
                 data = []
+                nitem = 0
                 for item in self.buffer:
                     if curpos - item[0] > self.grace:
                         data.append(item)
                         self.buffer.remove(item)
+                        nitem += 1
+                logging.info(
+                    "Processing %d input records (%d records in buffer; %d total; interval check)",
+                    nitem, len(self.buffer), self.records)
                 self.__process__(data)
 
             # clear the buffer on chromosome changes
             if bedentry[0] != prevchr:
+                logging.info(
+                    "Processing %d input records (%d total; chromosome change)",
+                    len(self.buffer), self.records)
                 self.__process__(self.buffer)
                 self.buffer.clear()
 
@@ -164,9 +170,14 @@ class Quantify(object):
 
             # add the current entry to the buffer
             self.buffer.append((pos, egtf, ebed))
+
+            # increase the numbers records
+            self.records += 1
             prevchr = bedentry[0]
 
+
         # process the rest of the buffer
+        logging.info("Processing %d input records (%d total; final)", len(self.buffer), self.records)
         self.__process__(self.buffer)
 
     def __process__(self, data):
@@ -176,6 +187,7 @@ class Quantify(object):
             return (item[1], item[2][0])
 
         # sort the data per entry
+        nrecords = 0
         data.sort(key=sorter)
         for key, values in itertools.groupby(data, key=sorter):
             tocnt = [b[2][1] for b in values]
@@ -186,11 +198,20 @@ class Quantify(object):
 
             if self.result is not None:
                 self.result(key, scores)
+            nrecords += 1
+        logging.info("%d Output records sent to output", nrecords)
 
 
 if __name__ == "__main__":
 
     def main():
+        # setup the logger
+        logginglevel = logging.DEBUG
+        logging.basicConfig(
+            level=logginglevel,
+            format="[%(asctime)s %(name)s %(process)d %(levelname)-6s]: %(message)s",
+            stream=sys.stderr)
+
         """Run the main program loop."""
         # prepare the argument parser
         parser = argparse.ArgumentParser(
@@ -238,6 +259,8 @@ if __name__ == "__main__":
 
         # parse the arguments
         args = parser.parse_args()
+        logging.info("Reading from %s", args.input)
+        logging.info("Writing to %s", args.output)
 
         # set the input and output streams
         instream = sys.stdin
@@ -272,6 +295,8 @@ if __name__ == "__main__":
             resultwriter=writer)
         quant.run()
 
+        logging.info("Finished quantification")
+        
         # close the streams
         if instream is not sys.stdin and not instream.closed:
             instream.close()
