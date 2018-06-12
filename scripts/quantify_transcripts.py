@@ -177,10 +177,12 @@ class Quantify(object):
             self.records += 1
             prevchr = bedentry[0]
 
-
         # process the rest of the buffer
-        logging.info("Processing %d input records (%d total; final)", len(self.buffer), self.records)
+        logging.info(
+            "Processing %d input records (%d total; final)",
+            len(self.buffer), self.records)
         self.__process__(self.buffer)
+        self.buffer.clear()
 
     def __process__(self, data):
         """Process the buffer."""
