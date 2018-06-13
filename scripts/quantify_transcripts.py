@@ -133,23 +133,23 @@ class Quantify(object):
             if not self.strand_check(bedentry[5], gtfentry[6]):
                 continue
 
-            # process the buffer every n entries
-            if self.records % self.ncheck == 0:
-                curpos = int(bedentry[1])
-                data = []
-                keep = []
-                nitem = 0
-                for item in self.buffer:
-                    if curpos - item[0] > self.grace:
-                        data.append(item)
-                        nitem += 1
-                    else:
-                        keep.append(item)
-                logging.info(
-                    "Processing %d input records (%d records in buffer; %d total; interval check)",
-                    nitem, len(keep), self.records)
-                self.__process__(data)
-                self.buffer = keep
+            # # process the buffer every n entries
+            # if self.records % self.ncheck == 0:
+            #     curpos = int(bedentry[1])
+            #     data = []
+            #     keep = []
+            #     nitem = 0
+            #     for item in self.buffer:
+            #         if curpos - item[0] > self.grace:
+            #             data.append(item)
+            #             nitem += 1
+            #         else:
+            #             keep.append(item)
+            #     logging.info(
+            #         "Processing %d input records (%d records in buffer; %d total; interval check)",
+            #         nitem, len(keep), self.records)
+            #     self.__process__(data)
+            #     self.buffer = keep
 
             # clear the buffer on chromosome changes
             if bedentry[0] != prevchr:
