@@ -141,10 +141,15 @@ if __name__ == "__main__":
         if args.output != "stdout":
             bedout = open(args.output, "w")
 
+        # no tags added
+        tags = []
+        if args.tags is None:
+            tags = args.tags
+
         # run the main program loop
         cigar_operations_to_bed(
             samin, bedout,
-            tags_to_add=args.tags,
+            tags_to_add=tags,
             cigar_operations=args.operations)
 
         # close the in and output files
