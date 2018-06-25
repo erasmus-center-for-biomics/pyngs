@@ -67,6 +67,7 @@ def merge_paired_bed_entries(istream=sys.stdin, ostream=sys.stdout):
 
     # foreach entry in the bed file
     for entry in iterator:
+        print(entry)
         sfields = entry[3][1].split(";")
         pid = sfields[0]
 
