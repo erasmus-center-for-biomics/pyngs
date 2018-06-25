@@ -143,7 +143,7 @@ if __name__ == "__main__":
 
         # no tags added
         tags = []
-        if args.tags is None:
+        if args.tags is not None:
             tags = args.tags
         print(tags)
 
