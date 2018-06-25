@@ -42,8 +42,8 @@ def get_regions(data=None):
     starts = []
     ends = []
     for elem in data:
-        starts.append(elem[1])
-        ends.append(elem[2])
+        starts.append(elem[1][1])
+        ends.append(elem[2][1])
     return data[0][0], min(starts), max(ends), data[0][5]
     
 
