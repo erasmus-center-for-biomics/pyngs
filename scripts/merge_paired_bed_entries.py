@@ -103,7 +103,7 @@ if __name__ == "__main__":
             type=str, nargs="?", default="stdin",
             help="The input BED file for which the entries will be merged.")
         parser.add_argument(
-            "-o", "--output", dest="input",
+            "-o", "--output", dest="output",
             type=str, nargs="?", default="stdout",
             help="The output BED file with the merged entries.")
         args = parser.parse_args()
