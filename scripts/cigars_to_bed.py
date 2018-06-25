@@ -145,6 +145,7 @@ if __name__ == "__main__":
         tags = []
         if args.tags is None:
             tags = args.tags
+        print(tags)
 
         # run the main program loop
         cigar_operations_to_bed(
