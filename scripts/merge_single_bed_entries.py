@@ -9,8 +9,8 @@ __version__ = "1.0"
 
 def bed_iterator(handle=sys.stdin):
     """Get the next BED entry."""
-    header = ["chromosome", "start", "end",
-              "comment", "score", "strand"]
+    # header = ["chromosome", "start", "end",
+    #           "comment", "score", "strand"]
     for line in handle:
         line = line.rstrip()
         fields = line.split("\t")
@@ -22,7 +22,7 @@ def bed_iterator(handle=sys.stdin):
             pass
 
         # return the zipped data
-        yield zip(header, fields)
+        yield fields
 
 
 def process_entries(output=sys.stdout, pid=None, data=None):
@@ -42,10 +42,9 @@ def get_regions(data=None):
     starts = []
     ends = []
     for elem in data:
-        starts.append(elem[1][1])
-        ends.append(elem[2][1])
+        starts.append(elem[1])
+        ends.append(elem[2])
     return data[0][0], min(starts), max(ends), data[0][5]
-    
 
 
 def merge_paired_bed_entries(istream=sys.stdin, ostream=sys.stdout):
@@ -58,7 +57,7 @@ def merge_paired_bed_entries(istream=sys.stdin, ostream=sys.stdout):
 
     # foreach entry in the bed file
     for entry in iterator:
-        sfields = entry[3][1].split(";")
+        sfields = entry[3].split(";")
         pid = sfields[0]
 
         # process the entry
