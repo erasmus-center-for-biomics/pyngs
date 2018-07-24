@@ -41,9 +41,9 @@ if __name__ == "__main__":
             data[0].write("@{0}\n{1}\n+\n{2}\n".format(tokens[0], tokens[1], tokens[2]))
             data[1].write("@{0}\n{1}\n+\n{2}\n".format(tokens[3], tokens[4], tokens[5]))
         
-        for data in handles.items():
-            data[0].close()
-            data[1].close()
+        for key, value in handles.items():
+            value[0].close()
+            value[1].close()
 
     # run the program
     main()
