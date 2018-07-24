@@ -55,7 +55,7 @@ if __name__ == "__main__":
         parser.add_argument(
             "-o", "--output", dest="out",
             type=str, nargs="?", default="stdout",
-            help="The output FastQ file.")
+            help="The output SAM file.")
         parser.add_argument(
             "-t", "--tag", dest="tag",
             type=str, nargs="?", default="um",

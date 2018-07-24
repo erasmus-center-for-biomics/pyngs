@@ -267,7 +267,7 @@ class CreateConsensus(object):
                 rgtag = alignments[0].get_tag("RG")
                 if rgtag is not None:
                     tags.append(rgtag)
-                    
+
                 consaln = pyngs.alignment.SAMAlignment(
                     consname, alignments[0].flag,
                     alignments[0].chromosome, consensus[0],
