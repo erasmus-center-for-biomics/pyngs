@@ -11,16 +11,16 @@ if __name__ == "__main__":
             prog=sys.argv[0],
             description="""A script to demultiplex PE demux files.""")
         parser.add_argument(
-            "-i", "--input", dest="int",
+            "-i", "--input", dest="input",
             type=str, nargs="?", default="stdin",
             help="The input table.")
         parser.add_argument(
             "-p", "--prefix", dest="prefix",
-            type=str,
+            type=str, default="prefix_",
             help="The prefix of the output files.")
         # parse the command line parameters
         args = parser.parse_args()
-
+        prefix = args.prefix
         # open the in and output streams for regular and compressed files
         instream = open(args.input, "r") if args.input != "stdin" else sys.stdin
 
@@ -44,6 +44,6 @@ if __name__ == "__main__":
         for data in handles.items():
             data[0].close()
             data[1].close()
-            
+
     # run the program
     main()
