@@ -67,6 +67,32 @@
             ]
         },
         {
+            "name": "Filter consensus",
+            "type": "python",
+            "pythonPath":"${config:python.pythonPath}",
+            "request": "launch",
+            "stopOnEntry": true,
+            "externalConsole":false,
+            "args": [
+                "--sam", "data/I18-1196-01.consensus.sam",
+                "--tag", "rd",
+                "--type", "greater",
+                "--value", "2",
+                "--discard-absent", "true",
+                "--output", "data/I18-1196-01.consensus.flt.sam"
+                ],
+            "program": "${workspaceRoot}/scripts/filters/sam_tag.py",
+            "cwd": "${workspaceRoot}",
+            "env": {
+                "PYTHONPATH": "${workspaceRoot}"
+            },
+            "debugOptions": [
+                "WaitOnAbnormalExit",
+                "WaitOnNormalExit",
+                "RedirectOutput"
+            ]
+        },
+        {
             "name": "Assign",
             "type": "python",
             "pythonPath":"${config:python.pythonPath}",
