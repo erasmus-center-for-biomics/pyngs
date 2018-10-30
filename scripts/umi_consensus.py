@@ -122,9 +122,10 @@ class DNAFragment(object):
 class CreateConsensus(object):
     """An object to create consensus alignments."""
 
-    def __init__(self, instream=sys.stdin, outstream=sys.stdout, tag="um"):
+    def __init__(self, instream=sys.stdin, outstream=sys.stdout, tag="um", distance=20):
         """Initialize the consensus caller."""
         self.tag = tag
+        self.distance = distance
         self.buffer = []
         self.umi = None
         self.parser = pyngs.alignment.SAMParser(instream)
@@ -239,7 +240,7 @@ class CreateConsensus(object):
         # make groups of DNA fragments which are close enough
         # on the genome for consensus calling.
         fragment_count = 0
-        for dna_fragment in group_dna_fragments(fragments):
+        for dna_fragment in group_dna_fragments(fragments, distance=self.distance):
             fragment_count += 1
 
             # if only 1 fragment is in a group just write it
@@ -313,6 +314,10 @@ if __name__ == "__main__":
             type=str, nargs="?", default="um",
             help="The tag-name for the UMI tag.")
         parser.add_argument(
+            "-d", "--distance", dest="distance",
+            type=int, nargs="?", default=20,
+            help="The allowed distance between the start postion of alignments with the same UMI.")
+        parser.add_argument(
             "-o", "--output", dest="out",
             type=str, nargs="?", default="stdout",
             help="The output SAM file with the consensus sequences.")
@@ -323,7 +328,7 @@ if __name__ == "__main__":
         outstream = open(args.out, "w") if args.out != "stdout" else sys.stdout
 
         # create the consensus sequences per UMI
-        consobj = CreateConsensus(instream, outstream, args.tag)
+        consobj = CreateConsensus(instream, outstream, args.tag, args.distance)
         consobj()
 
         # close opened files
