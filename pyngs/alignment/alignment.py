@@ -132,11 +132,16 @@ class SAMAlignment(object):
             chrom = "*"
             position = 0
             tlen = 0
-        # if other read maps to a different chromosome
-        if self.chromosome != other.chromosome:
+        elif self.is_unmapped:
             chrom = other.chromosome
+            position = other.position
             tlen = 0
-        else:
+            
+        # if other read maps to a different chromosome
+        elif self.chromosome != other.chromosome:
+            chrom = other.chromosome
+            tlen = 0        
+        else:            
             # get in the insert size
             if other.position > self.position:
                 lastpos = 0

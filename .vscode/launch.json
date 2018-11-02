@@ -67,6 +67,54 @@
             ]
         },
         {
+            "name": "Consensus_2",
+            "type": "python",
+            "pythonPath":"${config:python.pythonPath}",
+            "request": "launch",
+            "stopOnEntry": true,
+            "externalConsole":false,
+            "args": [
+                "--sam", "data/test_grouping.sam",
+                "--tag", "um",
+                "--distance", "100",
+                "--output", "data/test_grouping_b.sam"
+                ],
+            "program": "${workspaceRoot}/scripts/consensus.py",
+            "cwd": "${workspaceRoot}",
+            "env": {
+                "PYTHONPATH": "${workspaceRoot}"
+            },
+            "debugOptions": [
+                "WaitOnAbnormalExit",
+                "WaitOnNormalExit",
+                "RedirectOutput"
+            ]
+        },
+        {
+            "name": "Consensus_3",
+            "type": "python",
+            "pythonPath":"${config:python.pythonPath}",
+            "request": "launch",
+            "stopOnEntry": true,
+            "externalConsole":false,
+            "args": [
+                "--sam", "data/I18-1196-01.tag.sam",
+                "--tag", "um",
+                "--distance", "100",
+                "--output", "data/I18-1196-01.tag.cns.sam"
+                ],
+            "program": "${workspaceRoot}/scripts/consensus.py",
+            "cwd": "${workspaceRoot}",
+            "env": {
+                "PYTHONPATH": "${workspaceRoot}"
+            },
+            "debugOptions": [
+                "WaitOnAbnormalExit",
+                "WaitOnNormalExit",
+                "RedirectOutput"
+            ]
+        },
+        {
             "name": "Filter consensus",
             "type": "python",
             "pythonPath":"${config:python.pythonPath}",
