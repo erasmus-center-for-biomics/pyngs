@@ -100,14 +100,19 @@ def to_list(seq: str) -> (list):
     return retval
 
 
-def match(sequence: str, recognition: list) -> (bool):
+def match(sequence: str, recognition: list, from_begin: bool=True) -> (bool):
     """Match the sequence with a recognition sequence."""
     if len(recognition) > len(sequence):
         return False
-    for idx, bases in enumerate(recognition):
-        if bases:
-            if not sequence[idx] in bases:
-                return False
+    if from_begin:
+        for idx, bases in enumerate(recognition):
+            if bases:
+                if not sequence[idx] in bases:
+                    return False
+    else:
+        offset = len(sequence) - len(recognition)
+        for idx, bases in enumerate(recognition):
+            if bases:                
+                if not sequence[offset + idx] in bases:
+                    return False
     return True
-
-
