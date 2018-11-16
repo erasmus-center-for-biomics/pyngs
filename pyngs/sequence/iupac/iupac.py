@@ -102,6 +102,8 @@ def to_list(seq: str) -> (list):
 
 def match(sequence: str, recognition: list) -> (bool):
     """Match the sequence with a recognition sequence."""
+    if len(recognition) > len(sequence):
+        return False
     for idx, bases in enumerate(recognition):
         if bases:
             if not sequence[idx] in bases:
