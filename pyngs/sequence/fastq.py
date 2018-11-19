@@ -8,21 +8,37 @@ import sys
 class FastQ(object):
     """A class to iterate over FastQ file streams."""
 
-    def __init__(self, instream=sys.stdin):
+    def __init__(self, instream=sys.stdin, clean_readname=False):
         """Initialize the FastQ reader."""
         self.instream = instream
         self.total_reads = 0
+        self.clean_readname = clean_readname
 
     def __iter__(self: object):
         """Mark this class as an iterator."""
         return self
 
+    def readname(self, name: str="") -> (str):
+        """Process the readname."""
+        retval = name[1:]
+        if self.clean_readname:
+            # remove everything before the first space
+            retval = retval.split(" ")[0]
+        return retval
+
     def __next__(self: object) -> (tuple):
         """Get the next entry."""
-        name = next(self.instream).rstrip()[1:]
+        # get the readname
+        name = self.readname(next(self.instream).rstrip())
+
+        # get the sequence
         sequence = next(self.instream).rstrip()
         next(self.instream)
+
+        # get the quality string
         quality = next(self.instream).rstrip()
+
+        # increment the total reads
         self.total_reads += 1
         return name, sequence, quality
 
