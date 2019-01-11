@@ -1,2 +1,13 @@
+# the cached python files
 *__pycache__*
-data/*
+
+# intermediate files for building and distribution
+build/*
+dist/*
+*.egg-info*
+
+# the code editor specific files
+.vscode/*
+
+# test data
+test_data/*
