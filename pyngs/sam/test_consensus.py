@@ -5,6 +5,7 @@ import pyngs.sam.consensus as consensus
 
 
 class ConsensusTest(unittest.TestCase):
+    """A test for the Consensus method."""
 
     def setUp(self):
         self.alignments = [
@@ -22,6 +23,7 @@ class ConsensusTest(unittest.TestCase):
                 "IIIIIIIIII????", sep=" ")]
 
     def test_consensus(self):
+        """Test the consensus alignments."""
         consobj = consensus.Consensus()
         consobj(self.alignments)
 
