@@ -8,6 +8,7 @@ class ConsensusTest(unittest.TestCase):
     """A test for the Consensus method."""
 
     def setUp(self):
+        """Prepare alignments for the test."""
         self.alignments = [
             sam.from_string(
                 "A 0 1 1003 60 3S3M1I6M1D4M * 0 0 NNNAACTAAAAAATAAA " +

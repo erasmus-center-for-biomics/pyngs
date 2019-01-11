@@ -1,8 +1,7 @@
-
-
 def forward_match(seq: str, recog: list) -> (bool):
     """
     Match the sequence with a recognition sequence.
+
     :param seq: the sequence to search in
     :param recogn: a list with bases that should be
                    matched subsequently
@@ -20,6 +19,7 @@ def forward_match(seq: str, recog: list) -> (bool):
 def reverse_match(seq: str, recog: list) -> (bool):
     """
     Match the sequence with a recognition sequence in reverse.
+
     :param seq: the sequence to search in
     :param recogn: a list with bases that should be
                    matched subsequently
@@ -38,6 +38,7 @@ def reverse_match(seq: str, recog: list) -> (bool):
 def match(seq: str, recog: list, from_begin: bool=True) -> (bool):
     """
     Match the sequence with a recognition sequence.
+
     :param seq: the sequence to search in
     :param recog: a list with bases that should be
                         matched subsequently
@@ -55,6 +56,7 @@ def match(seq: str, recog: list, from_begin: bool=True) -> (bool):
 def sites(sequence: str, recog: list):
     """
     Find the occurences of a recognition sequence in a larger sequence.
+
     :param seq: the sequence to search in
     :param recog: a list with bases that should be matched subsequently
     :yield: the start of the recognized sequence
