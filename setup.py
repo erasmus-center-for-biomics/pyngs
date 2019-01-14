@@ -1,6 +1,6 @@
 import setuptools
 
-with open("README.md", "rt") as stream:
+with open("Readme.md", "rt") as stream:
     long_description = stream.read()
 
 # prepare the setup
