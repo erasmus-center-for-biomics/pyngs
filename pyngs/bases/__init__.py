@@ -5,6 +5,7 @@ import typing
 def fasta(instream: typing.TextIO, toupper: bool=True, fullnames: bool=False):
     """
     Get the name, sequence pairs from a FastA formatted file.
+
     :param instream: the input file stream
     :param toupper: convert the sequence to uppercase
     :param fullnames: keep the full names

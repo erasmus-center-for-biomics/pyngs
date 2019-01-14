@@ -2,12 +2,8 @@
 
 ## Description
 
-PyNGS is a package to work with NGS data formats. It contains multiple 
+PyNGS is a package to work with NGS data formats. It contains multiple
 submodules for the various formats, such as sam, vcf, bed and bases.
-
-
-### Scripts
-
 
 ## Installation instructions
 
