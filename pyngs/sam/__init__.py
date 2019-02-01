@@ -368,6 +368,7 @@ def from_string(line: str, sep: str="\t"):
 
 class Reader:
     """Parse a SAM file."""
+
     def __init__(self, stream: typing.TextIO):
         self.header = []
         self.stream = stream
@@ -407,7 +408,8 @@ class Reader:
 
 
 class Writer:
-    """."""
+    """Write a SAM file."""
+
     def __init__(self, stream, header):
         """Initialize the SAM writer."""
         self.stream = stream
@@ -423,3 +425,8 @@ class Writer:
     def write(self, aln):
         """Write a new alignment to the SAM file."""
         self.stream.write("{aln}\n".format(aln=repr(aln)))
+
+
+def quality_to_score(qchar, offset=32):
+    """Convert the quality to a score."""
+    return ord(qchar) - offset
