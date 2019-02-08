@@ -1,7 +1,4 @@
-"""
-Classes and functions to read, write and otherwise
-process alignments in SAM format
-"""
+"""Read, write and otherwise process alignments in SAM format."""
 import typing
 import re
 from .cigar import CIGAR_OPERATIONS, \
@@ -51,6 +48,7 @@ class Alignment:
     def is_set(self, mask):
         """
         Check whether the bits in the mask are set in the flag.
+
         :param mask: the bits to check
         :return: True if the bits are set, False if not
         """
@@ -59,6 +57,7 @@ class Alignment:
     def set_bits(self, mask):
         """
         Set the bit in the mask.
+
         :param mask: the bits to set
         """
         self.flag |= mask
@@ -66,6 +65,7 @@ class Alignment:
     def clear_bits(self, mask):
         """
         Clear the bit in the mask.
+
         :param mask: the bits to clear
         """
         self.flag &= ~mask
@@ -206,6 +206,7 @@ class Alignment:
     def mate(self) -> (tuple):
         """
         Get the mate chromosome and postion.
+
         :return: the chromosome, position of the mate.
         """
         rchrom = self.mate_chromosome
@@ -217,6 +218,7 @@ class Alignment:
     def mate(self, other):
         """
         Set the mate of the current alignment.
+
         :param other: the alignment to set as the mate
         """
         # set the position
@@ -265,6 +267,7 @@ class Alignment:
     def cigar_regions(self):
         """
         Interpret the cigar regions as separate regions.
+
         :yield: a tuple with the chromosome, start, end and operation
         """
         delta = 0
@@ -283,6 +286,7 @@ class Alignment:
     def get_tag(self, code: str="XX") -> (tuple):
         """
         Get a tag with a specific code.
+
         :param code: the 2 letter code of the tag
         :return: the tag with the specified code
         """
@@ -307,6 +311,7 @@ class Alignment:
     def __repr__(self) -> (str):
         """
         Print the alignment in SAM format.
+
         :return: A SAM formatted string
         """
         tags = "\t".join([self.format_tag(tag) for tag in self.tags])
@@ -331,6 +336,7 @@ class Alignment:
 def next_tag(tags: list) -> (list):
     """
     Get the next tag.
+
     :param tags: a list of strings representing tags
     :yield: the next tag
     """
@@ -343,6 +349,7 @@ def next_tag(tags: list) -> (list):
 def from_tokens(tokens: list):
     """
     Parse a SAM alignment from a list of tokens.
+
     :param tokens: a list with tokens
     :param sep: the field separator
     :return: a SAM alignment
@@ -359,6 +366,7 @@ def from_tokens(tokens: list):
 def from_string(line: str, sep: str="\t"):
     """
     Parse a SAM alignment from a string.
+
     :param line: the line to parse
     :param sep: the field separator
     :return: a SAM alignment
@@ -370,6 +378,7 @@ class Reader:
     """Parse a SAM file."""
 
     def __init__(self, stream: typing.TextIO):
+        """Initialize a new SAM reader."""
         self.header = []
         self.stream = stream
         self.lastline = None
@@ -398,6 +407,7 @@ class Reader:
         return set(self.readgroups().values())
 
     def __iter__(self):
+        """Treat this object as a generator."""
         if self.lastline:
             yield from_string(self.lastline)
             self.lastline = ""

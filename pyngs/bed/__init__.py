@@ -1,3 +1,5 @@
+"""A package to work with BED files."""
+
 import typing
 from .parsers import parse_gff
 from .parsers import parse_bed3, parse_bed4, parse_bed5
@@ -15,8 +17,8 @@ NFIELDS = {
 
 
 def reader(instream: typing.TextIO, ftype: str="bed3", sep: str="\t"):
-    """
-    Parse the lines from a bed file.
+    """Parse the lines from a bed file.
+
     :param instream: the input stream
     :param format: the format of the input file.
                    The choices here are bed3, bed5, bedpe,
@@ -63,8 +65,8 @@ def reader(instream: typing.TextIO, ftype: str="bed3", sep: str="\t"):
 def intersect_reader(instream: typing.TextIO, sep: str="\t",
                      parser_a: typing.Callable=None, fields_a: int=0,
                      parser_b: typing.Callable=None, fields_b: int=0):
-    """
-    Parse the output from bedtools intersect.
+    """Parse the output from bedtools intersect.
+
     :param instream: the input stream
     :param sep: the token separator
     :param parser_a: the token parser for the first part
@@ -107,6 +109,7 @@ def intersect_reader(instream: typing.TextIO, sep: str="\t",
 def width(region):
     """
     Get the width of a region.
+
     :param region: a tuple representing the region
                    with chromosome, start, end
                    as the first 3 columns
@@ -118,6 +121,7 @@ def width(region):
 def has_overlap(frst, scnd):
     """
     Do 2 regions have overlap.
+
     :param frst: a tuple representing the first region
                  with chromosome, start, end as the first
                  3 columns
@@ -137,7 +141,8 @@ def has_overlap(frst, scnd):
 
 def bases_overlap(frst, scnd):
     """
-    Get the number of overlapping bases
+    Get the number of overlapping bases.
+
     :param frst: a tuple representing the first region
                  with chromosome, start, end as the first
                  3 columns
@@ -158,6 +163,7 @@ def bases_overlap(frst, scnd):
 def is_contained_in(frst, scnd):
     """
     Is the first region contained in the second.
+
     :param frst: a tuple representing the first region
                  with chromosome, start, end as the first
                  3 columns
