@@ -7,18 +7,12 @@
             "pythonPath":"${config:python.pythonPath}",
             "request": "launch",
             "stopOnEntry": true,
-            "externalConsole":false,
             "args": [],
             "program": "${workspaceRoot}/tests/__init__.py",
             "cwd": "${workspaceRoot}",
             "env": {
                 "PYTHONPATH": "${workspaceRoot}"
-            },
-            "debugOptions": [
-                "WaitOnAbnormalExit",
-                "WaitOnNormalExit",
-                "RedirectOutput"
-            ]
+            }
         }
     ]
 }

@@ -2,8 +2,9 @@
 Methods to generate consensus alignments from
 multiple other alignments.
 """
-import operator
 import collections
+from operator import itemgetter
+
 from . import quality_to_score
 from .cigar import operations, CigarOperation
 from .cigar import CIGAR_OPERATIONS_ON_QUERY
@@ -108,13 +109,31 @@ def consensus_sorter(obj: tuple):
         obj[0].query[1])
 
 
+def merge_non_reference(entries: list):
+    """Merge non reference entries."""
+    def group(entries: list):
+        """Group non reference entries."""
+        cidx = None
+        operations = []
+        for (cigop, aidx) in entries:
+            if aidx != cidx:
+                if len(operations):
+                    yield operations
+                cidx = aidx
+                operations = []
+            operations.append(cigop, aidx)
+
+        if len(operations):
+            yield operations
+
+
 def create_consensus_operation(entries: list, qual_offset=32):
-    """Create a consensus operation from cigar-operations (and alignment ids)."""
+    """Create a consensus operation from cigar-operations."""
     quality = 0
     for cigop, _ in entries:
-        if len(cigop.quality):
-            quality += quality_to_score(
-                cigop.quality, qual_offset)
+        if not len(cigop.quality):
+            continue
+        quality += quality_to_score(cigop.quality, qual_offset)
 
     base = entries[0][0]
     return ConsensusObject(
@@ -135,6 +154,8 @@ def consensus_operations(operations):
             return True
         return False
 
+    def
+
     entries = []
     for (cigop, aidx) in operations:
         if entries and emit(entries[0][0], cigop):
@@ -142,6 +163,7 @@ def consensus_operations(operations):
             if not entries[0][0].code in CIGAR_OPERATIONS_ON_REFERENCE:
                 # TODO resort the retvals to the alignments, merge
                 # operations per code and move it of to consensus_operation
+                merge_cigar_operations(entries)
                 pass
             else:
                 yield create_consensus_operation(entries)
