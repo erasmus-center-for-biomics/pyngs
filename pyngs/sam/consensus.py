@@ -12,15 +12,15 @@ from .cigar import CIGAR_OPERATIONS_ON_REFERENCE
 
 
 SplitOp = collections.namedtuple(
-    "SplitOp", 
+    "SplitOp",
     ["code", "length", "reference", "sequence", "quality"])
 
 
 def split_operations(alignment):
     """."""
-    
+
     for cigarop in operations(alignment):
-        
+
         # return non reference operations as is
         if cigarop.code not in CIGAR_OPERATIONS_ON_REFERENCE:
             yield SplitOp(
@@ -36,7 +36,7 @@ def split_operations(alignment):
                 qual = ""
                 if cigarop.code in CIGAR_OPERATIONS_ON_QUERY:
                     seq = cigarop.sequence[offset],
-                    qual = cigarop.quality[offset] 
+                    qual = cigarop.quality[offset]
                 yield SplitOp(
                     code=cigarop.code,
                     length=1,
@@ -91,7 +91,7 @@ def by_position(batches):
         if sets:
             if sets[0][0].reference != batch[0].reference:
                 yield sets
-                sets = [] 
+                sets = []
         sets.append(batch)
 
     if sets:
@@ -116,27 +116,27 @@ class Consensus:
             for cigarop in split_operations(alignment):
                 parts.append(cigarop)
         parts.sort(key=splitobs_sort)
-        
+
         # determine the preliminary consensus
         preliminary = []
         for batches in by_position(same_operation(parts)):
-            # get the performance of the possible entries per 
-            # position in the consensus 
+            # get the performance of the possible entries per
+            # position in the consensus
             to_choose = []
             for batch in batches:
                 meas = self.performance(batch)
                 to_choose.append((meas, batch[0]))
-            
+
             # append the top hit to the preliminary consensus
             to_choose.sort(key=performance_sort, reverse=True)
             preliminary.append(to_choose[0])
 
-        # TODO remove insertions with fewer than half the reads 
+        # remove insertions with fewer than half the reads
         # of the surrounding bases, internal soft-clipped and
         # hard-clipped bases.
         cleaned = []
         for idx, (meas, splitop) in enumerate(preliminary):
-            
+
             # decide to keep or skip insertions
             if splitop.code in "I":
                 if idx > 0 and meas[0] < preliminary[idx-1][0][0] / 2:
@@ -149,9 +149,9 @@ class Consensus:
                 if idx > 0 and idx < len(preliminary) - 1:
                     continue
             cleaned.append((meas, splitop))
-        
+
         # add N CIGAR operations for bases covered by the alignment
-        # but absent in the reference. 
+        # but absent in the reference.
         consensus = []
         for idx, (meas, consop) in enumerate(cleaned):
 
@@ -162,7 +162,7 @@ class Consensus:
                 # insert an N stretch if the previous operation
                 # does not end at the current operations
                 if prevop.reference[2] != consop.reference[1]:
-                    size = consop.reference[1] - prevop.reference[2] 
+                    size = consop.reference[1] - prevop.reference[2]
                     insert = SplitOp(
                         code="N", length=size,
                         reference=[
@@ -173,12 +173,11 @@ class Consensus:
                     consensus.append((0, 0.0), insert)
             consensus.append((meas, consop))
 
-        # return the consensus operation
+        # return the consensus operations
+        # TODO add a method to convert these operations
+        # to a SAM alignment
         return consensus
-     
 
-
-    
     def qual_to_score(self, qual):
         vals = [ord(q) - self.quality_offset for q in qual]
         return sum(vals) / len(qual)
