@@ -2,17 +2,13 @@
     "version": "1.0",
     "configurations": [
         {
-            "name": "Run tests",
+            "name": "Run consensus test",
             "type": "python",
-            "pythonPath":"${config:python.pythonPath}",
             "request": "launch",
             "stopOnEntry": true,
-            "args": [],
-            "program": "${workspaceRoot}/tests/__init__.py",
+            "program": "${workspaceRoot}/pyngs/sam/test_consensus.py",
             "cwd": "${workspaceRoot}",
-            "env": {
-                "PYTHONPATH": "${workspaceRoot}"
-            }
+            "console": "integratedTerminal"
         }
     ]
 }

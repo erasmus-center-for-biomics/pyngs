@@ -11,164 +11,95 @@ from .cigar import CIGAR_OPERATIONS_ON_QUERY
 from .cigar import CIGAR_OPERATIONS_ON_REFERENCE
 
 
-# define a consensus object
-ConsensusObject = collections.namedtuple("ConsensusObject", [
-    "code", "length", "reference",
-    "sequence", "quality", "alignments"])
+SplitOp = collections.namedtuple(
+    "SplitOp", 
+    ["code", "length", "reference", "sequence", "quality"])
 
 
-def split_operations(alignment: list):
-    """
-    Get annotation CIGAR operations per increment.
-
-    :param alignment: an alignment to process
-    :yield: a CIGAR operation of length 1 for
-            operations on the reference and the query.
-
-    Note: in the case of the query only operations
-          the query end position has been replaced
-          with the relative coordinate to the next
-          reference position. So:
-
-          I  I  I  I  M
-          0  1  2  3
-
-          This should make the consensus calling easier
-    """
-    def dual(cigop):
-        """Increment reference and query."""
-        delta = cigop.reference[2] - cigop.reference[1]
-        for offset in range(delta):
-            yield CigarOperation(
-                code=cigop.code,
-                length=1,
-                reference=(
-                    cigop.reference[0],
-                    cigop.reference[1] + offset,
-                    cigop.reference[1] + offset + 1),
-                query=(
-                    cigop.query[0],
-                    cigop.query[0], + offset + 1),
-                sequence=cigop.sequence[offset],
-                quality=cigop.quality[offset])
-
-    def query(cigop):
-        """Increment the query."""
-        delta = cigop.query[1] - cigop.query[0]
-        for offset in range(delta):
-            # the end position of the query has
-            # been repurposed to the relative
-            # offset in the cigar.
-            yield CigarOperation(
-                code=cigop.code,
-                length=1,
-                reference=cigop.reference,
-                query=(
-                    cigop.query[0] + offset,
-                    offset),
-                sequence=cigop.sequence[offset],
-                quality=cigop.quality[offset])
-
-    def reference(cigop):
-        """Increment the reference."""
-        delta = cigop.reference[2] - cigop.reference[1]
-        for offset in range(delta):
-            yield CigarOperation(
-                code=cigop.code,
-                length=1,
-                reference=(
-                    cigop.reference[0],
-                    cigop.reference[1] + offset,
-                    cigop.reference[1] + offset + 1),
-                query=cigop.query,
-                sequence=cigop.sequence,
-                quality=cigop.quality)
-
+def split_operations(alignment):
+    """."""
+    
     for cigarop in operations(alignment):
-        if cigarop.code in CIGAR_OPERATIONS_ON_REFERENCE and \
-                cigarop.code in CIGAR_OPERATIONS_ON_QUERY:
-            for cop in dual(cigarop):
-                yield cop
-        elif cigarop.code in CIGAR_OPERATIONS_ON_REFERENCE:
-            for cop in reference(cigarop):
-                yield cop
-        elif cigarop.code in CIGAR_OPERATIONS_ON_QUERY:
-            for cop in query(cigarop):
-                yield cop
+        
+        # return non reference operations as is
+        if cigarop.code not in CIGAR_OPERATIONS_ON_REFERENCE:
+            yield SplitOp(
+                code=cigarop.code,
+                length=cigarop.length,
+                reference=cigarop.reference,
+                sequence=cigarop.sequence,
+                quality=cigarop.quality)
         else:
-            yield cigarop
+            # split reference operations per base
+            for offset in range(0, cigarop.length):
+                seq = ""
+                qual = ""
+                if cigarop.code in CIGAR_OPERATIONS_ON_QUERY:
+                    seq = cigarop.sequence[offset],
+                    qual = cigarop.quality[offset] 
+                yield SplitOp(
+                    code=cigarop.code,
+                    length=1,
+                    reference=[
+                        cigarop.reference[0],
+                        cigarop.reference[1] + offset,
+                        cigarop.reference[1] + offset + 1],
+                    sequence=seq,
+                    quality=qual)
 
 
-def consensus_sorter(obj: tuple):
+def splitobs_sort(obj):
     """Sort cigar operations for the consensus creation."""
     return (
-        obj[0].reference[1],
-        obj[0].code,
-        obj[0].sequence,
-        obj[1],
-        obj[0].query[1])
+        obj.reference[1],
+        obj.reference[2],
+        obj.code,
+        obj.length,
+        obj.sequence)
 
 
-def merge_non_reference(entries: list):
-    """Merge non reference entries."""
-    def group(entries: list):
-        """Group non reference entries."""
-        cidx = None
-        operations = []
-        for (cigop, aidx) in entries:
-            if aidx != cidx:
-                if len(operations):
-                    yield operations
-                cidx = aidx
-                operations = []
-            operations.append(cigop, aidx)
-
-        if len(operations):
-            yield operations
+def differs(splitop_a, splitop_b):
+    """Check whether 2 consensus alignments differ."""
+    if splitop_a.reference != splitop_b.reference:
+        return True
+    if splitop_a.code != splitop_b.code:
+        return True
+    if splitop_a.length != splitop_b.length:
+        return True
+    if splitop_a.sequence != splitop_b.sequence:
+        return True
+    return False
 
 
-def create_consensus_operation(entries: list, qual_offset=32):
-    """Create a consensus operation from cigar-operations."""
-    quality = 0
-    for cigop, _ in entries:
-        if not len(cigop.quality):
-            continue
-        quality += quality_to_score(cigop.quality, qual_offset)
-
-    base = entries[0][0]
-    return ConsensusObject(
-        code=base.code, length=base.length,
-        reference=base.reference,
-        sequence=base.sequence, quality=quality, alignments=len(entries))
+def same_operation(splitops):
+    """Batch the same operations in the consensus alignment."""
+    batch = []
+    for splitop in splitops:
+        if batch:
+            if differs(batch[0], splitop):
+                yield batch
+                batch = []
+        batch.append(splitop)
+    if batch:
+        yield batch
 
 
-def consensus_operations(operations):
-    """Group consensus operations per reference position."""
-    def emit(ref, qry):
-        """Determine whether the return buffer should be emitted."""
-        if ref.reference[1] != qry.reference[1]:
-            return True
-        if ref.code != qry.code:
-            return True
-        if ref.sequence != qry.sequence:
-            return True
-        return False
+def by_position(batches):
+    """Group the consensus alignments by position."""
+    sets = []
+    for batch in batches:
+        if sets:
+            if sets[0][0].reference != batch[0].reference:
+                yield sets
+                sets = [] 
+        sets.append(batch)
 
-    def
+    if sets:
+        yield sets
 
-    entries = []
-    for (cigop, aidx) in operations:
-        if entries and emit(entries[0][0], cigop):
-            # special case for the query only operations
-            if not entries[0][0].code in CIGAR_OPERATIONS_ON_REFERENCE:
-                # TODO resort the retvals to the alignments, merge
-                # operations per code and move it of to consensus_operation
-                merge_cigar_operations(entries)
-                pass
-            else:
-                yield create_consensus_operation(entries)
-            entries = []
-        entries.append((cigop, aidx))
+
+def performance_sort(obj):
+    return (obj[0][0], obj[0][1])
 
 
 class Consensus:
@@ -181,10 +112,80 @@ class Consensus:
     def __call__(self, alignments: list):
         """Generate a new consensus alignment."""
         parts = []
-        for idx, alignment in enumerate(alignments):
+        for alignment in alignments:
             for cigarop in split_operations(alignment):
-                parts.append((cigarop, idx))
-        parts.sort(key=consensus_sorter)
+                parts.append(cigarop)
+        parts.sort(key=splitobs_sort)
+        
+        # determine the preliminary consensus
+        preliminary = []
+        for batches in by_position(same_operation(parts)):
+            # get the performance of the possible entries per 
+            # position in the consensus 
+            to_choose = []
+            for batch in batches:
+                meas = self.performance(batch)
+                to_choose.append((meas, batch[0]))
+            
+            # append the top hit to the preliminary consensus
+            to_choose.sort(key=performance_sort, reverse=True)
+            preliminary.append(to_choose[0])
 
-        for idx, conop in enumerate(consensus_operations(parts)):
-            print(idx, conop)
+        # TODO remove insertions with fewer than half the reads 
+        # of the surrounding bases, internal soft-clipped and
+        # hard-clipped bases.
+        cleaned = []
+        for idx, (meas, splitop) in enumerate(preliminary):
+            
+            # decide to keep or skip insertions
+            if splitop.code in "I":
+                if idx > 0 and meas[0] < preliminary[idx-1][0][0] / 2:
+                    continue
+                if idx < len(preliminary) - 1 and meas[0] < preliminary[idx+1][0][0] / 2:
+                    continue
+
+            # remove internal clipped bases
+            if splitop.code in "SH":
+                if idx > 0 and idx < len(preliminary) - 1:
+                    continue
+            cleaned.append((meas, splitop))
+        
+        # add N CIGAR operations for bases covered by the alignment
+        # but absent in the reference. 
+        consensus = []
+        for idx, (meas, consop) in enumerate(cleaned):
+
+            # only check after the first
+            if idx > 0:
+                prevop = cleaned[idx-1][1]
+
+                # insert an N stretch if the previous operation
+                # does not end at the current operations
+                if prevop.reference[2] != consop.reference[1]:
+                    size = consop.reference[1] - prevop.reference[2] 
+                    insert = SplitOp(
+                        code="N", length=size,
+                        reference=[
+                            consop.reference[0],
+                            prevop.reference[2],
+                            consop.reference[1]],
+                        sequence="", quality="")
+                    consensus.append((0, 0.0), insert)
+            consensus.append((meas, consop))
+
+        # return the consensus operation
+        return consensus
+     
+
+
+    
+    def qual_to_score(self, qual):
+        vals = [ord(q) - self.quality_offset for q in qual]
+        return sum(vals) / len(qual)
+
+    def performance(self, batch):
+        """."""
+        quals = 0
+        if batch[0].code in CIGAR_OPERATIONS_ON_QUERY:
+            quals = sum([self.qual_to_score(b.quality) for b in batch])
+        return len(batch), quals
