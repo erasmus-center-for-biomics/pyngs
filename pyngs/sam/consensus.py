@@ -99,6 +99,8 @@ def by_position(batches):
         yield sets
 
 
+# TODO add a method to convert these operations
+# to a SAM alignment
 class Consensus:
     """A class to generate consensus alignments."""
 
@@ -172,8 +174,6 @@ class Consensus:
             consensus.append((meas, consop))
 
         # return the consensus operations
-        # TODO add a method to convert these operations
-        # to a SAM alignment
         return consensus
 
     def performance(self, batch):
@@ -191,4 +191,6 @@ class Consensus:
                     quals[idx] += quality_to_score(
                         sop.quality[idx],
                         self.quality_offset)
+        # return a tuple with the quality
+        # and performance of the batch
         return len(batch), quals
