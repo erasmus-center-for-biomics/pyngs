@@ -17,8 +17,9 @@ SplitOp = collections.namedtuple(
 
 
 def split_operations(alignment):
-    """."""
+    """Split operations from an alignment."""
 
+    # for each operation
     for cigarop in operations(alignment):
 
         # return non reference operations as is
@@ -26,7 +27,7 @@ def split_operations(alignment):
             yield SplitOp(
                 code=cigarop.code,
                 length=cigarop.length,
-                reference=cigarop.reference,
+                reference=list(cigarop.reference),
                 sequence=cigarop.sequence,
                 quality=cigarop.quality)
         else:
@@ -35,7 +36,7 @@ def split_operations(alignment):
                 seq = ""
                 qual = ""
                 if cigarop.code in CIGAR_OPERATIONS_ON_QUERY:
-                    seq = cigarop.sequence[offset],
+                    seq = cigarop.sequence[offset]
                     qual = cigarop.quality[offset]
                 yield SplitOp(
                     code=cigarop.code,
@@ -98,18 +99,14 @@ def by_position(batches):
         yield sets
 
 
-def performance_sort(obj):
-    return (obj[0][0], obj[0][1])
-
-
 class Consensus:
     """A class to generate consensus alignments."""
 
-    def __init__(self, quality_offset: int=32, default_qual: int=30):
+    def __init__(self, quality_offset: int=32):
+        """Initialize a new Consensus object."""
         self.quality_offset = quality_offset
-        self.default_qual = default_qual
 
-    def __call__(self, alignments: list):
+    def operations(self, alignments: list):
         """Generate a new consensus alignment."""
         parts = []
         for alignment in alignments:
@@ -120,6 +117,7 @@ class Consensus:
         # determine the preliminary consensus
         preliminary = []
         for batches in by_position(same_operation(parts)):
+
             # get the performance of the possible entries per
             # position in the consensus
             to_choose = []
@@ -128,7 +126,7 @@ class Consensus:
                 to_choose.append((meas, batch[0]))
 
             # append the top hit to the preliminary consensus
-            to_choose.sort(key=performance_sort, reverse=True)
+            to_choose.sort(key=itemgetter(0), reverse=True)
             preliminary.append(to_choose[0])
 
         # remove insertions with fewer than half the reads
@@ -178,13 +176,19 @@ class Consensus:
         # to a SAM alignment
         return consensus
 
-    def qual_to_score(self, qual):
-        vals = [ord(q) - self.quality_offset for q in qual]
-        return sum(vals) / len(qual)
-
     def performance(self, batch):
-        """."""
-        quals = 0
+        """Determine the performance."""
+        quals = [0.0] * len(batch[0].quality)
+
+        # if we have a sequence
         if batch[0].code in CIGAR_OPERATIONS_ON_QUERY:
-            quals = sum([self.qual_to_score(b.quality) for b in batch])
+
+            # for each base in the query sequence
+            for idx in range(len(batch[0].quality)):
+
+                # for each split operation
+                for sop in batch:
+                    quals[idx] += quality_to_score(
+                        sop.quality[idx],
+                        self.quality_offset)
         return len(batch), quals

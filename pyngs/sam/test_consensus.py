@@ -26,8 +26,9 @@ class ConsensusTest(unittest.TestCase):
     def test_consensus(self):
         """Test the consensus alignments."""
         consobj = consensus.Consensus()
-        cns = consobj(self.alignments)
-        print(cns)
+        consop = consobj.operations(self.alignments)
+        # for idx, cns in enumerate(consobj):
+        #     print(idx, cns)
 
 if __name__ == "__main__":
     unittest.main()
