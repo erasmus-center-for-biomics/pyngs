@@ -27,7 +27,7 @@ class ConsensusTest(unittest.TestCase):
         """Test the consensus alignments."""
         consobj = consensus.Consensus()
         consop = consobj.operations(self.alignments)
-        for idx, cns in enumerate(consobj):
+        for idx, cns in enumerate(consop):
             print(idx, cns)
 
 if __name__ == "__main__":
