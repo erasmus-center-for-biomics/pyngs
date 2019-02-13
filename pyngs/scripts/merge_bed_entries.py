@@ -1,10 +1,3 @@
-"""A script to merge BED entries that represent the same DNA fragment.
-
-This script should be used together with
-cigar_to_bed.py.
-"""
-
-import argparse
 import gzip
 import sys
 from operator import attrgetter
@@ -97,33 +90,12 @@ def merge_paired_bed(instream, outstream, tag="READNAME"):
                     merged.starnd))
 
 
-def main():
-    """Parse the commandline parameters and run to_bed."""
-    parser = argparse.ArgumentParser(
-        prog=sys.argv[0],
-        description="""
-        A script to merge BED entries that
-        represent the same DNA fragment.
+def merge_bed_entries(args):
+    """
+    Merge BED entries that represent the same DNA fragment.
 
-        This script should be used together with
-        cigar_to_bed.py.
-        """
-    )
-    parser.add_argument(
-        "-i", "--input", dest="input",
-        type=str, nargs="?", default="stdin",
-        help="""The BED file with the entries to process.""")
-    parser.add_argument(
-        "-o", "--ouput", dest="ouput",
-        type=str, nargs="?", default="stdout",
-        help="The path to the BED with the merged entries.")
-    parser.add_argument(
-        "-t", "--tag", dest="tag",
-        type=str, nargs="?", default="READNAME",
-        help="The tag on which to merge the entries.")
-    args = parser.parse_args()
-
-    # open the in and output files
+    This function is meant to be used together with cigar-to-bed.
+    """
     instream = sys.stdin
     if args.sam != "stdin":
         if args.sam.endswith(".gz"):
@@ -146,9 +118,3 @@ def main():
         instream.close()
     if outstream != sys.stdout:
         outstream.close()
-
-
-if __name__ == "__main__":
-
-    # run the main program entry point
-    main()

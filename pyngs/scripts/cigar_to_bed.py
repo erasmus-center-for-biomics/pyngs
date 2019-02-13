@@ -1,6 +1,3 @@
-#!/bin/env python
-
-import argparse
 import gzip
 import sys
 
@@ -55,47 +52,8 @@ def to_bed(instream, outstream, operations, tags):
                     strand=strand))
 
 
-def main():
-    """Parse the commandline parameters and run to_bed."""
-    parser = argparse.ArgumentParser(
-        prog=sys.argv[0],
-        description="""
-        A script to generate BED entries for bases
-        covered by the specified CIGAR operation in a SAM
-        file.
-
-        Each BED entry will be annotated with the
-        read-name and CIGAR operation type in the COMMENT
-        column of the BED file. This script is particularly
-        useful for determining the bases covered by ATAC and
-        RNA-seq data.
-
-        Currently only SAM format is supported, but BAM files
-        can be piped in via samtools view.
-        """
-    )
-    parser.add_argument(
-        "-s", "--sam", dest="sam",
-        type=str, nargs="?", default="stdin",
-        help="""The SAM file of which the CIGAR entries will
-                be converted to BED entries.""")
-    parser.add_argument(
-        "-b", "--bed", dest="bed",
-        type=str, nargs="?", default="stdout",
-        help="The path to the output BED file.")
-    parser.add_argument(
-        "-c", "--cigar-operations", dest="operations",
-        type=str, nargs="+",
-        help="The CIGAR operations to convert to BED entries.")
-    parser.add_argument(
-        "-t", "--tags", dest="tags",
-        type=str, nargs="*",
-        help="""The BAM tags to add to the comment column in the
-                BED entries. Use the keyword sample to add the
-                sample as a comment.""")
-    args = parser.parse_args()
-
-    # open the in and output files
+def cigar_to_bed(args):
+    """Convert CIGAR entries to a BED file."""
     instream = sys.stdin
     if args.sam != "stdin":
         if args.sam.endswith(".gz"):
@@ -118,9 +76,3 @@ def main():
         instream.close()
     if outstream != sys.stdout:
         outstream.close()
-
-
-if __name__ == "__main__":
-
-    # run the main program entry point
-    main()
