@@ -2,6 +2,20 @@
     "version": "1.0",
     "configurations": [
         {
+            "name": "Run consensus tool",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceRoot}/bin/pyngs_tools",
+            "args": [
+                "umi-consensus", "--help"
+            ],
+            "cwd": "${workspaceRoot}",
+            "console": "integratedTerminal",
+            "env": {
+                "PYTHONPATH":"${workspaceRoot}"
+            }
+        },
+        {
             "name": "Run consensus test",
             "type": "python",
             "request": "launch",

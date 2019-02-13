@@ -38,7 +38,7 @@ def main():
         help="""The BAM tags to add to the comment column in the
                 BED entries. Use the keyword __sample__ to add the
                 sample as a comment.""")
-    parser_ctob.set_default(func=pyngs.scripts.cigar_to_bed)
+    parser_ctob.set_defaults(func=pyngs.scripts.cigar_to_bed)
 
     #
     # merge bed entries
@@ -60,7 +60,7 @@ def main():
         "-t", "--tag", dest="tag",
         type=str, nargs="?", default="READNAME",
         help="The tag on which to merge the entries.")
-    parser_mbe.set_default(func=pyngs.scripts.merge_bed_entries)
+    parser_mbe.set_defaults(func=pyngs.scripts.merge_bed_entries)
 
     #
     # consensus
@@ -87,7 +87,13 @@ def main():
         "-o", "--output", dest="out",
         type=str, nargs="?", default="stdout",
         help="The output SAM file with the consensus sequences.")
-    parser_con.set_default(func=pyngs.scripts.run_consensus)
+    parser_con.set_defaults(func=pyngs.scripts.run_consensus)
+
+    # parse the argument and call the script
+    args = parser.parse_args()
+    print(args)
+    args.func(args)
+
 
 if __name__ == "__main__":
 
