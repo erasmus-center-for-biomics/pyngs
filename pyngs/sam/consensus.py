@@ -101,8 +101,6 @@ def by_position(batches):
         yield sets
 
 
-# TODO add a method to convert these operations
-# to a SAM alignment
 class Consensus:
     """A class to generate consensus alignments."""
 
