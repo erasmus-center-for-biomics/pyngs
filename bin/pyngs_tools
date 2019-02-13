@@ -1,6 +1,6 @@
-import argparse
-import sys
+"""A set of tools for working with NGS data in Python."""
 
+import argparse
 import pyngs.scripts
 
 
