@@ -440,3 +440,24 @@ class Writer:
 def quality_to_score(qchar, offset=32):
     """Convert the quality to a score."""
     return ord(qchar) - offset
+
+
+def score_to_quality(qval, offset=32, maxval=126):
+    """Convert a score to quality value."""
+    cval = int(qval) + offset
+    if cval > maxval:
+        cval = maxval
+    return chr(cval)
+
+
+def encode_rle(lst):
+    """Run length encode a list."""
+    cur = []
+    for val in lst:
+        if cur:
+            if cur[0] != val:
+                yield len(cur), cur[0]
+                cur = []
+        cur.append(val)
+    if cur:
+        yield len(cur), cur[0]

@@ -5,7 +5,9 @@ multiple other alignments.
 import collections
 from operator import itemgetter
 
-from . import quality_to_score
+from . import quality_to_score, score_to_quality
+from . import encode_rle
+from . import Alignment
 from .cigar import operations, CigarOperation
 from .cigar import CIGAR_OPERATIONS_ON_QUERY
 from .cigar import CIGAR_OPERATIONS_ON_REFERENCE
@@ -104,9 +106,29 @@ def by_position(batches):
 class Consensus:
     """A class to generate consensus alignments."""
 
-    def __init__(self, quality_offset: int=32):
+    def __init__(self, quality_offset: int=32, quality_maxvalue=126):
         """Initialize a new Consensus object."""
         self.quality_offset = quality_offset
+        self.quality_maxvalue = quality_maxvalue
+
+    def performance(self, batch):
+        """Determine the performance."""
+        quals = [0.0] * len(batch[0].quality)
+
+        # if we have a sequence
+        if batch[0].code in CIGAR_OPERATIONS_ON_QUERY:
+
+            # for each base in the query sequence
+            for idx in range(len(batch[0].quality)):
+
+                # for each split operation
+                for sop in batch:
+                    quals[idx] += quality_to_score(
+                        sop.quality[idx],
+                        self.quality_offset)
+        # return a tuple with the quality
+        # and performance of the batch
+        return len(batch), quals
 
     def operations(self, alignments: list):
         """Generate a new consensus alignment."""
@@ -176,21 +198,51 @@ class Consensus:
         # return the consensus operations
         return consensus
 
-    def performance(self, batch):
-        """Determine the performance."""
-        quals = [0.0] * len(batch[0].quality)
+    def to_sam(self, consensus):
+        """Convert a list of consensus operations to a SAM alignment."""
+        #
+        sequence = []
+        quality_scores = []
+        cigarops = []
+        nalntag = []
+        for perf, cons in consensus:
+            cigarops.extend(cons.code * cons.length)
+            sequence.append(cons.sequence)
+            quality_scores.extend(perf[1])
+            nalntag.append(perf[0])
 
-        # if we have a sequence
-        if batch[0].code in CIGAR_OPERATIONS_ON_QUERY:
+        #
+        quality_strings = []
+        quality = []
+        for score in quality_scores:
+            quality_strings.append("{:.{prec}f}".format(score, prec=1))
+            quality.append(
+                score_to_quality(
+                    score, self.quality_offset, self.quality_maxvalue))
 
-            # for each base in the query sequence
-            for idx in range(len(batch[0].quality)):
+        # get the tags
+        tags = [
+            ("za", "Z", ",".join([str(v) for v in nalntag])),
+            ("zq", "Z", ",".join(quality_strings))]
 
-                # for each split operation
-                for sop in batch:
-                    quals[idx] += quality_to_score(
-                        sop.quality[idx],
-                        self.quality_offset)
-        # return a tuple with the quality
-        # and performance of the batch
-        return len(batch), quals
+        # get the sequence
+        seq = "".join(sequence)
+        qual = "".join(quality)
+        cigar = "".join(
+            ["{0}{1}".format(op[0], op[1]) for op in encode_rle(cigarops)])
+
+        # return a base alignment
+        return Alignment(
+            "", 0,
+            consensus[0][1].reference[0], consensus[0][1].reference[1],
+            0, cigar,
+            "*", 0, 0,
+            seq, qual, tags)
+
+    def sam_alignment(self, alignments):
+        """Get the consensus sequence as a SAM alignment."""
+        # get the consensus
+        consensus = self.operations(alignments)
+        if not consensus:
+            return None
+        return self.to_sam(consensus)
