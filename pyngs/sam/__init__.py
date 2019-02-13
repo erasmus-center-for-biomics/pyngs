@@ -245,7 +245,7 @@ class Alignment:
             if other.position > self.position:
                 lastpos = 0
                 for cig in other.cigar_regions():
-                    lastpos = cig.end
+                    lastpos = cig[2]
                 tlen = lastpos - self.position
             else:
                 lastpos = 0
@@ -315,9 +315,9 @@ class Alignment:
         :return: A SAM formatted string
         """
         tags = "\t".join([self.format_tag(tag) for tag in self.tags])
-        line = "{name}\t{flag}\t{chromosome}\t{position}\
-                \t{mapq}\t{cigar}\t{mate_chr}\t{mate_pos}\
-                \t{tlen}\t{sequence}\t{quality}\t{tags}"
+        line = "{name}\t{flag}\t{chromosome}\t{position}" + \
+                  "\t{mapq}\t{cigar}\t{mate_chr}\t{mate_pos}" + \
+                  "\t{tlen}\t{sequence}\t{quality}\t{tags}"
         return line.format(
             name=self.name,
             flag=self.flag,

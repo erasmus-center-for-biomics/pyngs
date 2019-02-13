@@ -190,7 +190,7 @@ class Consensus:
                             prevop.reference[2],
                             consop.reference[1]],
                         sequence="", quality="")
-                    consensus.append((0, 0.0), insert)
+                    consensus.append(((0, [0.0]), insert))
             consensus.append((meas, consop))
 
         # return the consensus operations
@@ -242,5 +242,5 @@ class Consensus:
         # get the consensus
         consensus = self.operations(alignments)
         if not consensus:
-            return None
+            raise ValueError("could not determine consensus")
         return self.to_sam(consensus)

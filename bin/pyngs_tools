@@ -80,6 +80,10 @@ def main():
         type=str, nargs="?", default="um",
         help="The tag-name for the UMI tag.")
     parser_con.add_argument(
+        "-r", "--discard", dest="discard",
+        type=bool, nargs="?", default=False,
+        help="Will non consensus alignments be discarded.")
+    parser_con.add_argument(
         "-d", "--distance", dest="distance",
         type=int, nargs="?", default=20,
         help="The allowed distance between the start postion of alignments with the same UMI.")
@@ -91,7 +95,6 @@ def main():
 
     # parse the argument and call the script
     args = parser.parse_args()
-    print(args)
     args.func(args)
 
 

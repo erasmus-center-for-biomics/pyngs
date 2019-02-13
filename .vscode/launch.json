@@ -7,7 +7,11 @@
             "request": "launch",
             "program": "${workspaceRoot}/bin/pyngs_tools",
             "args": [
-                "umi-consensus", "--help"
+                "umi-consensus",
+                "--tag", "um",
+                "--distance", "1024",
+                "--sam", "${workspaceRoot}/test_data/sam/I19-1012-19.um.sam.gz",
+                "--output", "${workspaceRoot}/test_data/consensus/I19-1012-19.consensus.sam.gz"
             ],
             "cwd": "${workspaceRoot}",
             "console": "integratedTerminal",
