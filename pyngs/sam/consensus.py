@@ -200,7 +200,7 @@ class Consensus:
 
     def to_sam(self, consensus):
         """Convert a list of consensus operations to a SAM alignment."""
-        #
+        # get the cigar and sequence as a list
         sequence = []
         quality_scores = []
         cigarops = []
@@ -211,11 +211,11 @@ class Consensus:
             quality_scores.extend(perf[1])
             nalntag.append(perf[0])
 
-        #
+        # convert the quality to a string
         quality_strings = []
         quality = []
         for score in quality_scores:
-            quality_strings.append("{:.{prec}f}".format(score, prec=1))
+            quality_strings.append("{:.{prec}f}".format(score, prec=0))
             quality.append(
                 score_to_quality(
                     score, self.quality_offset, self.quality_maxvalue))
