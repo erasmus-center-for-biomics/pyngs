@@ -13,7 +13,7 @@ def to_bed(instream, outstream, operations, tags):
     for alignment in reader:
 
         # get the strand
-        strand = "-" if alignment.is_reverse() else "+"
+        strand = "-" if alignment.reverse else "+"
 
         taglst = []
         if tags:
