@@ -53,7 +53,7 @@ def main():
         type=str, nargs="?", default="stdin",
         help="""The BED file with the entries to process.""")
     parser_mbe.add_argument(
-        "-o", "--ouput", dest="ouput",
+        "-o", "--ouput", dest="output",
         type=str, nargs="?", default="stdout",
         help="The path to the BED with the merged entries.")
     parser_mbe.add_argument(
@@ -92,6 +92,38 @@ def main():
         type=str, nargs="?", default="stdout",
         help="The output SAM file with the consensus sequences.")
     parser_con.set_defaults(func=pyngs.scripts.run_consensus)
+
+    #
+    # filter-by-samtag
+    #
+    parser_fst = subparsers.add_parser(
+        "filter-by-samtag",
+        help="""
+        Filter a SAM file by sam-tag.
+        """)
+    parser_fst.add_argument(
+        "-s", "--sam", dest="sam",
+        type=str, nargs="?", default="stdin",
+        help="The SAM file with the alignments to filter.")
+    parser_fst.add_argument(
+        "-o", "--output", dest="out",
+        type=str, nargs="?", default="stdout",
+        help="The output SAM file.")
+    parser_fst.add_argument(
+        "-t", "--tag", dest="tag",
+        type=str, help="The tag-name to filter on.")
+    parser_fst.add_argument(
+        "-y", "--type", dest="type",
+        choices=["equals", "greater", "less"], default="equals",
+        type=str, help="The type of filter to use.")
+    parser_fst.add_argument(
+        "-v", "--value", dest="value",
+        type=str, help="The value to filter on.")
+    parser_fst.add_argument(
+        "--discard-absent", dest="discard", default=False,
+        type=bool,
+        help="Discard entries for which the tag could not be found.")
+    parser_fst.set_defaults(func=pyngs.scripts.filter_by_samtag)
 
     # parse the argument and call the script
     args = parser.parse_args()

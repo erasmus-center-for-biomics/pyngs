@@ -2,7 +2,7 @@
     "version": "1.0",
     "configurations": [
         {
-            "name": "Run consensus tool",
+            "name": "Run umi-consensus",
             "type": "python",
             "request": "launch",
             "program": "${workspaceRoot}/bin/pyngs_tools",
@@ -12,6 +12,26 @@
                 "--distance", "1024",
                 "--sam", "${workspaceRoot}/test_data/sam/I19-1012-19.um.sam.gz",
                 "--output", "${workspaceRoot}/test_data/consensus/I19-1012-19.consensus.sam.gz"
+            ],
+            "cwd": "${workspaceRoot}",
+            "console": "integratedTerminal",
+            "env": {
+                "PYTHONPATH":"${workspaceRoot}"
+            }
+        },
+        {
+            "name": "Run samtag filter",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceRoot}/bin/pyngs_tools",
+            "args": [
+                "filter-by-samtag",
+                "--tag", "rd",
+                "--type", "greater",
+                "--value", "5",
+                "--discard-absent", "True",
+                "--sam", "${workspaceRoot}/test_data/consensus/I19-1012-19.consensus.sam.gz",
+                "--output", "${workspaceRoot}/test_data/consensus/I19-1012-19.consfilter.sam.gz"
             ],
             "cwd": "${workspaceRoot}",
             "console": "integratedTerminal",

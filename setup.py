@@ -6,7 +6,7 @@ with open("Readme.md", "rt") as stream:
 # prepare the setup
 setuptools.setup(
     name="pyngs",
-    version="0.4",
+    version="0.3",
     author="R.W.W. Brouwer",
     author_email="r.w.w.brouwer@gmail.com",
     description="A package to work with NGS data.",
