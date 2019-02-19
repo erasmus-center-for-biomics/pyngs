@@ -40,6 +40,23 @@
             }
         },
         {
+            "name": "Run merge bed",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceRoot}/bin/pyngs_tools",
+            "args": [
+                "merge-bed-entries",
+                "--tag", "READNAME",
+                "--input", "${workspaceRoot}/test_data/bed/I19-1022-09.rg.operation.bed",
+                "--output", "${workspaceRoot}/test_data/bed/I19-1022-09.rg.fragments.bed"
+            ],
+            "cwd": "${workspaceRoot}",
+            "console": "integratedTerminal",
+            "env": {
+                "PYTHONPATH":"${workspaceRoot}"
+            }
+        },
+        {
             "name": "Run consensus test",
             "type": "python",
             "request": "launch",

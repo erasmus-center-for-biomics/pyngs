@@ -53,7 +53,7 @@ def main():
         type=str, nargs="?", default="stdin",
         help="""The BED file with the entries to process.""")
     parser_mbe.add_argument(
-        "-o", "--ouput", dest="output",
+        "-o", "--output", dest="output",
         type=str, nargs="?", default="stdout",
         help="The path to the BED with the merged entries.")
     parser_mbe.add_argument(

@@ -61,8 +61,8 @@ def merge_entries(batch, comment):
     """Merge the entries for a batch."""
     # split entries per chromosome
     batch.sort(key=attrgetter("chromosome"))
-    for chrom, values in groupby(batch, attrgetter("chromosome")):
-        print(chrom, values)
+    for chrom, values in groupby(batch, key=attrgetter("chromosome")):
+        values = list(values)
         starts = [en.start for en in values]
         ends = [en.end for en in values]
         mrg = BED(chrom, min(starts), max(ends), comment, 0, ".")
@@ -73,16 +73,15 @@ def merge_paired_bed(instream, outstream, tag="READNAME"):
     """Merge paired BED entries."""
     outstring = "{chromosome}\t{start}\t{end}\t{comment}\t{score}\t{strand}\n"
     for value, group in partition_bed(instream, target_tag=tag):
-        print(list(group))
         for merged in merge_entries(group, value):
             outstream.write(
                 outstring.format(
-                    merged.chromosome,
-                    merged.start,
-                    merged.end,
-                    merged.comment,
-                    merged.score,
-                    merged.starnd))
+                    chromosome=merged.chromosome,
+                    start=merged.start,
+                    end=merged.end,
+                    comment=merged.comment,
+                    score=merged.score,
+                    strand=merged.strand))
 
 
 def merge_bed_entries(args):
