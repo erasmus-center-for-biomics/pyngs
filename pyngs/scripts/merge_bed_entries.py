@@ -62,7 +62,7 @@ def merge_entries(batch, comment):
     def split_batch_on_chromosome(batch):
         """Split read batches on chromosome."""
         batch.sort(key=attrgetter("chromosome"))
-        for chrom, values in groupby(attrgetter("chromosome")):
+        for chrom, values in groupby(batch, attrgetter("chromosome")):
             yield chrom, values
 
     # split entries per chromosome
