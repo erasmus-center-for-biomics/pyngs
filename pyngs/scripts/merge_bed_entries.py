@@ -73,6 +73,7 @@ def merge_paired_bed(instream, outstream, tag="READNAME"):
     """Merge paired BED entries."""
     outstring = "{chromosome}\t{start}\t{end}\t{comment}\t{score}\t{strand}\n"
     for value, group in partition_bed(instream, target_tag=tag):
+        print(list(group))
         for merged in merge_entries(group, value):
             outstream.write(
                 outstring.format(
