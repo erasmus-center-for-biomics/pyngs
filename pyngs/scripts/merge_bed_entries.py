@@ -59,18 +59,14 @@ def partition_bed(instream, target_tag="READNAME"):
 
 def merge_entries(batch, comment):
     """Merge the entries for a batch."""
-    def split_batch_on_chromosome(batch):
-        """Split read batches on chromosome."""
-        batch.sort(key=attrgetter("chromosome"))
-        for chrom, values in groupby(batch, attrgetter("chromosome")):
-            yield chrom, values
-
     # split entries per chromosome
-    for chrom, entries in split_batch_on_chromosome(batch):
+    batch.sort(key=attrgetter("chromosome"))
+    for chrom, values in groupby(batch, attrgetter("chromosome")):
+        print(values)
         mrg = BED(
             chrom,
-            min([en.start for en in entries]),
-            max([en.end for en in entries]),
+            min([en.start for en in values]),
+            max([en.end for en in values]),
             comment, 0, ".")
         yield mrg
 
