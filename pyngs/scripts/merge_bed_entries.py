@@ -104,11 +104,11 @@ def merge_bed_entries(args):
             instream = open(args.input, "rt")
 
     outstream = sys.stdout
-    if args.bed != "stdout":
-        if args.bed.endswith(".gz"):
-            outstream = gzip.open(args.bed, "wt")
+    if args.ouput != "stdout":
+        if args.ouput.endswith(".gz"):
+            outstream = gzip.open(args.ouput, "wt")
         else:
-            outstream = open(args.bed, "wt")
+            outstream = open(args.ouput, "wt")
 
     # write the BED entries
     merge_paired_bed(instream, outstream, args.tag)
