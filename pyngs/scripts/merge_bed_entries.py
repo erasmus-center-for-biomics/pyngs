@@ -97,11 +97,11 @@ def merge_bed_entries(args):
     This function is meant to be used together with cigar-to-bed.
     """
     instream = sys.stdin
-    if args.sam != "stdin":
-        if args.sam.endswith(".gz"):
-            instream = gzip.open(args.sam, "rt")
+    if args.input != "stdin":
+        if args.input.endswith(".gz"):
+            instream = gzip.open(args.input, "rt")
         else:
-            instream = open(args.sam, "rt")
+            instream = open(args.input, "rt")
 
     outstream = sys.stdout
     if args.bed != "stdout":
