@@ -62,12 +62,10 @@ def merge_entries(batch, comment):
     # split entries per chromosome
     batch.sort(key=attrgetter("chromosome"))
     for chrom, values in groupby(batch, attrgetter("chromosome")):
-        print(values)
-        mrg = BED(
-            chrom,
-            min([en.start for en in values]),
-            max([en.end for en in values]),
-            comment, 0, ".")
+        print(chrom, values)
+        starts = [en.start for en in values]
+        ends = [en.end for en in values]
+        mrg = BED(chrom, min(starts), max(ends), comment, 0, ".")
         yield mrg
 
 
