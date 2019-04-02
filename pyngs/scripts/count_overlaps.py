@@ -1,17 +1,20 @@
 import sys
 import gzip
+import pyngs.bed.parsers
+import pyngs.bed as bed
 
 
 def select_parser(name):
     """Select the parser based on a name."""
     if name == "BED3":
-        pass
+        return pyngs.bed.parsers.parse_bed3
     elif name == "BED4":
-        pass
+        return pyngs.bed.parsers.parse_bed4
     elif name == "BED5":
-        pass
+        return pyngs.bed.parsers.parse_bed5
     elif name == "GTF":
-        pass
+        return pyngs.bed.parsers.parse_gff
+    return None
 
 
 def count_overlaps(args):
