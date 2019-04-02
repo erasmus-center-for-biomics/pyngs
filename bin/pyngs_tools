@@ -14,116 +14,157 @@ def main():
     #
     # cigar-to-bed command
     #
-    parser_ctob = subparsers.add_parser(
+    sparser = subparsers.add_parser(
         "cigar-to-bed",
         help="""Generate BED entries for bases
         covered by the specified CIGAR operation in a SAM
         file.""")
-    parser_ctob.add_argument(
+    sparser.add_argument(
         "-s", "--sam", dest="sam",
         type=str, nargs="?", default="stdin",
         help="""The SAM file of which the CIGAR entries will
                 be converted to BED entries.""")
-    parser_ctob.add_argument(
+    sparser.add_argument(
         "-b", "--bed", dest="bed",
         type=str, nargs="?", default="stdout",
         help="The path to the output BED file.")
-    parser_ctob.add_argument(
+    sparser.add_argument(
         "-c", "--cigar-operations", dest="operations",
         type=str, nargs="+",
         help="The CIGAR operations to convert to BED entries.")
-    parser_ctob.add_argument(
+    sparser.add_argument(
         "-t", "--tags", dest="tags",
         type=str, nargs="*",
         help="""The BAM tags to add to the comment column in the
                 BED entries. Use the keyword __sample__ to add the
                 sample as a comment.""")
-    parser_ctob.set_defaults(func=pyngs.scripts.cigar_to_bed)
+    sparser.set_defaults(func=pyngs.scripts.cigar_to_bed)
 
     #
     # merge bed entries
     #
-    parser_mbe = subparsers.add_parser(
+    sparser = subparsers.add_parser(
         "merge-bed-entries",
         help="""
         Merge BED entries that represent the same DNA fragment.
         """)
-    parser_mbe.add_argument(
+    sparser.add_argument(
         "-i", "--input", dest="input",
         type=str, nargs="?", default="stdin",
         help="""The BED file with the entries to process.""")
-    parser_mbe.add_argument(
+    sparser.add_argument(
         "-o", "--output", dest="output",
         type=str, nargs="?", default="stdout",
         help="The path to the BED with the merged entries.")
-    parser_mbe.add_argument(
+    sparser.add_argument(
         "-t", "--tag", dest="tag",
         type=str, nargs="?", default="READNAME",
         help="The tag on which to merge the entries.")
-    parser_mbe.set_defaults(func=pyngs.scripts.merge_bed_entries)
+    sparser.set_defaults(func=pyngs.scripts.merge_bed_entries)
 
     #
     # consensus
     #
-    parser_con = subparsers.add_parser(
+    sparser = subparsers.add_parser(
         "umi-consensus",
         help="""
         Generate consensus alignments for alignments with the
         same UMI.
         """)
-    parser_con.add_argument(
+    sparser.add_argument(
         "-s", "--sam", dest="sam",
         type=str, nargs="?", default="stdin",
-        help="The input SAM file sorted on the tag with samtools sort -t {tag}.")
-    parser_con.add_argument(
+        help="""The input SAM file sorted on the tag
+        with samtools sort -t {tag}.""")
+    sparser.add_argument(
         "-t", "--tag", dest="tag",
         type=str, nargs="?", default="um",
         help="The tag-name for the UMI tag.")
-    parser_con.add_argument(
+    sparser.add_argument(
         "-r", "--discard", dest="discard",
         type=bool, nargs="?", default=False,
         help="Will non consensus alignments be discarded.")
-    parser_con.add_argument(
+    sparser.add_argument(
         "-d", "--distance", dest="distance",
         type=int, nargs="?", default=20,
-        help="The allowed distance between the start postion of alignments with the same UMI.")
-    parser_con.add_argument(
+        help="""The allowed distance between the start postion of
+        alignments with the same UMI.""")
+    sparser.add_argument(
         "-o", "--output", dest="out",
         type=str, nargs="?", default="stdout",
         help="The output SAM file with the consensus sequences.")
-    parser_con.set_defaults(func=pyngs.scripts.run_consensus)
+    sparser.set_defaults(func=pyngs.scripts.run_consensus)
 
     #
     # filter-by-samtag
     #
-    parser_fst = subparsers.add_parser(
+    sparser = subparsers.add_parser(
         "filter-by-samtag",
         help="""
         Filter a SAM file by sam-tag.
         """)
-    parser_fst.add_argument(
+    sparser.add_argument(
         "-s", "--sam", dest="sam",
         type=str, nargs="?", default="stdin",
         help="The SAM file with the alignments to filter.")
-    parser_fst.add_argument(
+    sparser.add_argument(
         "-o", "--output", dest="out",
         type=str, nargs="?", default="stdout",
         help="The output SAM file.")
-    parser_fst.add_argument(
+    sparser.add_argument(
         "-t", "--tag", dest="tag",
         type=str, help="The tag-name to filter on.")
-    parser_fst.add_argument(
+    sparser.add_argument(
         "-y", "--type", dest="type",
         choices=["equals", "greater", "less"], default="equals",
         type=str, help="The type of filter to use.")
-    parser_fst.add_argument(
+    sparser.add_argument(
         "-v", "--value", dest="value",
         type=str, help="The value to filter on.")
-    parser_fst.add_argument(
+    sparser.add_argument(
         "--discard-absent", dest="discard", default=False,
         type=bool,
         help="Discard entries for which the tag could not be found.")
-    parser_fst.set_defaults(func=pyngs.scripts.filter_by_samtag)
+    sparser.set_defaults(func=pyngs.scripts.filter_by_samtag)
+
+    #
+    # Count BED overlaps
+    #
+    sparser = subparsers.add_parser(
+        "count-bed-gtf-overlaps",
+        help="""
+        Count overlaps from BEDtools intersect. This script functions
+        on the output of
+        bedtools intersect -a FILEA -b FILEB -wo
+        """)
+    sparser.add_argument(
+        "-i", "--input", dest="input",
+        type=str, nargs="?", default="stdin",
+        help="The file with overlaps.")
+    sparser.add_argument(
+        "-o", "--output", dest="out",
+        type=str, nargs="?", default="stdout",
+        help="The output tab-delimited text file.")
+    sparser.add_argument(
+        "--type-a", dest="type_a",
+        type=str, choices=["GTF", "BED3", "BED4", "BED5"], default="BED5",
+        help="The input format of file a.")
+    sparser.add_argument(
+        "--type-b", dest="type_b",
+        type=str, choices=["GTF", "BED3", "BED4", "BED5"], default="GTF",
+        help="The input format of file b.")
+    sparser.add_argument(
+        "-s", "--strand", dest="strand",
+        choices=["equals", "opposite", "eiter"], default="either",
+        type=str, help="How to use the strand information of the overlaps.")
+    sparser.add_argument(
+        "-a", "--aggregate-per", dest="aggregate", default=["gene_id"],
+        type=str, help="Aggregate the counts per object in the id columns.")
+    sparser.add_argument(
+        "-w", "--what", dest="what",
+        default=["READNAME"],
+        type=str, help="What to count.")
+    sparser.set_defaults(func=pyngs.scripts.count_overlaps)
 
     # parse the argument and call the script
     args = parser.parse_args()
