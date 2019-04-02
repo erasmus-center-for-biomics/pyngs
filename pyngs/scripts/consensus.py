@@ -6,6 +6,41 @@ from pyngs import sam
 from pyngs.sam import consensus
 
 
+def consensus_header(reader):
+    """Create a header for the consensus writer."""
+    header = reader.header
+
+    # get the read group mapping
+    rgmapping = reader.readgroups()
+    sids = list(rgmapping.keys())
+    rgids = list(rgmapping.values())
+
+    # make sure there is only one sample in the BAM file
+    if len(sids) != 1:
+        raise ValueError("Wrong number of samples in the BAM file")
+
+    # check where to add the header
+    rgidx = len(header)
+    for idx, line in enumerate(header):
+        if line.startswith("@RG"):
+            rgidx = idx
+            break
+
+    # get a unique consensus code
+    crgid = "consensus"
+    while crgid in rgids:
+        crgid += "_1"
+
+    # add an RG line to the header
+    smline = "@RG\tID:{rgid}\tCN:ECB\tLB:{sample}\tSM:{sample}\tPL:ILLUMINA\tDS:NULL".format(
+        rgid=crgid,
+        sample=sids[0])
+    header.insert(rgidx, smline)
+
+    # return the new header and the consensus id
+    return header, crgid
+
+
 def group_per_umi(reader, tag="um"):
     """Get alignments per UMI from a UMI sorted samparser."""
     batch = []
@@ -131,7 +166,9 @@ def set_mates(aset):
     return aset
 
 
-def make_consensus(reader, writer, tag="um", max_distance=20, discard=False):
+def make_consensus(reader, writer,
+                   tag="um", max_distance=20, discard=False,
+                   consensus_id="x"):
     """Run the alignments."""
     consensus_factory = consensus.Consensus()
     for umi, alignments in group_per_umi(reader, tag):
@@ -186,15 +223,13 @@ def make_consensus(reader, writer, tag="um", max_distance=20, discard=False):
                     continue
 
                 # get the consensus alignment
-                # for cur in aln:
-                #     print(cur)
                 caln = consensus_factory.sam_alignment(aln)
-                # print(caln)
                 caln.name = name
                 caln.flag = aln[0].flag
                 mapq = int(sum([a.mapping_quality for a in aln]) / len(aln))
                 caln.mapping_quality = mapq
                 caln.tags.append(("rd", "i", len(aln)))
+                caln.tags.append(("RG", "Z", consensus_id))
 
                 # add the consensus alignment to the fragment
                 cfragments.append(caln)
@@ -223,8 +258,15 @@ def run_consensus(args):
             outstream = open(args.out, "wt")
     #
     reader = sam.Reader(instream)
-    writer = sam.Writer(outstream, reader.header)
-    make_consensus(reader, writer, args.tag, args.distance, args.discard)
+    header, rgid = consensus_header(reader)
+    writer = sam.Writer(outstream, header)
+    make_consensus(
+        reader,
+        writer,
+        args.tag,
+        args.distance,
+        args.discard,
+        consensus_id=rgid)
 
     # close opened files
     if not outstream.closed and outstream != sys.stdout:
