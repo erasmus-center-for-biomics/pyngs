@@ -27,7 +27,7 @@ def consensus_header(reader):
             break
 
     # get a unique consensus code
-    crgid = "consensus"
+    crgid = sids[0] + "_CNS"
     while crgid in rgids:
         crgid += "_1"
 
