@@ -12,8 +12,8 @@ def consensus_header(reader):
 
     # get the read group mapping
     rgmapping = reader.readgroups()
-    sids = list(rgmapping.keys())
-    rgids = list(rgmapping.values())
+    rgids = list(rgmapping.keys())
+    sids = list(set(list(rgmapping.values())))
 
     # make sure there is only one sample in the BAM file
     if len(sids) != 1:
