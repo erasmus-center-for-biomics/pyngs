@@ -12,7 +12,7 @@ setuptools.setup(
     description="A package to work with NGS data.",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/erasmus-center-for-biomics/pyaln",
+    url="https://github.com/erasmus-center-for-biomics/pyngs",
     packages=setuptools.find_packages(),
     scripts=[
         "bin/pyngs_tools"
