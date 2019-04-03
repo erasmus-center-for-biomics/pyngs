@@ -80,7 +80,7 @@ class Row:
         for sidx, value in enumerate(data):
             if value is None:
                 value = "."
-            self.samples[sidx].append(repr(value))
+            self.samples[sidx].append(value)
 
 
     def __repr__(self):
@@ -104,7 +104,9 @@ class Row:
             info=";".join(info))
         if self.format is not None:
             vstr += "\t{0}".format(":".join(self.format))
+
         for sample in self.samples:
-            vstr += "\t{0}".format(":".join(sample))
+            sval = ":".join([str(s) for s in sample])
+            vstr += "\t{0}".format(sval)
         #
         return vstr

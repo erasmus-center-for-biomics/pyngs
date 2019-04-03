@@ -166,6 +166,34 @@ def main():
         type=str, help="What to count.")
     sparser.set_defaults(func=pyngs.scripts.count_overlaps)
 
+    #
+    # Haplotype VCF files
+    #
+    sparser = subparsers.add_parser(
+        "haplotype-vcf",
+        description="""Haplotype a VCf file based on the child, father, mother relation.""")
+    sparser.add_argument(
+        "-v", "--vcf", dest="vcf",
+        type=str, nargs="?", default="stdin",
+        help="The input VCF file.")
+    sparser.add_argument(
+        "-o", "--output", dest="output",
+        type=str, nargs="?", default="stdout",
+        help="The output VCF file.")
+    sparser.add_argument(
+        "--offspring", dest="offspring",
+        type=str, nargs="+",
+        help="The sample names of the offspring.")
+    parser.add_argument(
+        "--fathers", dest="fathers",
+        type=str, nargs="+",
+        help="The sample names of the fathers.")
+    sparser.add_argument(
+        "--mothers", dest="mothers",
+        type=str, nargs="+",
+        help="The sample names of the mothers.")
+    sparser.set_defaults(func=pyngs.scripts.haplotype_vcf)
+
     # parse the argument and call the script
     args = parser.parse_args()
     args.func(args)
