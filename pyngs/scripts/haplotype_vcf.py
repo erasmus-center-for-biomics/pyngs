@@ -21,15 +21,14 @@ def count(lst):
 
 
 def haplotype(calleles, palleles, malleles):
-    """Haplotype a child with the information from its parents."""
+    """Haplotype a child with the information from its parents.
+
+    return the paternal and maternal alleles in that order
+    """
 
     # homozygous child
-    paternal = "N"
-    maternal = "N"
     if calleles[0] == calleles[1]:
-        paternal = calleles[0]
-        maternal = calleles[1]
-        return paternal, maternal
+        return calleles[0], calleles[1]
     # heterozygous child
     else:
         # filter all alleles that are not present in the child
@@ -39,20 +38,21 @@ def haplotype(calleles, palleles, malleles):
         allele_count = [t for t in count(parental)]
         allele_count.sort(key=itemgetter(1))
 
-        # unsolvable case where
-        # child is Q/P, father is Q/P and mother is Q/P
-        if allele_count[0][1] != 1:
-            return paternal, maternal
-
-        # case child is Q/P, father is Q/P,
-        # mother is P/P
-        if allele_count[0][0] in palleles:
-            paternal = allele_count[0][0]
-            maternal = allele_count[1][0]
-        elif allele_count[0][0] in malleles:
-            paternal = allele_count[1][0]
-            maternal = allele_count[0][0]
-        return paternal, maternal
+        # error case where the child has different alleles than the parents
+        if len(allele_count) <= 1:
+            return "E", "E"
+        # unsolvable case where child is Q/P, father is Q/P and mother is Q/P
+        elif allele_count[0][1] == 2:
+            return "?", "?"
+        elif allele_count[0][1] == 1:
+            # case child is Q/P, father is Q/P,
+            # mother is P/P
+            if allele_count[0][0] in palleles:
+                return allele_count[0][0], allele_count[1][0]
+            elif allele_count[0][0] in malleles:
+                return allele_count[1][0], allele_count[0][0]
+    # should never happen
+    return None, None
 
 
 def assign_haplotypes(instream, outstream, assignments, tag="GT"):
@@ -180,18 +180,32 @@ def haplotype_vcf(args):
         else:
             outstream = open(args.output, "wt")
 
-    offspring = [v for v in args.offspring if v != ""]
-    fathers = [v for v in args.fathers if v != ""]
-    mothers = [v for v in args.mothers if v != ""]
-
-    assert len(offspring) == len(fathers)
-    assert len(offspring) == len(mothers)
-
-    # group the offspring, parent pairs
+    # add the assignments
     assignments = []
-    for idx, child in enumerate(offspring):
-        assignments.append(
-            (child, fathers[idx], mothers[idx]))
+    if args.relations:
+        stream = open(args.relations, "rt")
+        for line in stream:
+            line = line.rstrip()
+            if line.startswith("#"):
+                continue
+            tokens = line.split("\t")
+            assignments.append(
+                (tokens[0], tokens[1], tokens[2]))
+        stream.close()
+
+    # add the commandline assignments
+    if args.offspring and args.fathers and args.mothers:
+        offspring = [v for v in args.offspring if v != ""]
+        fathers = [v for v in args.fathers if v != ""]
+        mothers = [v for v in args.mothers if v != ""]
+
+        assert len(offspring) == len(fathers)
+        assert len(offspring) == len(mothers)
+
+        # group the offspring, parent pairs
+        for idx, child in enumerate(offspring):
+            assignments.append(
+                (child, fathers[idx], mothers[idx]))
 
     # assign the haplotypes to the variants
     assign_haplotypes(instream, outstream, assignments)
@@ -218,16 +232,21 @@ if __name__ == "__main__":
         type=str, nargs="?", default="stdout",
         help="The output VCF file.")
     parser.add_argument(
+        "-r", "--relations", dest="relations",
+        type=str, nargs="?",
+        help="""A file with the trio relations in the
+        order child, father, mother.""")
+    parser.add_argument(
         "--offspring", dest="offspring",
-        type=str, nargs="+",
+        type=str, nargs="*",
         help="The sample names of the offspring.")
     parser.add_argument(
         "--fathers", dest="fathers",
-        type=str, nargs="+",
+        type=str, nargs="*",
         help="The sample names of the fathers.")
     parser.add_argument(
         "--mothers", dest="mothers",
-        type=str, nargs="+",
+        type=str, nargs="*",
         help="The sample names of the mothers.")
     parser.set_defaults(func=haplotype_vcf)
 

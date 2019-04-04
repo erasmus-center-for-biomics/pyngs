@@ -8,10 +8,8 @@
             "program": "${workspaceRoot}/pyngs/scripts/haplotype_vcf.py",
             "args": [
                 "--vcf", "${workspaceRoot}/test_data/vcf/all_variants.vcf.gz",
-                "--output", "${workspaceRoot}/test_data/vcf/all_variants.haplo.vcf",
-                "--offspring", "I18-1492-03",
-                "--fathers", "I18-1492-02",
-                "--mothers", "I18-1492-01",
+                "--output", "${workspaceRoot}/test_data/vcf/all_variants.haplo2.vcf.gz",
+                "--relations", "${workspaceRoot}/test_data/vcf/trios.txt"
             ],
             "cwd": "${workspaceRoot}",
             "console": "integratedTerminal",

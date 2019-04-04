@@ -154,16 +154,21 @@ def main():
         type=str, nargs="?", default="stdout",
         help="The output VCF file.")
     sparser.add_argument(
+        "-r", "--relations", dest="relations",
+        type=str, nargs="?",
+        help="""A file with the trio relations in the
+        order child, father, mother.""")
+    sparser.add_argument(
         "--offspring", dest="offspring",
-        type=str, nargs="+",
+        type=str, nargs="*",
         help="The sample names of the offspring.")
-    parser.add_argument(
+    sparser.add_argument(
         "--fathers", dest="fathers",
-        type=str, nargs="+",
+        type=str, nargs="*",
         help="The sample names of the fathers.")
     sparser.add_argument(
         "--mothers", dest="mothers",
-        type=str, nargs="+",
+        type=str, nargs="*",
         help="The sample names of the mothers.")
     sparser.set_defaults(func=pyngs.scripts.haplotype_vcf)
 
