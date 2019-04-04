@@ -171,7 +171,8 @@ def main():
     #
     sparser = subparsers.add_parser(
         "haplotype-vcf",
-        description="""Haplotype a VCf file based on the child, father, mother relation.""")
+        description="""Haplotype a VCf file based on the
+        child, father, mother relation.""")
     sparser.add_argument(
         "-v", "--vcf", dest="vcf",
         type=str, nargs="?", default="stdin",
