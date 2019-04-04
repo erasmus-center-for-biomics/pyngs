@@ -15,6 +15,17 @@
             "console": "integratedTerminal",
         },
         {
+            "name": "Extract haplotypes",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceRoot}/pyngs/scripts/extract_haplotypes.py",
+            "args": [
+                "--vcf", "${workspaceRoot}/test_data/vcf/all_variants.haplo2.vcf.gz"
+            ],
+            "cwd": "${workspaceRoot}",
+            "console": "integratedTerminal",
+        },
+        {
             "name": "Run umi-consensus",
             "type": "python",
             "request": "launch",

@@ -78,7 +78,7 @@ def assign_haplotypes(instream, outstream, assignments, tag="GT"):
     header = reader.header
     header.append(vcf.Header("""FORMAT=<ID=MAT,Number=1,Type=String,Description="The maternal allele">"""))
     header.append(vcf.Header("""FORMAT=<ID=PAT,Number=1,Type=String,Description="The paternal allele">"""))
-    header.append(vcf.Header("""FORMAT=<ID=OFF,Number=1,Type=String,Description="The allele transmited to the offspring">"""))
+    header.append(vcf.Header("""FORMAT=<ID=OFF,Number=.,Type=String,Description="The allele transmited to the offspring">"""))
 
     # prepare the header
     writer = vcf.Writer(outstream, header, reader.samples)
