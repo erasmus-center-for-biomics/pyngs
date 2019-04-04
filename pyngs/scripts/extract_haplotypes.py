@@ -37,11 +37,14 @@ def extract(instream, outstream):
 
         #
         for sidx, sample in enumerate(variant.samples):
+
+            # get the relevant fields
             gt = list(gtparser.interpret(sample[gidx]))[0]
             patallele = list(patparser.interpret(sample[pidx]))[0]
             matallele = list(matparser.interpret(sample[midx]))[0]
             childallele = list(childparser.interpret(sample[cidx]))[0]
 
+            # A normal haplotyped child
             if patallele is not "." and matallele is not ".":
                 outstream.write(outline.format(
                     chrom=variant.chrom,
@@ -49,6 +52,9 @@ def extract(instream, outstream):
                     sample=reader.samples[sidx],
                     A=patallele,
                     B=matallele))
+
+            # extract haplotypes for a parent that
+            # was used to genotype a child
             elif childallele is not "." and gt is not ".":
                 allele_a = childallele.split("/")[1]
                 # skip erroneous alleles
