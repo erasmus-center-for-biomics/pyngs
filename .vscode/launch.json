@@ -20,7 +20,8 @@
             "request": "launch",
             "program": "${workspaceRoot}/pyngs/scripts/extract_haplotypes.py",
             "args": [
-                "--vcf", "${workspaceRoot}/test_data/vcf/all_variants.haplo2.vcf.gz"
+                "--vcf", "${workspaceRoot}/test_data/vcf/all_variants.haplo2.vcf.gz",
+                "--output", "${workspaceRoot}/test_data/vcf/haplotypes.tsv.gz"
             ],
             "cwd": "${workspaceRoot}",
             "console": "integratedTerminal",
