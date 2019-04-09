@@ -90,6 +90,10 @@ def main():
         help="""The allowed distance between the start postion of
         alignments with the same UMI.""")
     sparser.add_argument(
+        "-w", "--workers", dest="workers",
+        type=int, nargs="?", default=8,
+        help="""The number of workers for the consensus alignments.""")
+    sparser.add_argument(
         "-o", "--output", dest="out",
         type=str, nargs="?", default="stdout",
         help="The output SAM file with the consensus sequences.")
