@@ -15,7 +15,7 @@ class Writer(multiprocessing.Process):
 
     def run(self):
         # prepare the output stream
-        print("Starting %s" % self.name)
+        # print("Starting %s" % self.name)
         outstream = sys.stdout
         if self.filename != "stdout":
             if self.filename.endswith(".gz"):
@@ -29,7 +29,7 @@ class Writer(multiprocessing.Process):
         while True:
             task = self.q_in.get()
             if task is None:
-                print("Ending %s" % self.name)
+                # print("Ending %s" % self.name)
                 # self.q_in.task_done()
                 break
             for aln in task:
@@ -38,5 +38,5 @@ class Writer(multiprocessing.Process):
         #
         if outstream is not sys.stdout:
             outstream.close()
-        print("%s Finished" % self.name)
+        # print("%s Finished" % self.name)
         return
