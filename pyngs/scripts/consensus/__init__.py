@@ -86,6 +86,7 @@ def make_consensus(inpath, outpath, tag="um", max_distance=20, discard=False, nw
 
     print("Joining writer and workers")
     writer.join()
+    print("Joined writer")
     for w in workers:
         w.join()
     print("Joined writer and workers")
