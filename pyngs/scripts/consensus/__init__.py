@@ -97,4 +97,5 @@ def run_consensus(args):
         args.out,
         args.tag,
         args.distance,
-        args.discard)
+        args.discard,
+        nworkers=args.workers)
