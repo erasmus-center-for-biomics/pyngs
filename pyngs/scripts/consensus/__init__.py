@@ -83,16 +83,13 @@ def make_consensus(inpath, outpath, tag="um", max_distance=20, discard=False, nw
     # add the poison pill at the end of the writer and join it
     to_writer.put(None)
 
-    print("Joining writer queue (is empty: {0})".format(to_writer.empty()))
-
-    to_writer.join()
-    print("Joined writer queue")
+    print("Joining writer")
     writer.join()
     print("Joined writer")
-    # joining workers
-    for w in workers:
-        w.join()
-    print("joined workers")
+    print("Joining writer queue (is empty: {0})".format(to_writer.empty()))
+    to_writer.join()
+    print("Joined writer queue")
+
     # close the input file
     if not instream.closed and instream != sys.stdin:
         instream.close()
