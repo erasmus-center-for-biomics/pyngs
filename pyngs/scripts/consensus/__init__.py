@@ -79,10 +79,13 @@ def make_consensus(inpath, outpath, tag="um", max_distance=20, discard=False, nw
     for _ in range(nworkers):
         to_workers.put(None)
     to_workers.join()
-
+    print("Joined worker queue")
     # add the poison pill at the end of the writer and join it
     to_writer.put(None)
+
+    print("Joining writer")
     writer.join()
+    print("Joined writer")
 
     # close the input file
     if not instream.closed and instream != sys.stdin:
