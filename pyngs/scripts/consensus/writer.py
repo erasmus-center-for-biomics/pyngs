@@ -15,6 +15,7 @@ class SAMWriter(multiprocessing.Process):
 
     def run(self):
         # prepare the output stream
+        print("Starting %s" % self.name)
         outstream = sys.stdout
         if self.filename != "stdout":
             if self.filename.endswith(".gz"):
@@ -26,8 +27,7 @@ class SAMWriter(multiprocessing.Process):
         while True:
             task = self.q_in.get()
             if task is None:
-                self.q_in.task_done()
-                # print("Ending %s" % self.name)
+                print("Ending %s" % self.name)
                 break
             for aln in task:
                 writer.write(aln)
@@ -35,3 +35,4 @@ class SAMWriter(multiprocessing.Process):
 
         if outstream is not sys.stdout:
             outstream.close()
+        self.q_in.task_done()

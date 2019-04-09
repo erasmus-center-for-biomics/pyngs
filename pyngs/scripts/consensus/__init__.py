@@ -75,15 +75,14 @@ def make_consensus(inpath, outpath, tag="um", max_distance=20, discard=False, nw
     for umi, alignments in group_per_umi(reader, tag):
         to_workers.put((umi, alignments))
 
-    # add the poison pills at the end of the stack
+    # add the poison pills at the end of the stack and join the workers
     for _ in range(nworkers):
         to_workers.put(None)
-    # join the workers
     to_workers.join()
 
     # add the poison pill at the end of the writer and join it
     to_writer.put(None)
-    writer.join()
+    to_writer.join()
 
     # close the input file
     if not instream.closed and instream != sys.stdin:

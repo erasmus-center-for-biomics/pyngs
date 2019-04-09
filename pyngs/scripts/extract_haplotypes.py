@@ -78,6 +78,7 @@ def extract(instream, outstream):
                     A=allele_a,
                     B=allele_b))
 
+
 def extract_haplotypes(args):
     """."""
     instream = sys.stdin
