@@ -85,8 +85,13 @@ def make_consensus(inpath, outpath, tag="um", max_distance=20, discard=False, nw
 
     print("Joining writer")
     to_writer.join()
+    writer.join()
     print("Joined writer")
 
+    # joining workers
+    for w in workers:
+        w.join()
+    print("joined workers")
     # close the input file
     if not instream.closed and instream != sys.stdin:
         instream.close()
