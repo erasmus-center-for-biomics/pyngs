@@ -68,76 +68,63 @@ def group_per_umi(reader, tag="um"):
         yield umi, batch
 
 
-def fragment_sorter(aln):
+def pair_sorter(aln):
     """Get the alignment name and attributes for sorting."""
     return (
         aln.name,
         not aln.first_in_pair,
         aln.unmapped,
         aln.supplementary_alignment,
-        aln.secondary_alignment,
-        aln.flag,
-        aln.chromosome,
-        aln.position)
+        aln.secondary_alignment)
 
 
 def fragment_positions(fragment):
     """Get the fragmnent position."""
     return (
+        len(fragment),
         [aln.chromosome for aln in fragment],
         [aln.position for aln in fragment],
         [aln.flag for aln in fragment])
 
 
-def same_fragment(pos_a, pos_b, allowed_distance):
-    """Do 2 fragments have the same position."""
-    if len(pos_a[0]) != len(pos_b[0]):
-        return False
-    if pos_a[0] != pos_b[0]:
-        return False
-    if pos_a[1] != pos_b[1]:
-        distance = 0
-        for pos in zip(pos_a[1], pos_b[1]):
-            distance += abs(pos[0] - pos[1])
-            if distance > allowed_distance:
+def group_on_distance(fragments, maxd=20):
+    """Group fragments based on distance."""
+
+    def pairwise_compare(frg_a, frg_b, maxd=20):
+        """Compare 2 fragments pairwise."""
+        if len(frg_a) != len(frg_b):
+            return False
+        dst = 0
+        for idx in range(len(frg_a)):
+            if frg_a[idx].chromosome != frg_b[idx].chromosome:
                 return False
-    if pos_a[2] != pos_b[2]:
-        return False
-    return True
+            if frg_a[idx].flag != frg_b[idx].flag:
+                return False
+            dst += abs(frg_a[idx].position - frg_b[idx].position)
+            if dst > maxd:
+                return False
+        return True
 
-
-def within_distance(fragments, max_distance=20):
-    """Group the alignments by distance."""
     batch = []
-    for fragment in fragments:
-        positions = fragment_positions(fragment)
-
-        # only check after the first fragment is added
-        if batch:
-            if not same_fragment(
-                    batch[0][0], positions,
-                    allowed_distance=max_distance):
-                yield batch
-                batch = []
-
-        # always add the current alignment
-        batch.append((positions, fragment))
-
-    # yield the last entries
+    for frg in fragments:
+        if batch and not pairwise_compare(frg, batch[-1], maxd):
+            yield batch
+            batch = []
+        batch.append(frg)
     if batch:
         yield batch
 
 
-def mate_sorter(aln):
-    """Sort the alignments in order of mate."""
-    return (
-        aln.supplementary_alignment,
-        aln.secondary_alignment,
-        not aln.first_in_pair)
-
-
 def set_mates(aset):
     """Set the mates in a set of alignments."""
+
+    def mate_sorter(aln):
+        """Sort the alignments in order of mate."""
+        return (
+            aln.supplementary_alignment,
+            aln.secondary_alignment,
+            not aln.first_in_pair)
+
     aset.sort(key=mate_sorter)
     if len(aset) == 1:
         return aset
@@ -174,7 +161,7 @@ def make_consensus(reader, writer,
     for umi, alignments in group_per_umi(reader, tag):
 
         # sort the alignments based on the dna fragment
-        alignments.sort(key=fragment_sorter)
+        alignments.sort(key=pair_sorter)
         # print("{umi}\t{naln}\n".format(
         #     umi=umi, naln=len(alignments)))
 
@@ -187,6 +174,12 @@ def make_consensus(reader, writer,
 
         # sort the fragments on position
         fragments.sort(key=fragment_positions)
+        # with open("debug.txt", "wt") as stream:
+        #     for grp in group_on_distance(fragments, max_distance):
+        #         stream.write("\n")
+        #         for frag in grp:
+        #             for aln in frag:
+        #                 stream.write("{0}\n".format(aln))
 
         # get the fragments that start within `distance` bases
         # of each other in total. All alignments in the fragments
@@ -194,9 +187,8 @@ def make_consensus(reader, writer,
         # This also implies that each DNA fragment must have the same
         # number of reads (first of pair, last of pair, supplementary
         # and secondary)
-        for idx, tmpset in enumerate(within_distance(
+        for idx, fragset in enumerate(group_on_distance(
                 fragments, max_distance)):
-            fragset = [fg for _, fg in tmpset]
 
             # single dna fragment, so no merging required
             if len(fragset) == 1:

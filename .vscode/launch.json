@@ -34,9 +34,9 @@
             "args": [
                 "umi-consensus",
                 "--tag", "um",
-                "--distance", "1024",
-                "--sam", "${workspaceRoot}/test_data/sam/I19-1012-19.um.sam.gz",
-                "--output", "${workspaceRoot}/test_data/consensus/I19-1012-19.consensus.sam.gz"
+                "--distance", "20",
+                "--sam", "${workspaceRoot}/test_data/sam/temp.sam",
+                "--output", "${workspaceRoot}/test_data/consensus/temp.sam"
             ],
             "cwd": "${workspaceRoot}",
             "console": "integratedTerminal",
