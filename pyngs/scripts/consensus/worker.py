@@ -25,4 +25,3 @@ class Worker(multiprocessing.Process):
             # signal that we did our job
             # self.q_in.task_done()
         # print("%s Finished" % self.name)
-        return
