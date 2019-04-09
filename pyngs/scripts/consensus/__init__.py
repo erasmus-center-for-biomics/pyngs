@@ -108,3 +108,4 @@ def run_consensus(args):
         args.distance,
         args.discard,
         nworkers=args.workers)
+    print("finished")
