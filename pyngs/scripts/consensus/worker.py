@@ -24,3 +24,4 @@ class Worker(multiprocessing.Process):
                 self.q_out.put(out)
             # signal that we did our job
             self.q_in.task_done()
+        return
