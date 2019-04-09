@@ -109,3 +109,4 @@ def run_consensus(args):
         args.discard,
         nworkers=args.workers)
     print("finished")
+    sys.exit(0)
