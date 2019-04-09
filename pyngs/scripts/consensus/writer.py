@@ -33,8 +33,8 @@ class Writer(multiprocessing.Process):
                 break
             for aln in task:
                 writer.write(aln)
-            self.q_in.task_done()
 
+
+        #
         if outstream is not sys.stdout:
             outstream.close()
-        self.q_in.task_done()

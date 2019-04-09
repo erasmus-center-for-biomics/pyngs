@@ -41,7 +41,7 @@ def make_consensus(inpath, outpath, tag="um", max_distance=20, discard=False, nw
     """Run make consensus alignments."""
     # prepare the queues
     to_workers = multiprocessing.JoinableQueue()
-    to_writer = multiprocessing.JoinableQueue()
+    to_writer = multiprocessing.Queue()
 
     # prepare reading the input file
     instream = sys.stdin
@@ -82,7 +82,7 @@ def make_consensus(inpath, outpath, tag="um", max_distance=20, discard=False, nw
 
     # add the poison pill at the end of the writer and join it
     to_writer.put(None)
-    to_writer.join()
+    writer.join()
 
     # close the input file
     if not instream.closed and instream != sys.stdin:
