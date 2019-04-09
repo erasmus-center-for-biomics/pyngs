@@ -7,7 +7,7 @@ from pyngs import sam
 from .header import consensus_header
 from .task import PairedConsensus
 from .worker import Worker
-from .writer import SAMWriter
+from .writer import Writer
 
 
 def group_per_umi(reader, tag="um"):
@@ -61,7 +61,7 @@ def make_consensus(inpath, outpath, tag="um", max_distance=20, discard=False, nw
     conobj.max_distance = max_distance
 
     # initialize the writer
-    writer = SAMWriter(to_writer, outpath, header)
+    writer = Writer(to_writer, outpath, header)
     writer.start()
 
     # initialize the workers

@@ -4,7 +4,7 @@ import multiprocessing
 from pyngs import sam
 
 
-class SAMWriter(multiprocessing.Process):
+class Writer(multiprocessing.Process):
     """A worker."""
 
     def __init__(self, inqueue, filename, header):
@@ -27,6 +27,7 @@ class SAMWriter(multiprocessing.Process):
         while True:
             task = self.q_in.get()
             if task is None:
+                self.q_in.task_done()
                 print("Ending %s" % self.name)
                 break
             for aln in task:
