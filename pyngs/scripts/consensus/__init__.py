@@ -83,11 +83,11 @@ def make_consensus(inpath, outpath, tag="um", max_distance=20, discard=False, nw
     # add the poison pill at the end of the writer and join it
     to_writer.put(None)
 
-    print("Joining writer")
+    print("Joining writer queue")
     to_writer.join()
+    print("Joined writer queue")
     writer.join()
     print("Joined writer")
-
     # joining workers
     for w in workers:
         w.join()
