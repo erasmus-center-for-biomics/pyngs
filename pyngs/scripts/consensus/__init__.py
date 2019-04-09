@@ -90,6 +90,8 @@ def make_consensus(inpath, outpath, tag="um", max_distance=20, discard=False, nw
     # close the input file
     if not instream.closed and instream != sys.stdin:
         instream.close()
+    print("returning")
+    return
 
 
 def run_consensus(args):
