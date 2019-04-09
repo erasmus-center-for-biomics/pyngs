@@ -40,9 +40,7 @@ def group_per_umi(reader, tag="um"):
 def make_consensus(inpath, outpath, tag="um", max_distance=20, discard=False, nworkers=8):
     """Run make consensus alignments."""
     # prepare the queues
-    # to_workers = multiprocessing.JoinableQueue()
     to_workers = multiprocessing.Queue()
-    # to_writer = multiprocessing.JoinableQueue()
     to_writer = multiprocessing.Queue()
 
     # prepare reading the input file
@@ -95,7 +93,6 @@ def make_consensus(inpath, outpath, tag="um", max_distance=20, discard=False, nw
     if not instream.closed and instream != sys.stdin:
         instream.close()
     # print("returning")
-    return
 
 
 def run_consensus(args):
@@ -108,4 +105,3 @@ def run_consensus(args):
         args.distance,
         args.discard,
         nworkers=args.workers)
-    print("finished")
