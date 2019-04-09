@@ -81,12 +81,13 @@ def make_consensus(inpath, outpath, tag="um", max_distance=20, discard=False, nw
     for _ in range(nworkers):
         to_workers.put(None)
 
-    # add the poison pill at the end of the writer and join it
-    to_writer.put(None)
-
-    print("Joining writer and workers")
+    print("Joining workers")
     for w in workers:
         w.join()
+
+    # add the poison pill at the end of the writer and join it
+    print("Joining writer")
+    to_writer.put(None)
     writer.join()
     print("Joined writer and workers")
 
@@ -108,4 +109,3 @@ def run_consensus(args):
         args.discard,
         nworkers=args.workers)
     print("finished")
-    sys.exit(0)
