@@ -16,8 +16,8 @@ class Worker(multiprocessing.Process):
         while True:
             task = self.q_in.get()
             if task is None:
-                self.q_in.task_done()
                 print("Ending %s" % self.name)
+                self.q_in.task_done()
                 break
 
             for out in self.to_run(*task):

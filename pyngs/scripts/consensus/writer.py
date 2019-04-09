@@ -22,12 +22,13 @@ class Writer(multiprocessing.Process):
                 outstream = gzip.open(self.filename, "wt")
             else:
                 outstream = open(self.filename, "wt")
+
+        # prepare the sam writer
         writer = sam.Writer(outstream, self.header)
 
         while True:
             task = self.q_in.get()
             if task is None:
-                self.q_in.task_done()
                 print("Ending %s" % self.name)
                 break
             for aln in task:
