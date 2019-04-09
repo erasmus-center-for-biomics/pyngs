@@ -12,11 +12,11 @@ class Worker(multiprocessing.Process):
 
     def run(self):
         """."""
-        print("Starting %s" % self.name)
+        # print("Starting %s" % self.name)
         while True:
             task = self.q_in.get()
             if task is None:
-                print("Ending %s" % self.name)
+                # print("Ending %s" % self.name)
                 self.q_in.task_done()
                 break
 
