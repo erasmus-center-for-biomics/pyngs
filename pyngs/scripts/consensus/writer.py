@@ -39,3 +39,4 @@ class Writer(multiprocessing.Process):
         if outstream is not sys.stdout:
             outstream.close()
         print("%s Finished" % self.name)
+        return
