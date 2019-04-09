@@ -41,6 +41,7 @@ def make_consensus(inpath, outpath, tag="um", max_distance=20, discard=False, nw
     """Run make consensus alignments."""
     # prepare the queues
     to_workers = multiprocessing.JoinableQueue()
+    to_workers = multiprocessing.Queue()
     # to_writer = multiprocessing.JoinableQueue()
     to_writer = multiprocessing.Queue()
 
@@ -79,16 +80,15 @@ def make_consensus(inpath, outpath, tag="um", max_distance=20, discard=False, nw
     # add the poison pills at the end of the stack and join the workers
     for _ in range(nworkers):
         to_workers.put(None)
-    to_workers.join()
-    print("Joined worker queue")
+
+
     # add the poison pill at the end of the writer and join it
     to_writer.put(None)
 
     print("Joining writer and workers")
+    for w in workers:
+        w.join()
     writer.join()
-    print("Joined writer")
-    #for w in workers:
-    #    w.join()
     print("Joined writer and workers")
 
     # close the input file

@@ -17,11 +17,11 @@ class Worker(multiprocessing.Process):
             task = self.q_in.get()
             if task is None:
                 # print("Ending %s" % self.name)
-                self.q_in.task_done()
+                # self.q_in.task_done()
                 break
 
             for out in self.to_run(*task):
                 self.q_out.put(out)
             # signal that we did our job
-            self.q_in.task_done()
+            # self.q_in.task_done()
         return
