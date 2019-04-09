@@ -30,9 +30,11 @@ class Writer(multiprocessing.Process):
             task = self.q_in.get()
             if task is None:
                 print("Ending %s" % self.name)
+                self.q_in.task_done()
                 break
             for aln in task:
                 writer.write(aln)
+            self.q_in.task_done()
         #
         if outstream is not sys.stdout:
             outstream.close()

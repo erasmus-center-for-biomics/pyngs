@@ -35,7 +35,7 @@
                 "umi-consensus",
                 "--tag", "um",
                 "--distance", "100",
-                "--workers", "2",
+                "--workers", "8",
                 "--sam", "${workspaceRoot}/test_data/sam/temp.umi.sam",
                 "--output", "${workspaceRoot}/test_data/consensus/temp.cons.sam"
             ],
