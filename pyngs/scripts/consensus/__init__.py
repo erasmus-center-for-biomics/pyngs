@@ -40,8 +40,8 @@ def group_per_umi(reader, tag="um"):
 def make_consensus(inpath, outpath, tag="um", max_distance=20, discard=False, nworkers=8):
     """Run make consensus alignments."""
     # prepare the queues
-    to_workers = multiprocessing.Queue()
-    to_writer = multiprocessing.Queue()
+    to_workers = multiprocessing.Queue(maxsize=100000)
+    to_writer = multiprocessing.Queue(maxsize=100000)
 
     # prepare reading the input file
     instream = sys.stdin
