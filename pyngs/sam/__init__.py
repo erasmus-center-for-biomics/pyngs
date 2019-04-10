@@ -316,8 +316,8 @@ class Alignment:
         """
         tags = "\t".join([self.format_tag(tag) for tag in self.tags])
         line = "{name}\t{flag}\t{chromosome}\t{position}" + \
-                  "\t{mapq}\t{cigar}\t{mate_chr}\t{mate_pos}" + \
-                  "\t{tlen}\t{sequence}\t{quality}\t{tags}"
+               "\t{mapq}\t{cigar}\t{mate_chr}\t{mate_pos}" + \
+               "\t{tlen}\t{sequence}\t{quality}\t{tags}"
         return line.format(
             name=self.name,
             flag=self.flag,
