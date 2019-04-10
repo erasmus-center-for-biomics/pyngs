@@ -61,8 +61,8 @@ class Region:
         return False
 
 
-def region_parser(ftype="BED3"):
-    """Get a region parser for regions ."""
+def get_parser(ftype="BED3"):
+    """Get a region parser for various file formats."""
 
     def bed3(tokens):
         return Region(
@@ -105,11 +105,12 @@ def region_parser(ftype="BED3"):
             tokens[0],
             tokens[3],
             tokens[4],
+            source=tokens[1],
+            type=tokens[2],
             score=score,
             frame=frame,
             strand=tokens[6],
             comment=tokens[8]), tokens[9:]
-
 
     if ftype.upper() == "BED3":
         return bed3

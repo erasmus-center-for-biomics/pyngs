@@ -2,6 +2,30 @@
     "version": "1.0",
     "configurations": [
         {
+            "name": "Extract",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceRoot}/pyngs/scripts/extract_overlaps.py",
+            "args": [
+                "--input", "${workspaceRoot}/test_data/overlap/overlap",
+                "--output", "${workspaceRoot}/test_data/overlap/quant"
+            ],
+            "cwd": "${workspaceRoot}",
+            "console": "integratedTerminal",
+        },
+        {
+            "name": "Count",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceRoot}/pyngs/scripts/count_overlaps.py",
+            "args": [
+                "--input", "${workspaceRoot}/test_data/overlap/quant.srt.txt",
+                "--output", "${workspaceRoot}/test_data/overlap/total.txt"
+            ],
+            "cwd": "${workspaceRoot}",
+            "console": "integratedTerminal",
+        },
+        {
             "name": "Haplotype vcf",
             "type": "python",
             "request": "launch",

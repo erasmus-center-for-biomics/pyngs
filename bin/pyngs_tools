@@ -132,15 +132,39 @@ def main():
     sparser.set_defaults(func=pyngs.scripts.filter_by_samtag)
 
     #
-    # Count BED overlaps
+    # Extract BED overlaps
     #
-    # sparser = subparsers.add_parser(
-    #     "count-bed-gtf-overlaps",
-    #     help="""
-    #     Count overlaps from BEDtools intersect. This script functions
-    #     on the output of
-    #     bedtools intersect -a FILEA -b FILEB -wo
-    #     """)
+    sparser = subparsers.add_parser(
+        "extract-overlaps",
+        help="""
+        Parses  bedtools intersect -wao -sorted -a [BED5 file] -b [GTF file] output
+        """)
+    sparser.add_argument(
+        "-i", "--input", dest="input",
+        type=str, nargs="?", default="stdin",
+        help="The file with overlaps.")
+    sparser.add_argument(
+        "-o", "--output", dest="output",
+        type=str, nargs="?", default="stdout",
+        help="The output tab-delimited text file.")
+    sparser.add_argument(
+        "-s", "--strand", dest="strand",
+        choices=["same", "opposite", "any"], default="any",
+        type=str, help="How to use the strand information of the overlaps.")
+    sparser.add_argument(
+        "--which", dest="which", default=["exon"],
+        type=str, help="Which types in the GTF file to count.")
+    sparser.add_argument(
+        "--who", dest="who", default=["Parent"],
+        type=str, help="""The field with the ids in the GFF
+        file to aggregate over.""")
+    sparser.add_argument(
+        "--what", dest="what", default="READNAME",
+        type=str, help="What to count.")
+    sparser.add_argument(
+        "--gtf", dest="gtf", default=False,
+        type=bool, help="the intersect was performed with a GTF file")
+    sparser.set_defaults(func=pyngs.scripts.extract_overlaps)
 
     #
     # Haplotype VCF files
