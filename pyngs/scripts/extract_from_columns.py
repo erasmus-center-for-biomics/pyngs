@@ -10,7 +10,9 @@ def parse_gtf_comment(comment):
     for fld in comment.split(";"):
         tokens = fld.split(" ", 1)
         if len(tokens) == 2:
-            fields[tokens[0]] = tokens[1].replace('"', "")
+            key = tokens[0].strip()
+            value = tokens[1].replace('"', "")
+            fields[key] = value
     return fields
 
 
