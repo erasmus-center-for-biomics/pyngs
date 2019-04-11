@@ -2,16 +2,16 @@
     "version": "1.0",
     "configurations": [
         {
-            "name": "Extract",
+            "name": "Extract from columns",
             "type": "python",
             "request": "launch",
-            "program": "${workspaceRoot}/pyngs/scripts/extract_overlaps.py",
+            "program": "${workspaceRoot}/pyngs/scripts/extract_from_columns.py",
             "args": [
                 "--input", "${workspaceRoot}/test_data/overlap/overlap",
                 "--output", "${workspaceRoot}/test_data/overlap/quant.txt",
                 "--columns", "8", "14", "3",
-                "--encodings", "none", "gff", "gff",
-                "--fields", "X", "Parent,ID", "READNAME"
+                "--encodings", "none", "gtf", "gff",
+                "--fields", "X", "gene_biotype,gene_id,transcript_id", "READNAME"
             ],
             "cwd": "${workspaceRoot}",
             "console": "integratedTerminal",

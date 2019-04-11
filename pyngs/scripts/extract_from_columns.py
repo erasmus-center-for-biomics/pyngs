@@ -1,16 +1,16 @@
 import sys
 import argparse
 import gzip
-import pyngs.bed.regions as regions
 
 
 def parse_gtf_comment(comment):
     """Parse the GTF comment."""
     fields = {}
     for fld in comment.split(";"):
+        fld = fld.strip()
         tokens = fld.split(" ", 1)
         if len(tokens) == 2:
-            key = tokens[0].strip()
+            key = tokens[0]
             value = tokens[1].replace('"', "")
             fields[key] = value
     return fields
