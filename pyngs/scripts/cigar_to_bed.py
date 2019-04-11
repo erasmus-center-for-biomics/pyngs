@@ -22,7 +22,9 @@ def to_bed(instream, outstream, operations, tags):
                 if tagname == "__sample__":
                     rgrp = alignment.get_tag("RG")
                     if rgrp:
-                        taglst.append("__sample__={0}".format(readgroups[rgrp[2]]))
+                        taglst.append(
+                            "__sample__={0}".format(
+                                readgroups[rgrp[2]]))
                     else:
                         taglst.append("__sample__=None")
                 else:
