@@ -27,8 +27,8 @@ def count(instream):
         yield pkey, score
 
 
-def count_overlaps(args):
-    """."""
+def count_last_column(args):
+    """Count the number of entries in the last column."""
     # open the input and output files
     instream = sys.stdin
     if args.input != "stdin":
@@ -55,23 +55,24 @@ def count_overlaps(args):
         outstream.close()
 
 
-
 if __name__ == "__main__":
 
     # parse the commandline arguments
     sparser = argparse.ArgumentParser(
-        prog="count_overlaps",
-        description="""Parses a sorted list and count the .""")
+        prog="count_last_column",
+        description="""Count the number of
+        different entries in the last column from a sorted
+        tab-delimited text file.""")
     sparser.add_argument(
         "-i", "--input", dest="input",
         type=str, nargs="?", default="stdin",
-        help="The file with overlaps.")
+        help="A tab-delimited text file.")
     sparser.add_argument(
         "-o", "--output", dest="output",
         type=str, nargs="?", default="stdout",
         help="The output tab-delimited text file.")
 
-    sparser.set_defaults(func=count_overlaps)
+    sparser.set_defaults(func=count_last_column)
 
     # parse the arguments
     args = sparser.parse_args()

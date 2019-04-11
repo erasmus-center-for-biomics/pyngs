@@ -135,36 +135,58 @@ def main():
     # Extract BED overlaps
     #
     sparser = subparsers.add_parser(
-        "extract-overlaps",
+        "extract-from-columns",
         help="""
-        Parses  bedtools intersect -wao -sorted -a [BED5 file] -b [GTF file] output
+        Parses tabular data like that from
+        bedtools intersect -wao -sorted -a [file] -b [file]
         """)
     sparser.add_argument(
         "-i", "--input", dest="input",
         type=str, nargs="?", default="stdin",
-        help="The file with overlaps.")
+        help="A tab-delimited input file.")
     sparser.add_argument(
         "-o", "--output", dest="output",
         type=str, nargs="?", default="stdout",
         help="The output tab-delimited text file.")
     sparser.add_argument(
-        "-s", "--strand", dest="strand",
-        choices=["same", "opposite", "any"], default="any",
-        type=str, help="How to use the strand information of the overlaps.")
+        "--columns", dest="columns",
+        nargs="+", type=int,
+        help="The columns to parse from the input stream.")
     sparser.add_argument(
-        "--which", dest="which", default=["exon"],
-        type=str, help="Which types in the GTF file to count.")
+        "--fields", dest="fields",
+        nargs="+", type=str,
+        help="""The field to extract per column. If multiple fields
+        should be extracted per column, commas can be used to
+        separate the values.
+
+        If the column has no encoding any string can be specified
+        as long as it is not empty.
+
+        If a field is not present in a column, __NA__ will be printed.""")
     sparser.add_argument(
-        "--who", dest="who", default=["Parent"],
-        type=str, help="""The field with the ids in the GFF
-        file to aggregate over.""")
+        "--encodings", dest="encodings", choices=["none", "gff", "gtf"],
+        nargs="+", type=str,
+        help="""The encoding in the columns.""")
+    sparser.set_defaults(func=pyngs.scripts.extract_from_columns)
+
+    #
+    # Count columns
+    #
+    sparser = subparsers.add_parser(
+        "count-last-column",
+        help="""Count the number of
+        different entries in the last column from a sorted
+        tab-delimited text file.
+        """)
     sparser.add_argument(
-        "--what", dest="what", default="READNAME",
-        type=str, help="What to count.")
+        "-i", "--input", dest="input",
+        type=str, nargs="?", default="stdin",
+        help="A tab-delimited text file.")
     sparser.add_argument(
-        "--gtf", dest="gtf", default=False,
-        type=bool, help="the intersect was performed with a GTF file")
-    sparser.set_defaults(func=pyngs.scripts.extract_overlaps)
+        "-o", "--output", dest="output",
+        type=str, nargs="?", default="stdout",
+        help="The output tab-delimited text file.")
+    sparser.set_defaults(func=pyngs.scripts.count_last_column)
 
     #
     # Haplotype VCF files

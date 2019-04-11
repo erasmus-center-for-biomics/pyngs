@@ -1,7 +1,15 @@
 
+# SAM to BED methods
 from .cigar_to_bed import cigar_to_bed
 from .merge_bed_entries import merge_bed_entries
+
+# SAM methods
 from .consensus import run_consensus
 from .filter_by_samtag import filter_by_samtag
-from .extract_overlaps import extract_overlaps
+
+# VCF methods
 from .haplotype_vcf import haplotype_vcf
+
+# Tabular methods
+from .extract_from_columns import extract_from_columns
+from .count_last_column import count_last_column

@@ -8,7 +8,10 @@
             "program": "${workspaceRoot}/pyngs/scripts/extract_overlaps.py",
             "args": [
                 "--input", "${workspaceRoot}/test_data/overlap/overlap",
-                "--output", "${workspaceRoot}/test_data/overlap/quant"
+                "--output", "${workspaceRoot}/test_data/overlap/quant.txt",
+                "--columns", "8", "14", "3",
+                "--encodings", "none", "gff", "gff",
+                "--fields", "X", "Parent,ID", "READNAME"
             ],
             "cwd": "${workspaceRoot}",
             "console": "integratedTerminal",
