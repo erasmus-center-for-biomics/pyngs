@@ -173,7 +173,7 @@ def main():
     # Count columns
     #
     sparser = subparsers.add_parser(
-        "   ",
+        "count-last-column",
         help="""Count the number of
         different entries in the last column from a sorted
         tab-delimited text file.
