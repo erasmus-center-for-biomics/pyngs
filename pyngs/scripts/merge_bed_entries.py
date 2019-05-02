@@ -59,18 +59,19 @@ def partition_bed(instream, target_tag="READNAME"):
 
 def unique(seq):
     """Get and count the unique entries in seq."""
-    prev = None
+    current = None
     count = 0
 
     for item in seq:
-        if count and item != prev:
-            yield prev, count
+        if item != current:
+            if current is not None:
+                yield current, count
             count = 0
-            prev = item
+            current = item
         count += 1
 
     if count:
-        yield prev, count
+        yield current, count
 
 
 def merge_entries(batch, comment):
