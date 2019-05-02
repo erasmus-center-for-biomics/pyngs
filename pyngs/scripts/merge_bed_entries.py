@@ -56,16 +56,43 @@ def partition_bed(instream, target_tag="READNAME"):
     if len(batch):
         yield curtag, batch
 
+def unique(seq):
+    """."""
+    prev = None
+    count = 0
+
+    for item in seq:
+        if count and item != prev:
+            yield prev, count
+            count = 0
+            prev = item
+        count += 1
+
+    if count:
+        yield prev, count
+
+
 
 def merge_entries(batch, comment):
     """Merge the entries for a batch."""
     # split entries per chromosome
     batch.sort(key=attrgetter("chromosome"))
     for chrom, values in groupby(batch, key=attrgetter("chromosome")):
-        values = list(values)
-        starts = [en.start for en in values]
-        ends = [en.end for en in values]
-        mrg = BED(chrom, min(starts), max(ends), comment, 0, ".")
+
+        #
+        starts, ends, strands = [], [], []
+        for entry in values:
+            starts.append(entry.start)
+            ends.append(entry.ends)
+            strands.append(entry.strand)
+
+        # determine the strand
+        strands.sort()
+        ustrand = [e for e in unique(strands)]
+        strand = ustrand[0][0] if len(ustrand) == 1 else "."
+
+        # print the merged entry
+        mrg = BED(chrom, min(starts), max(ends), comment, 0, strand)
         yield mrg
 
 
