@@ -56,8 +56,9 @@ def partition_bed(instream, target_tag="READNAME"):
     if len(batch):
         yield curtag, batch
 
+
 def unique(seq):
-    """."""
+    """Get and count the unique entries in seq."""
     prev = None
     count = 0
 
@@ -72,7 +73,6 @@ def unique(seq):
         yield prev, count
 
 
-
 def merge_entries(batch, comment):
     """Merge the entries for a batch."""
     # split entries per chromosome
@@ -83,7 +83,7 @@ def merge_entries(batch, comment):
         starts, ends, strands = [], [], []
         for entry in values:
             starts.append(entry.start)
-            ends.append(entry.ends)
+            ends.append(entry.end)
             strands.append(entry.strand)
 
         # determine the strand
