@@ -43,7 +43,7 @@ alignments can be discarded prior to a processing step.
 - *pyngs_tools haplotype-vcf* assigns bases to an allele in VCF files in which mother, father and child are present.
 Multiple trios can be assigned in a single file and the alleles of the parents are separated per child. The VCF files
 should be genotyped and thus need to have a GT tag. The maternal allele in the child is indicated in the *MAT* column
-in the format. The paternal allele is in the *PAT* column. Both parents will be annotated with an *OFF*spring column in
+in the format. The paternal allele is in the *PAT* column. Both parents will be annotated with the *OFF* (from offspring) column in
 which the transmitted base is indicated together with the sample-id in the form of *sample_id*/*base*.
 
 ### Examples
