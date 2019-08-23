@@ -1,3 +1,4 @@
+import logging
 import typing
 from .utils import quote_tokenizer
 
@@ -38,12 +39,23 @@ class Row:
         # parse the samples
         self.samples = []
         if len(tokens) > 9:
-            for token in tokens[9:]:
+            for sidx, token in enumerate(tokens[9:]):
                 spart = [x for x in quote_tokenizer(token, ":")]
+
+                # check the format partitions
+                if len(spart) != len(self.format): 
+                    logging.warn(
+                        "For variant %s:%d sample %d: Expected %d fields, found %d", 
+                        self.chrom, self.position, sidx,
+                        len(self.format), len(spart))
+                    if len(self.format) > len(spart):
+                        for _ in range(len(self.format) - len(spart)):
+                            spart.append(".")
+                    elif len(self.format) < len(spart):
+                        spart = spart[0:len(self.format)]
+
+                # add the sample
                 self.samples.append(spart)
-                if len(spart) != len(self.format):
-                    raise ValueError("Expected {0} fields, found {1}".format(
-                        len(self.format), len(spart)))
 
     @property
     def position(self):
