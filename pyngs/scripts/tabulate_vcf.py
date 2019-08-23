@@ -8,7 +8,7 @@ def tabulate(instream, outstream, tags=None):
     """Tabulate the tags in a VCF entry."""
     reader = pyngs.vcf.Reader(instream)
     outstream.write(
-        "{chrom}\t{position}\t{reference}\t{alternate}\t{sample}\t{values}".format(
+        "{chrom}\t{position}\t{reference}\t{alternate}\t{sample}\t{values}\n".format(
             chrom="chrom",
             position="position",
             reference="reference",
@@ -27,7 +27,7 @@ def tabulate(instream, outstream, tags=None):
                     values.append(".")
 
             outstream.write(
-                "{chrom}\t{position}\t{reference}\t{alternate}\t{sample}\t{values}".format(
+                "{chrom}\t{position}\t{reference}\t{alternate}\t{sample}\t{values}\n".format(
                     chrom=variant.chrom,
                     position=variant.position,
                     reference=variant.reference,
