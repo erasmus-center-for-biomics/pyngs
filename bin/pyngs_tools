@@ -227,8 +227,8 @@ def main():
     #
     sparser = subparsers.add_parser(
         "vcf-b-allel-frequency",
-        description="""Add the B-allele frequency to a VCF 
-        file based on the allelic depth.""")
+        description="""Add the frequency of the reference 
+        allele to a VCF file based on the allelic depth.""")
     sparser.add_argument(
         "-v", "--vcf", dest="vcf",
         type=str, nargs="?", default="stdin",
@@ -242,7 +242,7 @@ def main():
         type=str, help="The allelic depth tag in the FORMAT field.")
     sparser.set_defaults(func=pyngs.scripts.add_b_allel_frequency)
 
-     #
+    #
     # VCF add Log R ratio
     #
     sparser = subparsers.add_parser(
@@ -264,6 +264,25 @@ def main():
         "-e", "--expected", dest="expected",
         type=float, nargs="+", help="The allelic depth tag in the FORMAT field.")
     sparser.set_defaults(func=pyngs.scripts.add_log_r_ratio)
+
+    #
+    # VCF to table
+    #
+    sparser = subparsers.add_parser(
+        "tabulate-vcf",
+        description="""Tabulate a VCF file.""")
+    sparser.add_argument(
+        "-v", "--vcf", dest="vcf",
+        type=str, nargs="?", default="stdin",
+        help="The input VCF file.")
+    sparser.add_argument(
+        "-o", "--output", dest="output",
+        type=str, nargs="?", default="stdout",
+        help="The output VCF file.")
+    sparser.add_argument(
+        "-t", "--tags", dest="tags", nargs="+",
+        type=str, help="The FORMAT tags to include in the output.")
+    sparser.set_defaults(func=pyngs.scripts.tabulate_vcf)
 
     # parse the argument and call the script
     args = parser.parse_args()
