@@ -240,7 +240,7 @@ def main():
     sparser.add_argument(
         "-t", "--tag", dest="tag", default="AD",
         type=str, help="The allelic depth tag in the FORMAT field.")
-    sparser.set_defaults(func=pyngs.scripts.vcf.add_b_allel_frequency)
+    sparser.set_defaults(func=pyngs.scripts.add_b_allel_frequency)
 
      #
     # VCF add Log R ratio
@@ -263,7 +263,7 @@ def main():
     sparser.add_argument(
         "-e", "--expected", dest="expected",
         type=float, nargs="+", help="The allelic depth tag in the FORMAT field.")
-    sparser.set_defaults(func=pyngs.scripts.vcf.add_log_r_ratio)
+    sparser.set_defaults(func=pyngs.scripts.add_log_r_ratio)
 
     # parse the argument and call the script
     args = parser.parse_args()
