@@ -1,4 +1,7 @@
 
+# FastQ methods
+from .trim_fastq import trim_fastq
+
 # SAM to BED methods
 from .cigar_to_bed import cigar_to_bed
 from .merge_bed_entries import merge_bed_entries

@@ -61,3 +61,9 @@ def add_log_r_ratio(args):
     
     # add the LRR value
     add_lrr(instream, outstream, args.tag, args.expected)
+
+    # close the in and output files
+    if instream is not sys.stdin:
+        instream.close()
+    if outstream is not sys.stdout:
+        outstream.close()

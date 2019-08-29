@@ -12,6 +12,27 @@ def main():
     subparsers = parser.add_subparsers(help="sub-command help")
 
     #
+    # Shorten FastQ
+    #
+    sparser = subparsers.add_parser(
+        "trim-fastq",
+        help="""Shorten the reads in a FastQ file 
+        to the specified length.""")
+    sparser.add_argument(
+        "-i", "--input", dest="input",
+        type=str, default="stdin",
+        help="""The input FastQ file.""")
+    sparser.add_argument(
+        "-o", "--output", dest="output",
+        type=str, default="stdout",
+        help="The output FastQ file.")
+    sparser.add_argument(
+        "-l", "--length", dest="length",
+        type=int, default=50,
+        help="""The size to trim the reads to.""")
+    sparser.set_defaults(func=pyngs.scripts.trim_fastq)
+
+    #
     # cigar-to-bed command
     #
     sparser = subparsers.add_parser(

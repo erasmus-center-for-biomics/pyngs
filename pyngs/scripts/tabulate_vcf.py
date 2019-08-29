@@ -54,3 +54,9 @@ def tabulate_vcf(args):
     
     # add the BAF value
     tabulate(instream, outstream, args.tags)
+
+    # close the in and output files
+    if instream is not sys.stdin:
+        instream.close()
+    if outstream is not sys.stdout:
+        outstream.close()

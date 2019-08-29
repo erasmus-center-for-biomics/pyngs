@@ -60,3 +60,9 @@ def add_b_allel_frequency(args):
     
     # add the BAF value
     add_baf(instream, outstream, args.tag)
+
+    # close the in and output files
+    if instream is not sys.stdin:
+        instream.close()
+    if outstream is not sys.stdout:
+        outstream.close()
