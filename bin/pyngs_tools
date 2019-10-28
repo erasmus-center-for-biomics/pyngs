@@ -60,8 +60,8 @@ def main():
     # Extract information from the read names
     #
     sparser = subparsers.add_parser(
-        prog="extract-tags",
-        description="""Extract information from the read names 
+        "extract-tags",
+        help="""Extract information from the read names 
         and add them as tags in a SAM file.""")
     sparser.add_argument(
         "-i", "--input", dest="input",
@@ -115,8 +115,7 @@ def main():
     #
     sparser = subparsers.add_parser(
         "merge-bed-entries",
-        help="""
-        Merge BED entries that represent the same DNA fragment.
+        help="""Merge BED entries that represent the same DNA fragment.
         """)
     sparser.add_argument(
         "-i", "--input", dest="input",
