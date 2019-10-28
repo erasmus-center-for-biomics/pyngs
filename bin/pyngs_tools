@@ -78,7 +78,7 @@ def main():
         "-t", "--tag", dest="tag",
         type=str, default="umi",
         help="""The tag to use for the UMI sequence""")
-    sparser.set_defaults(func=pyngs.scripts.extract_subreads)
+    sparser.set_defaults(func=pyngs.scripts.add_umis_to_readname)
  
     #
     # Extract information from the read names
