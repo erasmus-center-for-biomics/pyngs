@@ -1,6 +1,6 @@
 """Read, write and otherwise process alignments in SAM format."""
 import re
-from typing import TextIO, List, Tuple, Generator, Dict
+from typing import TextIO, List, Tuple, Generator, Dict, Iterable
 from .cigar import CIGAR_OPERATIONS, \
     CIGAR_OPERATIONS_ON_REFERENCE, \
     cigar_operations
@@ -264,7 +264,7 @@ class Alignment:
         self.mate_position = position
         self.tlen = tlen
 
-    def cigar_regions(self) -> Generator[Tuple[str, int, int, str]]:
+    def cigar_regions(self) -> Generator[Tuple[str, int, int, str], None, None]:
         """
         Interpret the cigar regions as separate regions.
 
@@ -333,7 +333,7 @@ class Alignment:
             tags=tags)
 
 
-def next_tag(tags: Generator[Tuple[str, str, str]]) -> Tuple[str, str, str]:
+def next_tag(tags: Iterable[Tuple[str, str, str]]) -> Tuple[str, str, str]:
     """
     Get the next tag.
 
