@@ -42,7 +42,7 @@ def clean_readname(readname: str) -> str:
     :param readname: the name of a read
     :return: the string of the readname up to the first space
     """
-    return readname.split(" ")[0]
+    return readname.split(" ", 1)[0]
 
 
 def encode_in_readname(readname: str, data: Iterable[str], sep: str=":") -> str:
