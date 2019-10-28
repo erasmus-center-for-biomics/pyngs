@@ -33,6 +33,55 @@ def main():
     sparser.set_defaults(func=pyngs.scripts.trim_fastq)
 
     #
+    # Extract a sub read from a FastQ file
+    #
+    sparser = subparsers.add_parser(
+        "extract-subread-from-fastq",
+        help="""Extract a subread from a FastQ file.""")
+    sparser.add_argument(
+        "-i", "--input", dest="input",
+        type=str, default="stdin",
+        help="""The input FastQ file.""")
+    sparser.add_argument(
+        "-o", "--output", dest="output",
+        type=str, default="stdout",
+        help="The output FastQ file.")
+    sparser.add_argument(
+        "-s", "--start", dest="start",
+        type=int, default=0,
+        help="""The start of the sub-read.""")
+    sparser.add_argument(
+        "-e", "--end", dest="end",
+        type=int, default=-1,
+        help="""The end of the sub-read.""")
+    sparser.set_defaults(func=pyngs.scripts.extract_subreads)
+
+    #
+    # Extract information from the read names
+    #
+    sparser = subparsers.add_parser(
+        prog="extract-tags",
+        description="""Extract information from the read names 
+        and add them as tags in a SAM file.""")
+    sparser.add_argument(
+        "-i", "--input", dest="input",
+        type=str, default="stdin",
+        help="""The input SAM file.""")
+    sparser.add_argument(
+        "-o", "--output", dest="output",
+        type=str, default="stdout",
+        help="The output SAM file.")
+    sparser.add_argument(
+        "-t", "--tags", dest="tags",
+        type=str, nargs="+",
+        help="""The tags to extract from the read name""")
+    sparser.add_argument(
+        "-s", "--sam-tag", dest="samtags",
+        type=str, nargs="+",
+        help="""The tag to deposit in the SAM file""")
+    sparser.set_defaults(func=pyngs.scripts.retrieve_tag_from_readname)
+
+    #
     # cigar-to-bed command
     #
     sparser = subparsers.add_parser(

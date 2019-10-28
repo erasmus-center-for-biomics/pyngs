@@ -2,10 +2,10 @@
 A generator to parse FastQ files.
 """
 import sys
-from typing import TextIO, Generator, List
+from typing import TextIO, Generator
 
 
-def fastq(instream: TextIO) -> (Generator[str, str, str]):
+def fastq(instream: TextIO) -> Generator[str, str, str]:
     """
     Parse a FastQ file.
     :param instream: the input stream with FastQ formatted data.
@@ -22,7 +22,7 @@ def fastq(instream: TextIO) -> (Generator[str, str, str]):
         pass
 
 
-def format(name: str, sequence: str, quality: str) -> (str):
+def format(name: str, sequence: str, quality: str) -> str:
     """
     Format a FastQ entry.
     :param name: the read name
@@ -36,7 +36,7 @@ def format(name: str, sequence: str, quality: str) -> (str):
         qual=quality)
 
 
-def clean_readname(readname: str) -> (str):
+def clean_readname(readname: str) -> str:
     """
     Removes all characters after the first space.
     :param readname: the name of a read
@@ -45,7 +45,7 @@ def clean_readname(readname: str) -> (str):
     return readname.split(" ")[0]
 
 
-def encode_in_readname(readname: str, data: List[str], sep: str=":") -> (str):
+def encode_in_readname(readname: str, data: Generator[str], sep: str=":") -> str:
     """
     Encode data in the read-name.
     :param readname: the name of a read

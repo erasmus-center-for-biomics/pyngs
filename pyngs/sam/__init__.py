@@ -1,6 +1,6 @@
 """Read, write and otherwise process alignments in SAM format."""
-import typing
 import re
+from typing import TextIO, List, Tuple, Generator, Dict
 from .cigar import CIGAR_OPERATIONS, \
     CIGAR_OPERATIONS_ON_REFERENCE, \
     cigar_operations
@@ -30,7 +30,7 @@ class Alignment:
         "mate_position", "tlen", "sequence", "quality",
         "tags"]
 
-    def __init__(self, *args):
+    def __init__(self, *args) -> None:
         """Create a new alignment."""
         self.name = args[0]
         self.flag = args[1]
@@ -45,7 +45,7 @@ class Alignment:
         self.quality = args[10]
         self.tags = args[11]
 
-    def is_set(self, mask):
+    def is_set(self, mask: int) -> bool:
         """
         Check whether the bits in the mask are set in the flag.
 
@@ -54,7 +54,7 @@ class Alignment:
         """
         return self.flag | mask == self.flag
 
-    def set_bits(self, mask):
+    def set_bits(self, mask: int) -> None:
         """
         Set the bit in the mask.
 
@@ -62,7 +62,7 @@ class Alignment:
         """
         self.flag |= mask
 
-    def clear_bits(self, mask):
+    def clear_bits(self, mask) -> None:
         """
         Clear the bit in the mask.
 
@@ -71,139 +71,139 @@ class Alignment:
         self.flag &= ~mask
 
     @property
-    def paired(self):
+    def paired(self) -> bool:
         return self.is_set(IS_PAIRED)
 
     @paired.setter
-    def paired(self, value: bool):
+    def paired(self, value: bool) -> None:
         if value:
             self.set_bits(IS_PAIRED)
         else:
             self.clear_bits(IS_PAIRED)
 
     @property
-    def proper_pair(self):
+    def proper_pair(self) -> bool:
         return self.is_set(PROPER_PAIR)
 
     @proper_pair.setter
-    def proper_pair(self, value: bool):
+    def proper_pair(self, value: bool) -> None:
         if value:
             self.set_bits(PROPER_PAIR)
         else:
             self.clear_bits(PROPER_PAIR)
 
     @property
-    def unmapped(self):
+    def unmapped(self) -> bool:
         return self.is_set(QUERY_UNMAPPED)
 
     @unmapped.setter
-    def unmapped(self, value: bool):
+    def unmapped(self, value: bool) -> None:
         if value:
             self.set_bits(QUERY_UNMAPPED)
         else:
             self.clear_bits(QUERY_UNMAPPED)
 
     @property
-    def mate_unmapped(self):
+    def mate_unmapped(self) -> bool:
         return self.is_set(MATE_UNMAPPED)
 
     @mate_unmapped.setter
-    def mate_unmapped(self, value: bool):
+    def mate_unmapped(self, value: bool) -> None:
         if value:
             self.set_bits(MATE_UNMAPPED)
         else:
             self.clear_bits(MATE_UNMAPPED)
 
     @property
-    def reverse(self):
+    def reverse(self) -> bool:
         return self.is_set(IS_REVERSE)
 
     @reverse.setter
-    def reverse(self, value: bool):
+    def reverse(self, value: bool) -> None:
         if value:
             self.set_bits(IS_REVERSE)
         else:
             self.clear_bits(IS_REVERSE)
 
     @property
-    def mate_reverse(self):
+    def mate_reverse(self) -> bool:
         return self.is_set(MATE_IS_REVERSE)
 
     @mate_reverse.setter
-    def mate_reverse(self, value: bool):
+    def mate_reverse(self, value: bool) -> None:
         if value:
             self.set_bits(MATE_IS_REVERSE)
         else:
             self.clear_bits(MATE_IS_REVERSE)
 
     @property
-    def first_in_pair(self):
+    def first_in_pair(self) -> bool:
         return self.is_set(FIRST_IN_PAIR)
 
     @first_in_pair.setter
-    def first_in_pair(self, value: bool):
+    def first_in_pair(self, value: bool) -> None:
         if value:
             self.set_bits(FIRST_IN_PAIR)
         else:
             self.clear_bits(FIRST_IN_PAIR)
 
     @property
-    def last_in_pair(self):
+    def last_in_pair(self) -> bool:
         return self.is_set(LAST_IN_PAIR)
 
     @last_in_pair.setter
-    def last_in_pair(self, value: bool):
+    def last_in_pair(self, value: bool) -> None:
         if value:
             self.set_bits(LAST_IN_PAIR)
         else:
             self.clear_bits(LAST_IN_PAIR)
 
     @property
-    def secondary_alignment(self):
+    def secondary_alignment(self) -> bool:
         return self.is_set(NOT_PRIMARY)
 
     @secondary_alignment.setter
-    def secondary_alignment(self, value: bool):
+    def secondary_alignment(self, value: bool) -> None:
         if value:
             self.set_bits(NOT_PRIMARY)
         else:
             self.clear_bits(NOT_PRIMARY)
 
     @property
-    def does_not_pass_filters(self):
+    def does_not_pass_filters(self) -> bool:
         return self.is_set(QC_FAILED)
 
     @does_not_pass_filters.setter
-    def does_not_pass_filters(self, value: bool):
+    def does_not_pass_filters(self, value: bool) -> None:
         if value:
             self.set_bits(QC_FAILED)
         else:
             self.clear_bits(QC_FAILED)
 
     @property
-    def duplicate(self):
+    def duplicate(self) -> bool:
         return self.is_set(DUPLICATE)
 
     @duplicate.setter
-    def duplicate(self, value: bool):
+    def duplicate(self, value: bool) -> None:
         if value:
             self.set_bits(DUPLICATE)
         else:
             self.clear_bits(DUPLICATE)
 
     @property
-    def supplementary_alignment(self):
+    def supplementary_alignment(self) -> bool:
         return self.is_set(SUPPLEMENTARY)
 
     @supplementary_alignment.setter
-    def supplementary_alignment(self, value: bool):
+    def supplementary_alignment(self, value: bool) -> None:
         if value:
             self.set_bits(SUPPLEMENTARY)
         else:
             self.clear_bits(SUPPLEMENTARY)
 
     @property
-    def mate(self) -> (tuple):
+    def mate(self) -> Tuple[str, str]:
         """
         Get the mate chromosome and postion.
 
@@ -215,7 +215,7 @@ class Alignment:
         return rchrom, self.mate_chromosome
 
     @mate.setter
-    def mate(self, other):
+    def mate(self, other) -> None:
         """
         Set the mate of the current alignment.
 
@@ -264,7 +264,7 @@ class Alignment:
         self.mate_position = position
         self.tlen = tlen
 
-    def cigar_regions(self):
+    def cigar_regions(self) -> Generator[Tuple[str, int, int, str]]:
         """
         Interpret the cigar regions as separate regions.
 
@@ -283,7 +283,7 @@ class Alignment:
                 operation)
         return
 
-    def get_tag(self, code: str="XX") -> (tuple):
+    def get_tag(self, code: str="XX") -> Tuple[str, str, str]:
         """
         Get a tag with a specific code.
 
@@ -295,7 +295,7 @@ class Alignment:
                 return tag
         return None
 
-    def get_tags(self, codes: list) -> (list):
+    def get_tags(self, codes: List[str]) -> List[Tuple[str, str, str]]:
         """Get a set of tags."""
         retval = [None] * len(codes)
         for tag in self.tags:
@@ -304,11 +304,11 @@ class Alignment:
         return retval
 
     @classmethod
-    def format_tag(cls, tag: list) -> (str):
+    def format_tag(cls, tag: List[str]) -> str:
         """Format a tag."""
         return tag[0] + ":" + tag[1] + ":" + str(tag[2])
 
-    def __repr__(self) -> (str):
+    def __repr__(self) -> str:
         """
         Print the alignment in SAM format.
 
@@ -333,7 +333,7 @@ class Alignment:
             tags=tags)
 
 
-def next_tag(tags: list) -> (list):
+def next_tag(tags: Generator[Tuple[str, str, str]]) -> Tuple[str, str, str]:
     """
     Get the next tag.
 
@@ -346,7 +346,7 @@ def next_tag(tags: list) -> (list):
             yield (tmp[0], tmp[1], tmp[2])
 
 
-def from_tokens(tokens: list):
+def from_tokens(tokens: List[str]) -> Alignment:
     """
     Parse a SAM alignment from a list of tokens.
 
@@ -363,7 +363,7 @@ def from_tokens(tokens: list):
     return Alignment(*tokens[:11], tags)
 
 
-def from_string(line: str, sep: str="\t"):
+def from_string(line: str, sep: str="\t") -> Alignment:
     """
     Parse a SAM alignment from a string.
 
@@ -377,7 +377,7 @@ def from_string(line: str, sep: str="\t"):
 class Reader:
     """Parse a SAM file."""
 
-    def __init__(self, stream: typing.TextIO):
+    def __init__(self, stream: TextIO):
         """Initialize a new SAM reader."""
         self.header = []
         self.stream = stream
@@ -391,7 +391,7 @@ class Reader:
                 self.lastline = line
                 break
 
-    def readgroups(self):
+    def readgroups(self) -> Dict[str, str]:
         """Get the readgroup to sample map."""
         matcher = re.compile("^.*ID:([^\t]+).*SM:([^\t]+).*$")
         samples = {}
@@ -420,29 +420,29 @@ class Reader:
 class Writer:
     """Write a SAM file."""
 
-    def __init__(self, stream, header):
+    def __init__(self, stream: TextIO, header) -> None:
         """Initialize the SAM writer."""
         self.stream = stream
         self.header = header
         self.write_header()
 
-    def write_header(self):
+    def write_header(self) -> None:
         """Write the header."""
         if self.header is not None:
             for line in self.header:
                 self.stream.write("{line}\n".format(line=line))
 
-    def write(self, aln):
+    def write(self, aln: Alignment) -> None:
         """Write a new alignment to the SAM file."""
         self.stream.write("{aln}\n".format(aln=repr(aln)))
 
 
-def quality_to_score(qchar, offset=32):
+def quality_to_score(qchar: str, offset: int=32) -> int:
     """Convert the quality to a score."""
     return ord(qchar) - offset
 
 
-def score_to_quality(qval, offset=32, maxval=126):
+def score_to_quality(qval, offset: int=32, maxval: int=126):
     """Convert a score to quality value."""
     cval = int(qval) + offset
     if cval > maxval:
