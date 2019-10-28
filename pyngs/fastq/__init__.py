@@ -2,7 +2,7 @@
 A generator to parse FastQ files.
 """
 import sys
-from typing import TextIO, Generator
+from typing import TextIO, Generator, Iterable
 
 
 def fastq(instream: TextIO) -> Generator[str, str, str]:
@@ -45,7 +45,7 @@ def clean_readname(readname: str) -> str:
     return readname.split(" ")[0]
 
 
-def encode_in_readname(readname: str, data: Generator[str], sep: str=":") -> str:
+def encode_in_readname(readname: str, data: Iterable[str], sep: str=":") -> str:
     """
     Encode data in the read-name.
     :param readname: the name of a read
