@@ -1,7 +1,7 @@
 import sys
 import gzip
 import argparse
-from typing import Generator
+from typing import Iterable
 from pyngs.fastq import fastq, encode_in_readname
 
 

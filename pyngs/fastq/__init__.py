@@ -2,10 +2,10 @@
 A generator to parse FastQ files.
 """
 import sys
-from typing import TextIO, Generator, Iterable
+from typing import TextIO, Generator, Tuple, Iterable
 
 
-def fastq(instream: TextIO) -> Generator[str, str, str]:
+def fastq(instream: TextIO) -> Generator[Tuple[str, str, str], None, None]:
     """
     Parse a FastQ file.
     :param instream: the input stream with FastQ formatted data.

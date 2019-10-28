@@ -5,7 +5,7 @@ from typing import Generator, Tuple
 from pyngs.fastq import fastq
 
 
-def subreads(provider: Generator[Tuple[str, str, str]], start: int=0, end: int=-1):
+def subreads(provider: Generator[Tuple[str, str, str], None, None], start: int=0, end: int=-1):
     """Shorten the reads from the provider."""
     for name, sequence, quality in provider:
         if len(sequence) < start:
