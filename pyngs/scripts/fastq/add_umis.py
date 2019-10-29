@@ -30,7 +30,7 @@ def add_umis_to_readname(args: argparse.Namespace) -> None:
     umiprovider = fastq(umistream)
     for name, sequence, quality in fastq(instream):
         _, umi, _ = next(umiprovider)
-        eumi = "{tag}={umi}".format(args.tag, umi)
+        eumi = "{0}={1}".format(args.tag, umi)
         name = clean_readname(name)
         name = encode_in_readname(name, [eumi])       
         outstream.write("@{0}\n{1}\n+\n{2}\n".format(
