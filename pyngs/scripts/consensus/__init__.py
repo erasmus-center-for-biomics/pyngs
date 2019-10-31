@@ -1,7 +1,8 @@
 import sys
 import gzip
 import itertools
-import multiprocessing
+import argparse
+from multiprocessing import Queue 
 from pyngs import sam
 
 from .header import consensus_header
@@ -37,11 +38,13 @@ def group_per_umi(reader, tag="um"):
         yield umi, batch
 
 
-def make_consensus(inpath, outpath, tag="um", max_distance=20, discard=False, nworkers=8):
+def make_consensus(
+        inpath: str, outpath: str, 
+        tag: str="um", max_distance: int=20, discard: bool=False, nworkers: int=8, queue_size: int=1000):
     """Run make consensus alignments."""
     # prepare the queues
-    to_workers = multiprocessing.Queue(maxsize=100000)
-    to_writer = multiprocessing.Queue(maxsize=100000)
+    to_workers = Queue(maxsize=queue_size)
+    to_writer = Queue(maxsize=queue_size)
 
     # prepare reading the input file
     instream = sys.stdin
@@ -95,7 +98,7 @@ def make_consensus(inpath, outpath, tag="um", max_distance=20, discard=False, nw
     # print("returning")
 
 
-def run_consensus(args):
+def run_consensus(args: argparse.Namespace):
     """Run the consensus calling."""
     # open the files
     make_consensus(
@@ -104,4 +107,41 @@ def run_consensus(args):
         args.tag,
         args.distance,
         args.discard,
-        nworkers=args.workers)
+        nworkers=args.workers,
+        queue_size=args.queue_size)
+
+if __name__ == '__main__':
+    sparser = argparse.ArgumentParser(
+        prog="extract_subread_from_fastq", 
+        description="""Extract a subread from a FastQ file.""")
+    sparser.add_argument(
+        "-s", "--sam", dest="sam",
+        type=str, default="stdin",
+        help="""The input SAM file sorted on the tag
+        with samtools sort -t {tag}.""")
+    sparser.add_argument(
+        "-t", "--tag", dest="tag",
+        type=str, default="um",
+        help="The tag-name for the UMI tag.")
+    sparser.add_argument(
+        "-r", "--discard", dest="discard",
+        type=bool, default=False,
+        help="Will non consensus alignments be discarded.")
+    sparser.add_argument(
+        "-d", "--distance", dest="distance",
+        type=int,  default=20,
+        help="""The allowed distance between the start postion of
+        alignments with the same UMI.""")
+    sparser.add_argument(
+        "-w", "--workers", dest="workers",
+        type=int, default=8,
+        help="""The number of workers for the consensus alignments.""")
+    sparser.add_argument(
+        "-q", "--queue", dest="queue_size",
+        type=int, default=100,
+        help="""The number of objects to hold in the Queues.""")
+    sparser.add_argument(
+        "-o", "--output", dest="out",
+        type=str, default="stdout",
+        help="The output SAM file with the consensus sequences.")
+    sparser.set_defaults(func=run_consensus)

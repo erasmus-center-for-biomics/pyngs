@@ -1,11 +1,11 @@
-import multiprocessing
+from multiprocessing import Queue, Process
+from typing import Callable
 
-
-class Worker(multiprocessing.Process):
+class Worker(Process):
     """A worker."""
 
-    def __init__(self, inqueue, outqueue, to_run):
-        multiprocessing.Process.__init__(self)
+    def __init__(self, inqueue: Queue, outqueue: Queue, to_run: Callable):
+        Process.__init__(self)
         self.q_in = inqueue
         self.q_out = outqueue
         self.to_run = to_run

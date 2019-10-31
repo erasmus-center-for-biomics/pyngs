@@ -166,29 +166,33 @@ def main():
         """)
     sparser.add_argument(
         "-s", "--sam", dest="sam",
-        type=str, nargs="?", default="stdin",
+        type=str, default="stdin",
         help="""The input SAM file sorted on the tag
         with samtools sort -t {tag}.""")
     sparser.add_argument(
         "-t", "--tag", dest="tag",
-        type=str, nargs="?", default="um",
+        type=str, default="um",
         help="The tag-name for the UMI tag.")
     sparser.add_argument(
         "-r", "--discard", dest="discard",
-        type=bool, nargs="?", default=False,
+        type=bool, default=False,
         help="Will non consensus alignments be discarded.")
     sparser.add_argument(
         "-d", "--distance", dest="distance",
-        type=int, nargs="?", default=20,
+        type=int,  default=20,
         help="""The allowed distance between the start postion of
         alignments with the same UMI.""")
     sparser.add_argument(
         "-w", "--workers", dest="workers",
-        type=int, nargs="?", default=8,
+        type=int, default=8,
         help="""The number of workers for the consensus alignments.""")
     sparser.add_argument(
+        "-q", "--queue", dest="queue_size",
+        type=int, default=100,
+        help="""The number of objects to hold in the Queues.""")
+    sparser.add_argument(
         "-o", "--output", dest="out",
-        type=str, nargs="?", default="stdout",
+        type=str, default="stdout",
         help="The output SAM file with the consensus sequences.")
     sparser.set_defaults(func=pyngs.scripts.run_consensus)
 

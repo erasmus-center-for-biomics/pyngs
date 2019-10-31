@@ -1,14 +1,15 @@
 import gzip
 import sys
-import multiprocessing
+from multiprocessing import Process, Queue
+from typing import List
 from pyngs import sam
 
 
-class Writer(multiprocessing.Process):
+class Writer(Process):
     """A worker."""
 
-    def __init__(self, inqueue, filename, header):
-        multiprocessing.Process.__init__(self)
+    def __init__(self, inqueue: Queue, filename: str, header: List[str]):
+        Process.__init__(self)
         self.q_in = inqueue
         self.filename = filename
         self.header = header
