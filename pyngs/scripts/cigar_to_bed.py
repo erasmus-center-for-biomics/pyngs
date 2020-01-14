@@ -70,7 +70,7 @@ def to_bed(instream, outstream, operations, tags, merge_entries=False):
                         score=cigar[4],
                         strand=cigar[5]))
         else:
-            for cigar in format_single_cigars(alignment, tags, operations):
+            for cigar in format_single_cigars(alignment, taglst, operations):
                 outstream.write(
                     bedline.format(
                         chromosome=cigar[0],
