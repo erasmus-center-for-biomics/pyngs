@@ -132,7 +132,7 @@ def main():
         help="""The BAM tags to add to the comment column in the
                 BED entries. Use the keyword __sample__ to add the
                 sample as a comment.""")
-    sparse.add_argument(
+    sparser.add_argument(
         "-m", "--merge-entries", dest="merge_entries",
         type=bool, default=False,
         help="""Merge BED entries from the same read to a single entry""")
