@@ -27,7 +27,7 @@ def format_single_cigars(alignment, tags, operations):
         tags=";".join(tags))
     cigars = [cig for cig in alignment.cigar_regions() if cig[3] in operations]
     cigars.sort(key=itemgetter(0, 1))
-    yield (cigars[0][0], cigars[0][1], cigars[len(cigars) - 1][0], comment, alignment.mapping_quality, strand)
+    yield (cigars[0][0], cigars[0][1], cigars[len(cigars) - 1][2], comment, alignment.mapping_quality, strand)
 
 
 def to_bed(instream, outstream, operations, tags, merge_entries=False):
