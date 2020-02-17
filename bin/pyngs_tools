@@ -379,11 +379,34 @@ def main():
     sparser.add_argument(
         "-o", "--output", dest="output",
         type=str, nargs="?", default="stdout",
-        help="The output VCF file.")
+        help="The output table.")
     sparser.add_argument(
         "-t", "--tags", dest="tags", nargs="+",
         type=str, help="The FORMAT tags to include in the output.")
     sparser.set_defaults(func=pyngs.scripts.tabulate_vcf)
+
+      #
+    # VCF to table (2)
+    #
+    sparser = subparsers.add_parser(
+        "vcf-to-table",
+        description="""Tabulate a VCF file.""")
+    sparser.add_argument(
+        "-v", "--vcf", dest="vcf",
+        type=str, nargs="?", default="stdin",
+        help="The input VCF file.")
+    sparser.add_argument(
+        "-o", "--output", dest="output",
+        type=str, nargs="?", default="stdout",
+        help="The output table.")
+    sparser.add_argument(
+        "-s", "--sep", dest="sep",
+        type=str, nargs="?", default="stdout",
+        help="The output field separator.")
+    sparser.add_argument(
+        "-t", "--tags", dest="tags", nargs="+",
+        type=str, help="The tags (INFO/X, FORMAT/X) to include in the output.")
+    sparser.set_defaults(func=pyngs.scripts.vcf_to_table)
 
     # parse the argument and call the script
     args = parser.parse_args()

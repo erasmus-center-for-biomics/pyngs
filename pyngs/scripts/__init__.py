@@ -14,10 +14,11 @@ from .filter_by_samtag import filter_by_samtag
 from .sam.retrieve_tag_from_readname import retrieve_tag_from_readname
 
 # VCF methods
-from .haplotype_vcf import haplotype_vcf
-from .b_allel_frequency import add_b_allel_frequency
-from .log_r_ratio import add_log_r_ratio
-from .tabulate_vcf import tabulate_vcf
+from .vcf.haplotype_vcf import haplotype_vcf
+from .vcf.b_allel_frequency import add_b_allel_frequency
+from .vcf.log_r_ratio import add_log_r_ratio
+from .vcf.tabulate_vcf import tabulate_vcf
+from .vcf.vcf_to_table import vcf_to_table
 
 # Tabular methods
 from .extract_from_columns import extract_from_columns
