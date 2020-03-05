@@ -344,7 +344,7 @@ def main():
         help="The output VCF file.")
     sparser.add_argument(
         "-f", "--minimum-frequency", dest="minimum_frequency",
-        type=float, default=0.01  * 1000000,
+        type=float, default=0.01,
         help="""The minimum alternate allele frequency.""")
     sparser.add_argument(
         "-r", "--minimum-alternate-reads", dest="minimum_alternate",

@@ -13,7 +13,7 @@ class CallerOptions:
         self.minimum_frequency = 0.01 * 1000000
         self.minimum_alternate = 0
         self.output_tag = "XAF"
-        self.output_header = """FORMAT=<ID={tag},Number=R,Type=Integer,Description="Allele Frequency * million (AD/total * 1000000)">"""
+        self.output_header = """FORMAT=<ID={tag},Number=R,Type=Integer,Description="Allele Frequency X 1 million (AD/total * 1000000)">"""
         self.digits = 5
 
 
