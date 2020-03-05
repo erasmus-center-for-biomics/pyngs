@@ -13,7 +13,7 @@ class CallerOptions:
         self.minimum_frequency = 0.01
         self.minimum_alternate = 0
         self.output_tag = "XAF"
-        self.output_header = """FORMAT=<ID={tag},Number=A,Type=Float,Description="Allele Frequency (AD/total)">"""
+        self.output_header = """FORMAT=<ID={tag},Number=R,Type=Float,Description="Allele Frequency (AD/total)">"""
         self.digits = 5
 
 
@@ -56,7 +56,8 @@ def call_variants(opt: CallerOptions, instream: TextIO, outstream: TextIO):
                     keep = True
 
             # print the frequencies to a string
-            freqstr[sampleidx] = ",".join([str(round(f, opt.digits)) for f in freqs])
+            if len(freqs) > 0:
+                freqstr[sampleidx] = ",".join([str(round(f, opt.digits)) for f in freqs])
         
         # if we keep the variant, add the alternate 
         # allele frequencies and write the variant 
