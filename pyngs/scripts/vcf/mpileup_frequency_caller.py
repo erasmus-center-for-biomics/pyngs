@@ -12,8 +12,8 @@ class CallerOptions:
         self.input_tag = "AD"
         self.minimum_frequency = 0.01
         self.minimum_alternate = 0
-        self.output_tag = "aaf"
-        self.output_header = """FORMAT=<ID={tag},Number=A,Type=Float,Description="Alternate Allele Frequency (alt/total)">"""
+        self.output_tag = "af"
+        self.output_header = """FORMAT=<ID={tag},Number=R,Type=Float,Description="Allele Frequency (AD/total)">"""
         self.digits = 5
 
 
@@ -51,10 +51,8 @@ def call_variants(opt: CallerOptions, instream: TextIO, outstream: TextIO):
             for idx, val in enumerate(values):
                 if val is None:
                     continue
-                if idx == 0:
-                    continue
-                freqs[idx-1] = val / totaldepth
-                if freqs[idx-1] >= opt.minimum_frequency and val >= opt.minimum_alternate:
+                freqs[idx] = val / totaldepth
+                if idx > 0 and freqs[idx] >= opt.minimum_frequency and val >= opt.minimum_alternate:
                     keep = True
 
             # print the frequencies to a string
