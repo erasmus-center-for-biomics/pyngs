@@ -13,7 +13,7 @@ class CallerOptions:
         self.minimum_frequency = 0.01
         self.minimum_alternate = 0
         self.output_tag = "XAF"
-        self.output_header = """FORMAT=<ID={tag},Number=R,Type=Float,Description="Allele Frequency (AD/total)">"""
+        self.output_header = """FORMAT=<ID={tag},Number=A,Type=Float,Description="Allele Frequency (AD/total)">"""
         self.digits = 5
 
 
@@ -47,17 +47,16 @@ def call_variants(opt: CallerOptions, instream: TextIO, outstream: TextIO):
             totaldepth = sum([v for v in values if v is not None])
 
             # determine the variant frequencies
-            freqs = [0.0] * len(values)
+            freqs = [0.0] * (len(values) - 1)
             for idx, val in enumerate(values):
-                if val is None:
+                if val is None or idx == 0:
                     continue
-                freqs[idx] = val / totaldepth
-                if idx > 0 and freqs[idx] >= opt.minimum_frequency and val >= opt.minimum_alternate:
+                freqs[idx - 1] = val / totaldepth
+                if freqs[idx - 1] >= opt.minimum_frequency and val >= opt.minimum_alternate:
                     keep = True
 
             # print the frequencies to a string
-            if len(freqs) > 0:
-                freqstr[sampleidx] = ",".join([str(round(f, opt.digits)) for f in freqs])
+            freqstr[sampleidx] = ",".join([str(round(f, opt.digits)) for f in freqs])
         
         # if we keep the variant, add the alternate 
         # allele frequencies and write the variant 
