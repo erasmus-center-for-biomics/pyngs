@@ -45,6 +45,8 @@ def call_variants(opt: CallerOptions, instream: TextIO, outstream: TextIO):
         for sampleidx, sample in enumerate(variant.samples):
             values = list(parser.interpret(sample[formatidx]))
             totaldepth = sum([v for v in values if v is not None])
+            if totaldepth == 0:
+                continue
 
             # determine the variant frequencies
             freqs = [0] * (len(values) - 1)

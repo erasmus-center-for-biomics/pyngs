@@ -41,6 +41,8 @@ def clean_variants(opt: CallerOptions, instream: TextIO, outstream: TextIO):
         # determine the frequencies for each sample
         for sidx, _ in enumerate(variant.samples):
             frqstr = variant.samples[sidx][formatidx]
+            if frqstr == ".":
+                continue
             frqparts = [f for f in pyngs.vcf.quote_tokenizer(frqstr, sep=",")]
             if altalleles < len(frqparts):
                 frqparts = frqparts[0:altalleles]
