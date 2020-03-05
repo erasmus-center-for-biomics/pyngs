@@ -344,22 +344,18 @@ def main():
         help="The output VCF file.")
     sparser.add_argument(
         "-f", "--minimum-frequency", dest="minimum_frequency",
-        type=float, default=0.01,
+        type=float, default=0.01  * 1000000,
         help="""The minimum alternate allele frequency.""")
     sparser.add_argument(
         "-r", "--minimum-alternate-reads", dest="minimum_alternate",
         type=int, default=0,
         help="""The minimum number of reads supporting an alternate allele.""")
     sparser.add_argument(
-        "-d", "--output-digits", dest="digits",
-        type=int, default=5,
-        help="""The number of decimals to report in the alternate allele frequency.""")
-    sparser.add_argument(
         "-t", "--input-tag", dest="input_tag",
         type=str, default="AD",
         help="""The format tag to parse for the reads per genotype.""")
     sparser.set_defaults(func=pyngs.scripts.mpileup_frequency_caller)
-    
+
     #
     # VCF add B-Allel Frequency
     #

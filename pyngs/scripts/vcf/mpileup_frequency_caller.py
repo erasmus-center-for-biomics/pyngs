@@ -10,10 +10,10 @@ class CallerOptions:
 
     def __init__(self):
         self.input_tag = "AD"
-        self.minimum_frequency = 0.01
+        self.minimum_frequency = 0.01 * 1000000
         self.minimum_alternate = 0
         self.output_tag = "XAF"
-        self.output_header = """FORMAT=<ID={tag},Number=R,Type=Float,Description="Allele Frequency (AD/total)">"""
+        self.output_header = """FORMAT=<ID={tag},Number=R,Type=Integer,Description="Allele Frequency * million (AD/total * 1000000)">"""
         self.digits = 5
 
 
@@ -47,11 +47,11 @@ def call_variants(opt: CallerOptions, instream: TextIO, outstream: TextIO):
             totaldepth = sum([v for v in values if v is not None])
 
             # determine the variant frequencies
-            freqs = [0.0] * len(values)
+            freqs = [0] * len(values)
             for idx, val in enumerate(values):
                 if val is None:
                     continue
-                freqs[idx] = val / totaldepth
+                freqs[idx] = int(val / totaldepth * 1000000) 
                 if idx > 0 and freqs[idx] >= opt.minimum_frequency and val >= opt.minimum_alternate:
                     keep = True
 
@@ -86,8 +86,7 @@ def mpileup_frequency_caller(args):
     opt = CallerOptions()
     opt.input_tag = args.input_tag
     opt.minimum_alternate = args.minimum_alternate
-    opt.minimum_frequency = args.minimum_frequency
-    opt.digits = args.digits
+    opt.minimum_frequency = args.minimum_frequency * 1000000
 
     # call_variants
     call_variants(opt, instream, outstream)
@@ -125,10 +124,6 @@ if __name__ == '__main__':
         "-r", "--minimum-alternate-reads", dest="minimum_alternate",
         type=int, default=0,
         help="""The minimum number of reads supporting an alternate allele.""")
-    sparser.add_argument(
-        "-d", "--output-digits", dest="digits",
-        type=int, default=5,
-        help="""The number of decimals to report in the alternate allele frequency.""")
     sparser.add_argument(
         "-t", "--input-tag", dest="input_tag",
         type=str, default="AD",
