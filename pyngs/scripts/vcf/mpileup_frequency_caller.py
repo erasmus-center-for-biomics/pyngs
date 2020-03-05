@@ -47,12 +47,12 @@ def call_variants(opt: CallerOptions, instream: TextIO, outstream: TextIO):
             totaldepth = sum([v for v in values if v is not None])
 
             # determine the variant frequencies
-            freqs = [0.0] * (len(values) - 1)
+            freqs = [0.0] * len(values)
             for idx, val in enumerate(values):
-                if val is None or idx == 0:
+                if val is None:
                     continue
-                freqs[idx - 1] = val / totaldepth
-                if freqs[idx - 1] >= opt.minimum_frequency and val >= opt.minimum_alternate:
+                freqs[idx] = val / totaldepth
+                if idx > 0 and freqs[idx] >= opt.minimum_frequency and val >= opt.minimum_alternate:
                     keep = True
 
             # print the frequencies to a string
