@@ -359,7 +359,7 @@ def main():
     #
     # VCF clean caller
     #
-    sparser = subparsers.add_parser((
+    sparser = subparsers.add_parser(
         "clean-frequencies",
         description="""Clean the alternate allele frequencies after BCFtools call.""")
     sparser.add_argument(
