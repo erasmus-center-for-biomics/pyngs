@@ -354,6 +354,10 @@ def main():
         "-t", "--input-tag", dest="input_tag",
         type=str, default="AD",
         help="""The format tag to parse for the reads per genotype.""")
+    sparser.add_argument(
+        "-d", "--digits", dest="digits",
+        type=int, default=5,
+        help="""The number of digits in the frequency.""")
     sparser.set_defaults(func=pyngs.scripts.mpileup_frequency_caller)
 
     #
