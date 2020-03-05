@@ -1,6 +1,7 @@
 {
     "version": "1.0",
     "configurations": [
+
         {
             "name": "Extract from columns",
             "type": "python",
@@ -115,6 +116,19 @@
             "request": "launch",
             "stopOnEntry": true,
             "program": "${workspaceRoot}/pyngs/sam/test_consensus.py",
+            "cwd": "${workspaceRoot}",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Run mpileup to VCF",
+            "type": "python",
+            "request": "launch",
+            "stopOnEntry": true,
+            "program": "${workspaceRoot}/pyngs/scripts/vcf/mpileup_frequency_calling.py",
+            "args": [
+                "--input", "${workspaceRoot}/test_data/vcf/temp.vcf",
+                "--output", "${workspaceRoot}/test_data/vcf/temp.f.vcf"
+            ],
             "cwd": "${workspaceRoot}",
             "console": "integratedTerminal"
         }

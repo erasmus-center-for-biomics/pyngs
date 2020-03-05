@@ -324,6 +324,43 @@ def main():
     sparser.set_defaults(func=pyngs.scripts.haplotype_vcf)
 
     #
+    # VCF add alternate frequencies
+    #
+    sparser = subparsers.add_parser(
+        "mpileup-frequency-caller",
+        description="""Call variants based on the frequency of the 
+        alternate allele. 
+        
+        Typically this script should be used between bcftools 
+        mpileup and bcftools call --keep-alts to create a 
+        proper VCF file with the lowly present variants included""")
+    sparser.add_argument(
+        "-i", "--input", dest="input",
+        type=str, default="stdin",
+        help="""The input VCF file.""")
+    sparser.add_argument(
+        "-o", "--output", dest="output",
+        type=str, default="stdout",
+        help="The output VCF file.")
+    sparser.add_argument(
+        "-f", "--minimum-frequency", dest="minimum_frequency",
+        type=float, default=0.01,
+        help="""The minimum alternate allele frequency.""")
+    sparser.add_argument(
+        "-r", "--minimum-alternate-reads", dest="minimum_alternate",
+        type=int, default=0,
+        help="""The minimum number of reads supporting an alternate allele.""")
+    sparser.add_argument(
+        "-d", "--output-digits", dest="digits",
+        type=int, default=5,
+        help="""The number of decimals to report in the alternate allele frequency.""")
+    sparser.add_argument(
+        "-t", "--input-tag", dest="input_tag",
+        type=str, default="AD",
+        help="""The format tag to parse for the reads per genotype.""")
+    sparser.set_defaults(func=pyngs.scripts.mpileup_frequency_caller)
+    
+    #
     # VCF add B-Allel Frequency
     #
     sparser = subparsers.add_parser(

@@ -19,6 +19,7 @@ from .vcf.b_allel_frequency import add_b_allel_frequency
 from .vcf.log_r_ratio import add_log_r_ratio
 from .vcf.tabulate_vcf import tabulate_vcf
 from .vcf.vcf_to_table import vcf_to_table
+from .vcf.mpileup_frequency_caller import mpileup_frequency_caller
 
 # Tabular methods
 from .extract_from_columns import extract_from_columns
