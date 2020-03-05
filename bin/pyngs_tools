@@ -357,6 +357,26 @@ def main():
     sparser.set_defaults(func=pyngs.scripts.mpileup_frequency_caller)
 
     #
+    # VCF clean caller
+    #
+    sparser = subparsers.add_parser((
+        prog="clean-frequencies",
+        description="""Clean the alternate allele frequencies after BCFtools call.""")
+    sparser.add_argument(
+        "-i", "--input", dest="input",
+        type=str, default="stdin",
+        help="""The input VCF file.""")
+    sparser.add_argument(
+        "-o", "--output", dest="output",
+        type=str, default="stdout",
+        help="The output VCF file.")    
+    sparser.add_argument(
+        "-t", "--input-tag", dest="input_tag",
+        type=str, default="XAF",
+        help="""The format tag to parse for the reads per genotype.""")
+    sparser.set_defaults(func=pyngs.scripts.clean_caller)
+    
+    #
     # VCF add B-Allel Frequency
     #
     sparser = subparsers.add_parser(

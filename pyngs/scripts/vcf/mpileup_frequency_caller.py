@@ -10,10 +10,10 @@ class CallerOptions:
 
     def __init__(self):
         self.input_tag = "AD"
-        self.minimum_frequency = 0.01 * 1000000
+        self.minimum_frequency = 0.01
         self.minimum_alternate = 0
         self.output_tag = "XAF"
-        self.output_header = """FORMAT=<ID={tag},Number=R,Type=Integer,Description="Allele Frequency X 1 million (AD/total * 1000000)">"""
+        self.output_header = """FORMAT=<ID={tag},Number=A,Type=Float,Description="Allele Frequency (AD/total)">"""
         self.digits = 5
 
 
@@ -47,12 +47,12 @@ def call_variants(opt: CallerOptions, instream: TextIO, outstream: TextIO):
             totaldepth = sum([v for v in values if v is not None])
 
             # determine the variant frequencies
-            freqs = [0] * len(values)
+            freqs = [0] * (len(values) - 1)
             for idx, val in enumerate(values):
                 if val is None:
                     continue
-                freqs[idx] = int(val / totaldepth * 1000000) 
-                if idx > 0 and freqs[idx] >= opt.minimum_frequency and val >= opt.minimum_alternate:
+                freqs[idx-1] = val / totaldepth 
+                if idx > 0 and freqs[idx-1] >= opt.minimum_frequency and val >= opt.minimum_alternate:
                     keep = True
 
             # print the frequencies to a string
@@ -86,7 +86,8 @@ def mpileup_frequency_caller(args):
     opt = CallerOptions()
     opt.input_tag = args.input_tag
     opt.minimum_alternate = args.minimum_alternate
-    opt.minimum_frequency = args.minimum_frequency * 1000000
+    opt.minimum_frequency = args.minimum_frequency
+    opt.digits = args.digits
 
     # call_variants
     call_variants(opt, instream, outstream)
@@ -124,6 +125,10 @@ if __name__ == '__main__':
         "-r", "--minimum-alternate-reads", dest="minimum_alternate",
         type=int, default=0,
         help="""The minimum number of reads supporting an alternate allele.""")
+    sparser.add_argument(
+        "-d", "--digits", dest="digits",
+        type=int, default=5,
+        help="""The number of digits in the frequency.""")
     sparser.add_argument(
         "-t", "--input-tag", dest="input_tag",
         type=str, default="AD",
