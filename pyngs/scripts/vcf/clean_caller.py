@@ -14,7 +14,11 @@ class CallerOptions:
 def clean_variants(opt: CallerOptions, instream: TextIO, outstream: TextIO):
     """Call the variants in the input stream."""
     reader = pyngs.vcf.Reader(instream)
-
+    parser = reader.field("FORMAT", opt.input_tag)
+    if parser.number != "A":
+        raise ValueError(
+            "{tag} value does not have number A".format(opt.input_tag))
+    
     # get the field parser for the allelic depth tag
     writer = pyngs.vcf.Writer(outstream, reader.header, reader.samples)
 
