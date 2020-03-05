@@ -124,7 +124,7 @@
             "type": "python",
             "request": "launch",
             "stopOnEntry": true,
-            "program": "${workspaceRoot}/pyngs/scripts/vcf/mpileup_frequency_calling.py",
+            "program": "${workspaceRoot}/pyngs/scripts/vcf/mpileup_frequency_caller.py",
             "args": [
                 "--input", "${workspaceRoot}/test_data/vcf/temp.vcf",
                 "--output", "${workspaceRoot}/test_data/vcf/temp.f.vcf"

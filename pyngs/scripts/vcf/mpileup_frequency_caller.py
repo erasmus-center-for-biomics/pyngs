@@ -12,7 +12,7 @@ class CallerOptions:
         self.input_tag = "AD"
         self.minimum_frequency = 0.01
         self.minimum_alternate = 0
-        self.output_tag = "af"
+        self.output_tag = "XAF"
         self.output_header = """FORMAT=<ID={tag},Number=R,Type=Float,Description="Allele Frequency (AD/total)">"""
         self.digits = 5
 
