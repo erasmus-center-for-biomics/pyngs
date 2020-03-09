@@ -442,7 +442,7 @@ def main():
         type=str, help="The FORMAT tags to include in the output.")
     sparser.set_defaults(func=pyngs.scripts.tabulate_vcf)
 
-      #
+    #
     # VCF to table (2)
     #
     sparser = subparsers.add_parser(

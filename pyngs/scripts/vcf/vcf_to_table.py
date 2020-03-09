@@ -1,6 +1,7 @@
 import sys
 import gzip
 import math
+import argparse
 import pyngs.vcf
 
 
@@ -8,15 +9,14 @@ class VCFToTable:
 
     def __init__(self, tags, sep="\t"):
         self.fields = []
-        fields = []
-        for idx, tag in enumerate(tags):
+        for tag in tags:
             if "/" in tag:
                 [section, name] = tag.split('/')
                 if section in ('INFO', 'FORMAT'):
-                    fields.append((tag, section, name))
+                    self.fields.append((tag, section, name))
                     continue
             else:
-                fields.append((tag, tag, '.'))
+                self.fields.append((tag, tag, '.'))
         
         self.sep = sep
 
@@ -54,7 +54,6 @@ class VCFToTable:
         outstream.write("{0}\n".format(self.__prepare_header__()))
         
         for variant in reader:
-
             # prepare the default output
             values = ["."] * len(self.fields)
 
@@ -76,7 +75,7 @@ class VCFToTable:
                     str(variant.position),
                     variant.reference,
                     variant.alternate,
-                    sample,
+                    reader.samples[sidx],
                     self.sep.join(values)])
                 outstream.write("{0}\n".format(line))
 
@@ -107,3 +106,27 @@ def vcf_to_table(args):
     if outstream is not sys.stdout:
         outstream.close()
         
+if __name__ == '__main__':
+    sparser = argparse.ArgumentParser(
+        prog= "vcf-to-table",
+        description="""Tabulate a VCF file.""")
+    sparser.add_argument(
+        "-v", "--vcf", dest="vcf",
+        type=str, nargs="?", default="stdin",
+        help="The input VCF file.")
+    sparser.add_argument(
+        "-o", "--output", dest="output",
+        type=str, nargs="?", default="stdout",
+        help="The output table.")
+    sparser.add_argument(
+        "-s", "--sep", dest="sep",
+        type=str, nargs="?", default="stdout",
+        help="The output field separator.")
+    sparser.add_argument(
+        "-t", "--tags", dest="tags", nargs="+",
+        type=str, help="The tags (INFO/X, FORMAT/X) to include in the output.")
+    sparser.set_defaults(func=vcf_to_table)
+
+    # parse the argument and call the script
+    args = sparser.parse_args()
+    args.func(args)

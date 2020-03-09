@@ -131,6 +131,21 @@
             ],
             "cwd": "${workspaceRoot}",
             "console": "integratedTerminal"
+        },
+        {
+            "name": "Run VCF to table",
+            "type": "python",
+            "request": "launch",
+            "stopOnEntry": true,
+            "program": "${workspaceRoot}/pyngs/scripts/vcf/vcf_to_table.py",
+            "args": [
+                "--vcf", "${workspaceRoot}/test_data/vcf/temp.f.vcf",
+                "--output", "${workspaceRoot}/test_data/vcf/temp.f.tsv",
+                "-s", ";",
+                "-t", "FORMAT/XAF", "FORMAT/AD", "FORMAT/DTOT"
+            ],
+            "cwd": "${workspaceRoot}",
+            "console": "integratedTerminal"
         }
     ]
 }

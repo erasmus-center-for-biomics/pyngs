@@ -14,6 +14,7 @@ class CallerOptions:
         self.minimum_alternate = 0
         self.output_tag = "XAF"
         self.output_header = """FORMAT=<ID={tag},Number=A,Type=Float,Description="Allele Frequency (AD/total)">"""
+        self.output_header_total = """FORMAT=<ID=DTOT,Number=1,Type=Integer,Description="Total depth">"""
         self.digits = 5
 
 
@@ -24,8 +25,9 @@ def call_variants(opt: CallerOptions, instream: TextIO, outstream: TextIO):
     # get the field parser for the allelic depth tag
     parser = reader.field("FORMAT", opt.input_tag)
     header = reader.header
-    header.append(
-        pyngs.vcf.Header(opt.output_header.format(tag=opt.output_tag)))
+    header.append(pyngs.vcf.Header(opt.output_header.format(tag=opt.output_tag)))
+    header.append(pyngs.vcf.Header(opt.output_header_total))
+    
     writer = pyngs.vcf.Writer(outstream, header, reader.samples)
 
     # foreach variant in the reader
@@ -39,12 +41,14 @@ def call_variants(opt: CallerOptions, instream: TextIO, outstream: TextIO):
         
         # prepare the output data
         freqstr = ["."] * len(variant.samples)
+        totalstr = ["."] * len(variant.samples)
         keep = False
 
         # determine the frequencies for each sample
         for sampleidx, sample in enumerate(variant.samples):
             values = list(parser.interpret(sample[formatidx]))
             totaldepth = sum([v for v in values if v is not None])
+            totalstr[sampleidx] = str(totaldepth)
             if totaldepth == 0:
                 continue
 
@@ -65,6 +69,7 @@ def call_variants(opt: CallerOptions, instream: TextIO, outstream: TextIO):
         # allele frequencies and write the variant 
         if keep:
             variant.add_data(opt.output_tag, freqstr)
+            variant.add_data('DTOT', totalstr)
             writer.write(variant)
 
 
