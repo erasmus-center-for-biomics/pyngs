@@ -120,7 +120,7 @@ if __name__ == '__main__':
         help="The output table.")
     sparser.add_argument(
         "-s", "--sep", dest="sep",
-        type=str, nargs="?", default="stdout",
+        type=str, nargs="?", default="\t",
         help="The output field separator.")
     sparser.add_argument(
         "-t", "--tags", dest="tags", nargs="+",
