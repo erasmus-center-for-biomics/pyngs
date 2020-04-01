@@ -17,8 +17,6 @@ from .sam.retrieve_tag_from_readname import retrieve_tag_from_readname
 from .vcf.haplotype_vcf import haplotype_vcf
 from .vcf.b_allel_frequency import add_b_allel_frequency
 from .vcf.log_r_ratio import add_log_r_ratio
-from .vcf.tabulate_vcf import tabulate_vcf
-from .vcf.vcf_to_table import vcf_to_table
 from .vcf.mpileup_frequency_caller import mpileup_frequency_caller
 from .vcf.clean_caller import clean_caller
 

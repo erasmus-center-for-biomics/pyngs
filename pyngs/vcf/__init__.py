@@ -1,4 +1,4 @@
-import typing
+from typing import TextIO, List
 from .header import Header
 from .row import Row
 from .utils import quote_tokenizer
@@ -6,7 +6,7 @@ from .utils import quote_tokenizer
 
 class Reader:
 
-    def __init__(self, instream: typing.TextIO):
+    def __init__(self, instream: TextIO):
         """Initialize the VCF reader object."""
         self.header = []
         self.samples = []
@@ -51,6 +51,16 @@ class Reader:
             return self.header[self.filter[name]]
         raise KeyError("section '{0}' is not registered".format(section))
 
+    def has_id(self, name: str, section: str=None):
+        """Check whether ID is already present in the header."""
+        for entry in self.header:
+            if entry.id == name:
+                if section is None:
+                    return True
+                elif section == section:
+                    return True
+        return False
+
     def __iter__(self):
         """Return a new iterator over the VCF file."""
         for line in self.stream:
@@ -63,7 +73,7 @@ class Reader:
 
 class Writer:
     """A class to write a VCF file."""
-    def __init__(self, stream: typing.TextIO, header: typing.List, samples: typing.List):
+    def __init__(self, stream: TextIO, header: List[Header], samples: List[str]):
         """Initialize a VCF writer."""
         self.stream = stream
         self.header = header

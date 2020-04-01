@@ -16,7 +16,7 @@ def main():
     #
     sparser = subparsers.add_parser(
         "trim-fastq",
-        help="""Shorten the reads in a FastQ file 
+        help="""Shorten the reads in a FastQ file
         to the specified length.""")
     sparser.add_argument(
         "-i", "--input", dest="input",
@@ -79,13 +79,13 @@ def main():
         type=str, default="umi",
         help="""The tag to use for the UMI sequence""")
     sparser.set_defaults(func=pyngs.scripts.add_umis_to_readname)
- 
+
     #
     # Extract information from the read names
     #
     sparser = subparsers.add_parser(
         "extract-tags",
-        help="""Extract information from the read names 
+        help="""Extract information from the read names
         and add them as tags in a SAM file.""")
     sparser.add_argument(
         "-i", "--input", dest="input",
@@ -328,11 +328,11 @@ def main():
     #
     sparser = subparsers.add_parser(
         "mpileup-frequency-caller",
-        description="""Call variants based on the frequency of the 
-        alternate allele. 
-        
-        Typically this script should be used between bcftools 
-        mpileup and bcftools call --keep-alts to create a 
+        description="""Call variants based on the frequency of the
+        alternate allele.
+
+        Typically this script should be used between bcftools
+        mpileup and bcftools call --keep-alts to create a
         proper VCF file with the lowly present variants included""")
     sparser.add_argument(
         "-i", "--input", dest="input",
@@ -373,19 +373,19 @@ def main():
     sparser.add_argument(
         "-o", "--output", dest="output",
         type=str, default="stdout",
-        help="The output VCF file.")    
+        help="The output VCF file.")
     sparser.add_argument(
         "-t", "--input-tag", dest="input_tag",
         type=str, default="XAF",
         help="""The format tag to parse for the reads per genotype.""")
     sparser.set_defaults(func=pyngs.scripts.clean_caller)
-    
+
     #
     # VCF add B-Allel Frequency
     #
     sparser = subparsers.add_parser(
         "vcf-b-allel-frequency",
-        description="""Add the frequency of the reference 
+        description="""Add the frequency of the reference
         allele to a VCF file based on the allelic depth.""")
     sparser.add_argument(
         "-v", "--vcf", dest="vcf",
@@ -405,7 +405,7 @@ def main():
     #
     sparser = subparsers.add_parser(
         "vcf-log-r-ratio",
-        description="""Add the Log R ratio to a VCF 
+        description="""Add the Log R ratio to a VCF
         file based on the allelic depth.""")
     sparser.add_argument(
         "-v", "--vcf", dest="vcf",
@@ -423,47 +423,6 @@ def main():
         type=float, nargs="+", help="The allelic depth tag in the FORMAT field.")
     sparser.set_defaults(func=pyngs.scripts.add_log_r_ratio)
 
-    #
-    # VCF to table
-    #
-    sparser = subparsers.add_parser(
-        "tabulate-vcf",
-        description="""Tabulate a VCF file.""")
-    sparser.add_argument(
-        "-v", "--vcf", dest="vcf",
-        type=str, nargs="?", default="stdin",
-        help="The input VCF file.")
-    sparser.add_argument(
-        "-o", "--output", dest="output",
-        type=str, nargs="?", default="stdout",
-        help="The output table.")
-    sparser.add_argument(
-        "-t", "--tags", dest="tags", nargs="+",
-        type=str, help="The FORMAT tags to include in the output.")
-    sparser.set_defaults(func=pyngs.scripts.tabulate_vcf)
-
-    #
-    # VCF to table (2)
-    #
-    sparser = subparsers.add_parser(
-        "vcf-to-table",
-        description="""Tabulate a VCF file.""")
-    sparser.add_argument(
-        "-v", "--vcf", dest="vcf",
-        type=str, nargs="?", default="stdin",
-        help="The input VCF file.")
-    sparser.add_argument(
-        "-o", "--output", dest="output",
-        type=str, nargs="?", default="stdout",
-        help="The output table.")
-    sparser.add_argument(
-        "-s", "--sep", dest="sep",
-        type=str, nargs="?", default="\t",
-        help="The output field separator.")
-    sparser.add_argument(
-        "-t", "--tags", dest="tags", nargs="+",
-        type=str, help="The tags (INFO/X, FORMAT/X) to include in the output.")
-    sparser.set_defaults(func=pyngs.scripts.vcf_to_table)
 
     # parse the argument and call the script
     args = parser.parse_args()

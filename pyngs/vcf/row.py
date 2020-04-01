@@ -1,5 +1,5 @@
 import logging
-import typing
+from typing import List, Union
 from .utils import quote_tokenizer
 
 
@@ -11,7 +11,7 @@ class Row:
     #     "quality", "filter",
     #     "info", "format", "samples"]
 
-    def __init__(self, tokens: list):
+    def __init__(self, tokens: List[Union[str, int]]):
         """Initialize a new VCF row."""
         self.chrom = tokens[0]
         self.position = tokens[1]
@@ -43,9 +43,9 @@ class Row:
                 spart = [x for x in quote_tokenizer(token, ":")]
 
                 # check the format partitions
-                if len(spart) != len(self.format): 
+                if len(spart) != len(self.format):
                     logging.warn(
-                        "For variant %s:%d sample %d: Expected %d fields, found %d", 
+                        "For variant %s:%d sample %d: Expected %d fields, found %d",
                         self.chrom, self.position, sidx,
                         len(self.format), len(spart))
                     if len(self.format) > len(spart):
@@ -81,7 +81,7 @@ class Row:
         except ValueError:
             self.__qual__ = None
 
-    def add_data(self, fcode: str, data: typing.List):
+    def add_data(self, fcode: str, data: List):
         """Adds new data to the format and samples of a variant."""
         assert(len(data) == len(self.samples))
 

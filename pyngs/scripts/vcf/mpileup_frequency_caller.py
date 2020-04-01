@@ -13,7 +13,7 @@ class CallerOptions:
         self.minimum_frequency = 0.01
         self.minimum_alternate = 0
         self.output_tag = "XAF"
-        self.output_header = """FORMAT=<ID={tag},Number=A,Type=Float,Description="Allele Frequency (AD/total)">"""
+        self.output_header_freq = """FORMAT=<ID=,Number=A,Type=Float,Description="Allele Frequency (AD/total)">"""
         self.output_header_total = """FORMAT=<ID=DTOT,Number=1,Type=Integer,Description="Total depth">"""
         self.digits = 5
 
@@ -22,13 +22,21 @@ def call_variants(opt: CallerOptions, instream: TextIO, outstream: TextIO):
     """Call the variants in the input stream."""
     reader = pyngs.vcf.Reader(instream)
 
+    # just copy the results if it is already present
+    if reader.has_id("XAF", "FORMAT") or reader.has_id("DTOT", "FORMAT"):
+        sys.stderr.write("tag XAF and/or DTOT is already present, just copying entries")
+        writer = pyngs.vcf.Writer(outstream, reader.header, reader.samples)
+        for var in reader:
+            writer.write(var)
+        return
+
     # get the field parser for the allelic depth tag
     parser = reader.field("FORMAT", opt.input_tag)
     header = reader.header
-    header.append(pyngs.vcf.Header(opt.output_header.format(tag=opt.output_tag)))
+    header.append(pyngs.vcf.Header(opt.output_header_freq))
     header.append(pyngs.vcf.Header(opt.output_header_total))
-    
     writer = pyngs.vcf.Writer(outstream, header, reader.samples)
+
 
     # foreach variant in the reader
     for variant in reader:
@@ -38,7 +46,7 @@ def call_variants(opt: CallerOptions, instream: TextIO, outstream: TextIO):
             # could not find the index of tag
             # so we will just continue
             continue
-        
+
         # prepare the output data
         freqstr = ["."] * len(variant.samples)
         totalstr = ["."] * len(variant.samples)
@@ -57,19 +65,19 @@ def call_variants(opt: CallerOptions, instream: TextIO, outstream: TextIO):
             for idx, val in enumerate(values):
                 if val is None:
                     continue
-                freqs[idx-1] = val / totaldepth 
+                freqs[idx-1] = val / totaldepth
                 if idx > 0 and freqs[idx-1] >= opt.minimum_frequency and val >= opt.minimum_alternate:
                     keep = True
 
             # print the frequencies to a string
             if len(freqs) > 0:
                 freqstr[sampleidx] = ",".join([str(round(f, opt.digits)) for f in freqs])
-        
-        # if we keep the variant, add the alternate 
-        # allele frequencies and write the variant 
+
+        # if we keep the variant, add the alternate
+        # allele frequencies and write the variant
         if keep:
-            variant.add_data(opt.output_tag, freqstr)
-            variant.add_data('DTOT', totalstr)
+            variant.add_data("XAF", freqstr)
+            variant.add_data("DTOT", totalstr)
             writer.write(variant)
 
 
@@ -110,11 +118,11 @@ def mpileup_frequency_caller(args):
 if __name__ == '__main__':
     sparser = argparse.ArgumentParser(
         prog="mpileup_to_vcf",
-        description="""Call variants based on the frequency of the 
-        alternate allele. 
-        
-        Typically this script should be used between bcftools 
-        mpileup and bcftools call --keep-alts to create a 
+        description="""Call variants based on the frequency of the
+        alternate allele.
+
+        Typically this script should be used between bcftools
+        mpileup and bcftools call --keep-alts to create a
         proper VCF file with the lowly present variants included""")
     sparser.add_argument(
         "-i", "--input", dest="input",
