@@ -11,3 +11,4 @@ dist/*
 
 # test data
 test_data/*
+env/*
