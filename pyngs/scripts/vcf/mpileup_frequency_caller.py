@@ -22,7 +22,7 @@ def call_variants(opt: CallerOptions, instream: TextIO, outstream: TextIO):
     """Call the variants in the input stream."""
     reader = pyngs.vcf.Reader(instream)
 
-    # just copy the results if it is already present
+    # just copy the variants if one of the tags are already present
     if reader.has_id("XAF", "FORMAT") or reader.has_id("DTOT", "FORMAT"):
         sys.stderr.write("tag XAF and/or DTOT is already present, just copying entries")
         writer = pyngs.vcf.Writer(outstream, reader.header, reader.samples)
@@ -36,7 +36,6 @@ def call_variants(opt: CallerOptions, instream: TextIO, outstream: TextIO):
     header.append(pyngs.vcf.Header(opt.output_header_freq))
     header.append(pyngs.vcf.Header(opt.output_header_total))
     writer = pyngs.vcf.Writer(outstream, header, reader.samples)
-
 
     # foreach variant in the reader
     for variant in reader:
