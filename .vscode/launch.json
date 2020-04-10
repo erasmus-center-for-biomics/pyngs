@@ -1,151 +1,22 @@
 {
     "version": "1.0",
     "configurations": [
-
         {
-            "name": "Extract from columns",
+            "name": "remove_undetected_alt",
             "type": "python",
             "request": "launch",
-            "program": "${workspaceRoot}/pyngs/scripts/extract_from_columns.py",
+            "stopOnEntry": true,
+            "program": "${workspaceRoot}/pyngs/scripts/vcf/remove_undetected_alt.py",
             "args": [
-                "--input", "${workspaceRoot}/test_data/overlap/overlap",
-                "--output", "${workspaceRoot}/test_data/overlap/quant.txt",
-                "--columns", "8", "14", "3",
-                "--encodings", "none", "gtf", "gff",
-                "--fields", "X", "gene_biotype,gene_id,transcript_id", "READNAME"
-            ],
-            "cwd": "${workspaceRoot}",
-            "console": "integratedTerminal",
-        },
-        {
-            "name": "Count",
-            "type": "python",
-            "request": "launch",
-            "program": "${workspaceRoot}/pyngs/scripts/count_overlaps.py",
-            "args": [
-                "--input", "${workspaceRoot}/test_data/overlap/quant.srt.txt",
-                "--output", "${workspaceRoot}/test_data/overlap/total.txt"
-            ],
-            "cwd": "${workspaceRoot}",
-            "console": "integratedTerminal",
-        },
-        {
-            "name": "Haplotype vcf",
-            "type": "python",
-            "request": "launch",
-            "program": "${workspaceRoot}/pyngs/scripts/haplotype_vcf.py",
-            "args": [
-                "--vcf", "${workspaceRoot}/test_data/vcf/all_variants.vcf.gz",
-                "--output", "${workspaceRoot}/test_data/vcf/all_variants.haplo2.vcf.gz",
-                "--relations", "${workspaceRoot}/test_data/vcf/trios.txt"
-            ],
-            "cwd": "${workspaceRoot}",
-            "console": "integratedTerminal",
-        },
-        {
-            "name": "Extract haplotypes",
-            "type": "python",
-            "request": "launch",
-            "program": "${workspaceRoot}/pyngs/scripts/extract_haplotypes.py",
-            "args": [
-                "--vcf", "${workspaceRoot}/test_data/vcf/all_variants.haplo2.vcf.gz",
-                "--output", "${workspaceRoot}/test_data/vcf/haplotypes.tsv.gz"
-            ],
-            "cwd": "${workspaceRoot}",
-            "console": "integratedTerminal",
-        },
-        {
-            "name": "Run umi-consensus",
-            "type": "python",
-            "request": "launch",
-            "program": "${workspaceRoot}/bin/pyngs_tools",
-            "args": [
-                "umi-consensus",
-                "--tag", "um",
-                "--distance", "100",
-                "--workers", "8",
-                "--sam", "${workspaceRoot}/test_data/sam/temp.umi.sam",
-                "--output", "${workspaceRoot}/test_data/consensus/temp.cons.sam"
+                "--input", "${workspaceRoot}/data/mpileup/mpl.vcf",
+                "--output", "${workspaceRoot}/data/mpileup/out.vcf",
+                "--ploidy", "2"
             ],
             "cwd": "${workspaceRoot}",
             "console": "integratedTerminal",
             "env": {
                 "PYTHONPATH":"${workspaceRoot}"
             }
-        },
-        {
-            "name": "Run samtag filter",
-            "type": "python",
-            "request": "launch",
-            "program": "${workspaceRoot}/bin/pyngs_tools",
-            "args": [
-                "filter-by-samtag",
-                "--tag", "rd",
-                "--type", "greater",
-                "--value", "5",
-                "--discard-absent", "True",
-                "--sam", "${workspaceRoot}/test_data/consensus/I19-1012-19.consensus.sam.gz",
-                "--output", "${workspaceRoot}/test_data/consensus/I19-1012-19.consfilter.sam.gz"
-            ],
-            "cwd": "${workspaceRoot}",
-            "console": "integratedTerminal",
-            "env": {
-                "PYTHONPATH":"${workspaceRoot}"
-            }
-        },
-        {
-            "name": "Run merge bed",
-            "type": "python",
-            "request": "launch",
-            "program": "${workspaceRoot}/bin/pyngs_tools",
-            "args": [
-                "merge-bed-entries",
-                "--tag", "READNAME",
-                "--input", "${workspaceRoot}/test_data/bed/I19-1022-09.rg.operation.bed",
-                "--output", "${workspaceRoot}/test_data/bed/I19-1022-09.rg.fragments.bed"
-            ],
-            "cwd": "${workspaceRoot}",
-            "console": "integratedTerminal",
-            "env": {
-                "PYTHONPATH":"${workspaceRoot}"
-            }
-        },
-        {
-            "name": "Run consensus test",
-            "type": "python",
-            "request": "launch",
-            "stopOnEntry": true,
-            "program": "${workspaceRoot}/pyngs/sam/test_consensus.py",
-            "cwd": "${workspaceRoot}",
-            "console": "integratedTerminal"
-        },
-        {
-            "name": "Run mpileup to VCF",
-            "type": "python",
-            "request": "launch",
-            "stopOnEntry": true,
-            "program": "${workspaceRoot}/pyngs/scripts/vcf/mpileup_frequency_caller.py",
-            "args": [
-                "--input", "${workspaceRoot}/test_data/vcf/temp.vcf",
-                "--output", "${workspaceRoot}/test_data/vcf/temp.f.vcf"
-            ],
-            "cwd": "${workspaceRoot}",
-            "console": "integratedTerminal"
-        },
-        {
-            "name": "Run VCF to table",
-            "type": "python",
-            "request": "launch",
-            "stopOnEntry": true,
-            "program": "${workspaceRoot}/pyngs/scripts/vcf/vcf_to_table.py",
-            "args": [
-                "--vcf", "${workspaceRoot}/test_data/vcf/temp.f.vcf",
-                "--output", "${workspaceRoot}/test_data/vcf/temp.f.tsv",
-                "-s", ";",
-                "-t", "FORMAT/XAF", "FORMAT/AD", "FORMAT/DTOT"
-            ],
-            "cwd": "${workspaceRoot}",
-            "console": "integratedTerminal"
         }
     ]
 }

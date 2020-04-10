@@ -1,6 +1,6 @@
+from typing import Generator, List
 
-
-def quote_tokenizer(sstring: str="", sep: str=",", quote='"'):
+def quote_tokenizer(sstring: str="", sep: str=",", quote='"') -> Generator[str, None, None]:
     """Separate the fields while ignoring quotes."""
     tokens = sstring.split(sep)
     keep = False
@@ -23,3 +23,24 @@ def quote_tokenizer(sstring: str="", sep: str=",", quote='"'):
         # not quotes, no issue
         else:
             yield token
+
+
+def genotypes(ploidy: int=2, alleles: int=1, thusfar: List[int]=None) -> Generator[List[int], None, None]:
+    """
+    Get the genotype compbinations according to https://samtools.github.io/hts-specs/VCFv4.3.pdf.
+
+    Note that alleles is equivalent to N and indicates the largest index of the alleles present.
+    """
+
+    # initialize the allele
+    if thusfar is None:
+        thusfar = []
+
+    for allele in range(0, alleles + 1):
+        #
+        if ploidy == 1:
+            yield [allele] + thusfar
+
+        elif ploidy > 1:
+            yield from genotypes(ploidy-1, allele, [allele] + thusfar)
+

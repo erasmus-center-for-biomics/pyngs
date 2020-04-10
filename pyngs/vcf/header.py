@@ -1,5 +1,5 @@
 from .utils import quote_tokenizer
-
+from typing import Generator, Union
 
 class Header:
 
@@ -22,7 +22,7 @@ class Header:
         if hstring:
             self.__parse__(hstring)
 
-    def __parse__(self, hstring: str=""):
+    def __parse__(self, hstring: str="") -> None:
         """Parse the header line."""
         tokens = hstring.split("=", 1)
         self.section = tokens[0]
@@ -30,7 +30,7 @@ class Header:
         if self.value.startswith("<"):
             self.__parse_value__(self.value.lstrip("<").rstrip(">"))
 
-    def __parse_value__(self, value: str=""):
+    def __parse_value__(self, value: str="") -> None:
         """Parse the value."""
         for token in quote_tokenizer(value, ","):
             fields = token.split("=", 1)
@@ -47,7 +47,7 @@ class Header:
             else:
                 self.other[fields[0]] = fields[1]
 
-    def interpret(self, value: str=""):
+    def interpret(self, value: str="") -> Generator[Union[None, str, float,int], None, None]:
         """Parse a field with the specified data."""
         if self.type == "Flag":
             yield True

@@ -1,0 +1,220 @@
+import sys
+import gzip
+import argparse
+import re
+from typing import TextIO, Dict, AnyStr, Generator, List
+import pyngs.vcf as vcf
+
+"""
+A script to remove unknown alternate allele from mpileup output, such as the <*> allele from the mpileup VCF output.
+"""
+
+class ProcessVariant:
+
+    def __init__(self, variant: vcf.Row, ploidy:int =2) -> None:
+        """"."""
+        self.variant = variant
+        self.alternates = [a for a in vcf.quote_tokenizer(self.variant.alternate, sep=";")]
+        try:
+            self.altidx = self.alternates.index("<*>")
+        except ValueError:
+            self.altidx = -1
+        self.ploidy = ploidy
+        self.genotypes_to_rm = []
+
+    def __genotypes_to_remove__(self) -> None:
+        """."""
+        self.genotypes_to_rm = []
+        for idx, geno in enumerate(vcf.genotypes(self.ploidy, len(self.alternates))):
+            if self.altidx in geno:
+                self.genotypes_to_rm.append(idx)
+
+    def process_info(self, parsers: List[vcf.Header], keys: List[str]=None) -> None:
+        """Process the info field."""
+        if keys is None:
+            keys = [h.id for h in parsers]
+
+        # check each of the variant keys
+        for iidx, ikey, ivalue in enumerate(self.variant.info):
+            try:
+                pidx = keys.index(ikey)
+            except ValueError:
+                continue
+            parser = parsers[pidx]
+
+            # filter genotypes
+            if parser.number == "G":
+
+                # initialize the genotypes when we need them
+                if not self.genotypes_to_rm:
+                    self.__genotypes_to_remove__()
+
+                # remove the genotypes with the alternate
+                keep = []
+                for idx, val in enumerate(vcf.quote_tokenizer(ivalue, sep=",")):
+                    if idx not in genotypes_to_rm:
+                        if "," in val:
+                            val = '"' + val + '"'
+                        keep.append(val)
+
+                # replace the info entry
+                self.variant.info[iidx] = (ikey, ",".join(keep))
+
+            # remove a value if the info is per alternate
+            elif parser.number == "A":
+                keep = []
+                for idx, val in enumerate(vcf.quote_tokenizer(ivalue, sep=",")):
+                    if idx != self.altidx:
+                        if "," in val:
+                            val = '"' + val + '"'
+                        keep.append(val)
+
+                # replace the info entry
+                if keep:
+                    self.variant.info[iidx] = (ikey, ",".join(keep))
+                else:
+                    self.variant.info[iidx] = None
+
+            elif parser.number == "R":
+                keep = []
+                for idx, val in enumerate(vcf.quote_tokenizer(ivalue, sep=",")):
+                    if idx != self.altidx + 1:
+                        if "," in val:
+                            val = '"' + val + '"'
+                        keep.append(val)
+
+                # replace the info entry
+                if keep:
+                    self.variant.info[iidx] = (ikey, ",".join(keep))
+                else:
+                    self.variant.info[iidx] = None
+
+    def process_format(self, parsers: List[vcf.Header]):
+        """Process the format field."""
+        for parser in parsers:
+            try:
+                formatidx = self.variant.format.index(parser.id)
+            except ValueError:
+                continue
+
+            for sidx, _ in enumerate(variant.samples):
+                valuestr = self.variant.samples[sidx][formatidx]
+                if valuestr == ".":
+                    continue
+                valuetokens = [tok for tok in vcf.quote_tokenizer(valuestr, sep=",")]
+
+                # check the genotypes
+                if parser.number == "G":
+
+                    # initialize the genotypes when we need them
+                    if not self.genotypes_to_rm:
+                        self.__genotypes_to_remove__()
+
+                    tokens = [v for i, v in enumerate(valuetokens) if i not in self.genotypes_to_rm]
+                    modstr = ",".join(tokens)
+                    self.variant.samples[sidx][formatidx] = modstr
+                elif parser.number == "A":
+                    tokens = [v for i, v in enumerate(valuetokens) if i != self.altidx]
+                    if tokens:
+                        modstr = ",".join(tokens)
+                        self.variant.samples[sidx][formatidx] = modstr
+                    else:
+                        self.variant.samples[sidx][formatidx] = "."
+                elif parser.number == "R":
+                    tokens = [v for i, v in enumerate(valuetokens) if i != self.altidx + 1]
+                    if tokens:
+                        modstr = ",".join(tokens)
+                        self.variant.samples[sidx][formatidx] = modstr
+                    else:
+                        self.variant.samples[sidx][formatidx] = "."
+
+
+class FilterAlt:
+
+    def __init__(self, ploidy: int=2):
+        """Initialize the object."""
+        self.ploidy = ploidy
+
+    def __filter_header__(self, header: List[vcf.Header]) -> List[vcf.Header]:
+        """Filter the ALT=<ID="*" ..> header entry."""
+        rval = []
+        for hd in header:
+            if hd.section != "ALT" and hd.id != "*":
+                rval.append(hd)
+        return rval
+
+    def __call__(self, instream: TextIO, outstream: TextIO) -> None:
+        """Filter the other alt alleles."""
+        reader = vcf.Reader(instream)
+        header = self.__filter_header__(reader.header)
+        writer = vcf.Writer(outstream, header, reader.samples)
+
+        # determine the fields we will need to modify
+        info_p = [h for h in header if h.section == 'INFO' and h.number in ('G', 'R')]
+        info_keys = [h.id for h in info_p]
+        format_p = [h for h in header if h.section == 'FORMAT' and h.number in ('G', 'R')]
+
+        # pass through the variants
+        for variant in reader:
+            modvar = ProcessVariant(variant)
+
+            # just write variants without a <*> allele
+            if modvar.altidx < 0:
+                writer.write(variant)
+                continue
+
+            # special case where there is only 1 alternate allele
+            # and this allele is <*>
+            if len(modvar.alternates) == 1:
+                modvar.variant.alternate = '.'
+
+            # modify the info fields
+            modvar.process_info(info_p, info_keys)
+
+            # modify the format fields
+            modvar.process_format(format_p)
+
+            # write the modified variant
+            writer.write(modvar.variant)
+
+
+def run(args):
+    """Run the script."""
+    instream = sys.stdin
+    if args.input != "stdin":
+        if args.input.endswith(".gz"):
+            instream = gzip.open(args.input, "rt")
+        else:
+            instream = open(args.input, "rt")
+
+    outstream = sys.stdout
+    if args.output != "stdout":
+        if args.output.endswith(".gz"):
+            outstream = gzip.open(args.output, "wt")
+        else:
+            outstream = open(args.output, "wt")
+
+    # filter the alternate alleles
+
+    # close the in and output files
+    if instream is not sys.stdin:
+        instream.close()
+    if outstream is not sys.stdout:
+        outstream.close()
+
+
+if __name__ == "__main__":
+    sparser = argparse.ArgumentParser(
+        prog="remove_undetected_alt",
+        description="""Remove the <*> alternate allele from mpileup input.""")
+    sparser.add_argument(
+        "-i", "--input", dest="input",
+        type=str, default="stdin",
+        help="""The input VCF file.""")
+    sparser.add_argument(
+        "-o", "--output", dest="output",
+        type=str, default="stdout",
+        help="The output VCF file.")
+    sparser.set_defaults(func=run)
+    args = sparser.parse_args()
+    args.func(args)

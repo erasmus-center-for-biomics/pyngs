@@ -1,6 +1,6 @@
 import unittest
 import pyngs.vcf as vcf
-from pyngs.vcf.utils import quote_tokenizer
+from pyngs.vcf.utils import quote_tokenizer, genotypes
 
 
 def per_line(text):
@@ -10,6 +10,32 @@ def per_line(text):
 
 
 class TestReader(unittest.TestCase):
+
+    def test_genotypes(self):
+        stddiploid = [g for g in genotypes(2, 1)]
+        self.assertListEqual(stddiploid, [[0,0], [0,1], [1,1]])
+
+        mnydiploid = [g for g in genotypes(2, 2)]
+        self.assertListEqual(mnydiploid, [[0,0], [0,1], [1,1], [0,2], [1,2], [2,2]])
+
+        stdtriploid = [g for g in genotypes(3, 1)]
+        self.assertListEqual(stdtriploid, [[0,0,0], [0,0,1], [0,1,1], [1,1,1]])
+
+        mnytriploid = [g for g in genotypes(3, 2)]
+        self.assertListEqual(
+            mnytriploid,
+            [
+                [0,0,0],
+                [0,0,1],
+                [0,1,1],
+                [1,1,1],
+                [0,0,2],
+                [0,1,2],
+                [1,1,2],
+                [0,2,2],
+                [1,2,2],
+                [2,2,2]
+            ])
 
     def test_tokenizer(self):
         text = 'A;B;"V D";x="XYZ"'

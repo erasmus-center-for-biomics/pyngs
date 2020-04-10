@@ -18,7 +18,7 @@ def clean_variants(opt: CallerOptions, instream: TextIO, outstream: TextIO):
     if parser.number != "A":
         raise ValueError(
             "{tag} value does not have number A".format(opt.input_tag))
-    
+
     # get the field parser for the allelic depth tag
     writer = pyngs.vcf.Writer(outstream, reader.header, reader.samples)
 
@@ -31,13 +31,13 @@ def clean_variants(opt: CallerOptions, instream: TextIO, outstream: TextIO):
             # so we will just continue
             writer.write(variant)
             continue
-        
+
         # determine the number of alternate alleles
         altalleles = 0
         for alt in pyngs.vcf.quote_tokenizer(variant.alternate, sep=","):
             if alt != ".":
                 altalleles += 1
-        
+
         # determine the frequencies for each sample
         for sidx, _ in enumerate(variant.samples):
             frqstr = variant.samples[sidx][formatidx]
@@ -47,8 +47,8 @@ def clean_variants(opt: CallerOptions, instream: TextIO, outstream: TextIO):
             if altalleles < len(frqparts):
                 frqparts = frqparts[0:altalleles]
                 variant.samples[sidx][formatidx] = ",".join(frqparts)
-    
-        # write the variant with the modified 
+
+        # write the variant with the modified
         # alternate allele frequencies
         writer.write(variant)
 
@@ -95,7 +95,7 @@ if __name__ == '__main__':
     sparser.add_argument(
         "-o", "--output", dest="output",
         type=str, default="stdout",
-        help="The output VCF file.")    
+        help="The output VCF file.")
     sparser.add_argument(
         "-t", "--input-tag", dest="input_tag",
         type=str, default="XAF",
