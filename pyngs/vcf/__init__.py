@@ -1,6 +1,8 @@
 from typing import TextIO, List, Iterator, List
 from .header import Header
-from .row import Row, HeaderIndex, Variant
+from .headerindex import HeaderIndex
+from .row import Row
+from .variant import Variant
 from .utils import quote_tokenizer, genotypes
 
 

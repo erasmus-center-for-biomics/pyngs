@@ -11,4 +11,8 @@ dist/*
 
 # test data
 test_data/*
+data/*
+
+# virtual python environment
 env/*
+

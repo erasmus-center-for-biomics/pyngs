@@ -1,5 +1,10 @@
 from typing import Generator, List
 
+# the types in a VCF file
+VCFTYPES = ("Flag", "Character", "String", "Float", "Integer")
+VCFNUMBERS = (".", "G", "R", "A")
+
+
 def quote_tokenizer(sstring: str="", sep: str=",", quote='"') -> Generator[str, None, None]:
     """Separate the fields while ignoring quotes."""
     tokens = sstring.split(sep)
