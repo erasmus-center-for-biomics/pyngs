@@ -57,5 +57,5 @@ class Meta:
 
     def __str__(self) -> str:
         return "##{key}={value}\n".format(
-            str(self.key),
-            str(self.value))
+            key=str(self.key),
+            value=str(self.value))

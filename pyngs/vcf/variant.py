@@ -34,7 +34,7 @@ class Variant:
         # prepare the alternates
         alternates = fields[4].split(",")
         quality = float(fields[5]) if fields[5] != "." else None
-        flts = [f if f != "." else None for f in fields[6].split(",")]
+        flts = None if fields[6] == "." else fields[6].split(",")
 
         # prepare the info store
         infostore = InfoStore()
@@ -48,7 +48,12 @@ class Variant:
 
             formatstore.init_stores(len(fields) - 9)
             for sidx, value in enumerate(fields[9:]):
-                formatstore.add_sample_data(sidx, value)
+                try:
+                    formatstore.add_sample_data(sidx, value)
+                except ValueError:
+                    formatstore.add_sample_data(
+                        sidx,
+                        ":".join(["."] * len(formatstore.format)))
 
         # return the variant
         return cls(
@@ -67,9 +72,9 @@ class Variant:
         fields = [
             self.chrom,
             str(self.position),
-            self.ids,
-            self.ref,
-            ",".join(alternates),
+            self.id,
+            self.reference,
+            ",".join(self.alternates),
             str(self.quality) if self.quality is not None else ".",
             ",".join(self.filter) if self.filter is not None else ".",
             str(self.istore)]

@@ -114,7 +114,7 @@ class InfoStore:
         for code, info_p in self.info.items():
             if not code in self.data.keys():
                 continue
-            if info_p == "Flag":
+            if info_p.type == "Flag":
                 parts.append(code)
             else:
                 strval = info_p.representer(self.data[code])

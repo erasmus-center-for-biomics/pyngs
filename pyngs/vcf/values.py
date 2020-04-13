@@ -14,6 +14,8 @@ VcfBaseValues = Union[None, str, float, int]
 def parse_types(convert: Callable[[str], Union[bool, str, float, int]]) -> Callable[[str], VcfPrintable]:
     """Parse types from a string to a list."""
     def inner(value: str) -> VcfPrintable:
+        if value == ".":
+            return None
         try:
             return [convert(s) for s in quote_tokenizer(value, sep = ",")]
         except ValueError:

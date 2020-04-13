@@ -1,4 +1,5 @@
 import unittest
+from io import StringIO
 import pyngs.vcf as vcf
 from pyngs.vcf.utils import quote_tokenizer, genotypes
 
@@ -50,7 +51,7 @@ class TestReader(unittest.TestCase):
         stream = per_line(self.vcf_data)
         reader = vcf.Reader(stream)
         # test the header length
-        self.assertEqual(len(reader.meta), 42)
+        self.assertEqual(len(reader.meta), 39)
 
         # test the header format index
         self.assertEqual(len(reader.format.keys()), 10)
@@ -65,42 +66,54 @@ class TestReader(unittest.TestCase):
         variants = [e for e in reader]
         self.assertEqual(len(variants), 3)
 
-
-
-        # self.assertEqual(len(vardata), 3)
-        # self.assertEqual(len(vardata[0]), 1)
         # # GT:AD:DP:GQ:PGT:PID:PL
         # #  1  2  3  4   5   6  7
         # # 0/0:14,0:14:17:.:.:0,17,357
-        # # print(vardata[0][0])
-        # self.assertEqual(len(vardata[0][0]), 7)
-        # self.assertEqual(vardata[0][0][0], ("GT", ["0/0"]))
-        # self.assertEqual(vardata[0][0][1], ("AD", [14, 0]))
-        # self.assertEqual(vardata[0][0][2], ("DP", [14]))
-        # self.assertEqual(vardata[0][0][3], ("GQ", [17]))
-        # self.assertEqual(vardata[0][0][4], ("PGT", ["."]))
-        # self.assertEqual(vardata[0][0][5], ("PID", ["."]))
-        # self.assertEqual(vardata[0][0][6], ("PL", [0, 17, 357]))
+        self.assertEqual(variants[0].fstore.stores[0]["GT"], ["0/0"])
+        self.assertEqual(variants[0].fstore.stores[0]["AD"], [14, 0])
+        self.assertEqual(variants[0].fstore.stores[0]["DP"], [14])
+        self.assertEqual(variants[0].fstore.stores[0]["GQ"], [17])
+        self.assertEqual(variants[0].fstore.stores[0]["PGT"], None)
+        self.assertEqual(variants[0].fstore.stores[0]["PID"], None)
+        self.assertEqual(variants[0].fstore.stores[0]["PL"], [0, 17, 357])
 
         # # GT:AD:DP:GQ:PL
         # #  1  2  3  4  5
         # # 0/0:36,0:36:39:0,39,1052
-        # self.assertEqual(len(vardata[1][0]), 5)
-        # self.assertEqual(vardata[1][0][0], ("GT", ["0/0"]))
-        # self.assertEqual(vardata[1][0][1], ("AD", [36, 0]))
-        # self.assertEqual(vardata[1][0][2], ("DP", [36]))
-        # self.assertEqual(vardata[1][0][3], ("GQ", [39]))
-        # self.assertEqual(vardata[1][0][4], ("PL", [0, 39, 1052]))
+        self.assertEqual(variants[1].fstore.stores[0]["GT"], ["0/0"])
+        self.assertEqual(variants[1].fstore.stores[0]["AD"], [36, 0])
+        self.assertEqual(variants[1].fstore.stores[0]["DP"], [36])
+        self.assertEqual(variants[1].fstore.stores[0]["GQ"], [39])
+        self.assertEqual(variants[1].fstore.stores[0]["PL"], [0, 39, 1052])
 
         # # GT:AD:DP:GQ:PL
         # #  1  2  3  4  5
         # # 1/1:0,2:2:6:51,6,0
-        # self.assertEqual(len(vardata[2][0]), 5)
-        # self.assertEqual(vardata[2][0][0], ("GT", ["1/1"]))
-        # self.assertEqual(vardata[2][0][1], ("AD", [0, 2]))
-        # self.assertEqual(vardata[2][0][2], ("DP", [2]))
-        # self.assertEqual(vardata[2][0][3], ("GQ", [6]))
-        # self.assertEqual(vardata[2][0][4], ("PL", [51, 6, 0]))
+        self.assertEqual(variants[2].fstore.stores[0]["GT"], ["1/1"])
+        self.assertEqual(variants[2].fstore.stores[0]["AD"], [0, 2])
+        self.assertEqual(variants[2].fstore.stores[0]["DP"], [2])
+        self.assertEqual(variants[2].fstore.stores[0]["GQ"], [6])
+        self.assertEqual(variants[2].fstore.stores[0]["PL"], [51, 6, 0])
+
+    def test_writer(self):
+        instream = per_line(self.vcf_data)
+        reader = vcf.Reader(instream)
+
+        with StringIO() as outstream:
+            writer = vcf.Writer(outstream, reader.meta, reader.samples)
+            for variant in reader:
+                writer.write(variant)
+
+            content = outstream.getvalue()
+        newlines = content.split("\n")
+        orilines = self.vcf_data.split("\n")
+        self.assertEqual(len(newlines), len(orilines))
+
+        # check the headers as the variants may differ slightly due to
+        # formatting differences between programming languages (such as
+        # float 0. may be 0.0 in python)
+        for idx in range(39):
+            self.assertEqual(newlines[39], orilines[39])
 
     def setUp(self):
         self.vcf_data = """##fileformat=VCFv4.2
@@ -117,9 +130,6 @@ class TestReader(unittest.TestCase):
 ##FORMAT=<ID=PL,Number=G,Type=Integer,Description="Normalized, Phred-scaled likelihoods for genotypes as defined in the VCF specification">
 ##FORMAT=<ID=RGQ,Number=1,Type=Integer,Description="Unconditional reference genotype confidence, encoded as a phred quality -10*log10 p(genotype call is wrong)">
 ##FORMAT=<ID=SB,Number=4,Type=Integer,Description="Per-sample component statistics which comprise the Fisher's Exact Test to detect strand bias.">
-##GATKCommandLine=<ID=GenomicsDBImport,CommandLine="GenomicsDBImport  --genomicsdb-workspace-path gatk/genomicsdb/chrM:1-16571 --variant gatk/haplotypecaller/I18-1012-13.mrg.gvcf.gz --variant
-##GATKCommandLine=<ID=GenotypeGVCFs,CommandLine="GenotypeGVCFs  --output gatk/genotypegvcfs/chrM:1-16571.vcf.gz --use-new-qual-calculator true --annotation-group StandardAnnotation --dbsnp /da
-##GATKCommandLine=<ID=HaplotypeCaller,CommandLine="HaplotypeCaller  --emit-ref-confidence GVCF --max-alternate-alleles 3 --contamination-fraction-to-filter 0.0 --output gatk/haplotypecaller/I1
 ##INFO=<ID=AC,Number=A,Type=Integer,Description="Allele count in genotypes, for each ALT allele, in the same order as listed">
 ##INFO=<ID=AF,Number=A,Type=Float,Description="Allele Frequency, for each ALT allele, in the same order as listed">
 ##INFO=<ID=AN,Number=1,Type=Integer,Description="Total number of alleles in called genotypes">
@@ -132,8 +142,8 @@ class TestReader(unittest.TestCase):
 ##INFO=<ID=ExcessHet,Number=1,Type=Float,Description="Phred-scaled p-value for exact test of excess heterozygosity">
 ##INFO=<ID=FS,Number=1,Type=Float,Description="Phred-scaled p-value using Fisher's exact test to detect strand bias">
 ##INFO=<ID=InbreedingCoeff,Number=1,Type=Float,Description="Inbreeding coefficient as estimated from the genotype likelihoods per-sample when compared against the Hardy-Weinberg expectation">
-##INFO=<ID=MLEAC,Number=A,Type=Integer,Description="Maximum likelihood expectation (MLE) for the allele counts (not necessarily the same as the AC), for each ALT allele, in the same order as l
-##INFO=<ID=MLEAF,Number=A,Type=Float,Description="Maximum likelihood expectation (MLE) for the allele frequency (not necessarily the same as the AF), for each ALT allele, in the same order as
+##INFO=<ID=MLEAC,Number=A,Type=Integer,Description="Maximum likelihood expectation (MLE) for the allele counts (not necessarily the same as the AC), for each ALT allele, in the same order as">
+##INFO=<ID=MLEAF,Number=A,Type=Float,Description="Maximum likelihood expectation (MLE) for the allele frequency (not necessarily the same as the AF), for each ALT allele, in the same order as">
 ##INFO=<ID=MQ,Number=1,Type=Float,Description="RMS Mapping Quality">
 ##INFO=<ID=MQRankSum,Number=1,Type=Float,Description="Z-score From Wilcoxon rank sum test of Alt vs. Ref read mapping qualities">
 ##INFO=<ID=QD,Number=1,Type=Float,Description="Variant Confidence/Quality by Depth">
