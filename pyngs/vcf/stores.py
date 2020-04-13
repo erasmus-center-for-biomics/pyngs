@@ -3,7 +3,6 @@ from typing import List, Dict, Callable
 from .values import VcfValue
 from .format import Format
 from .info import Info
-from .header import Header
 from .utils import quote_tokenizer
 
 
@@ -76,37 +75,29 @@ class FormatStore:
         return code in self.__tags__
 
     def add_format(self, fmt: Format) -> None:
-        """Add a header to the store."""
+        """Add a format to the store."""
         # append to the Format list
         self.format.append(fmt)
         self.__changed__ = True
 
     def add_formats_from_dict(self, strval: str, fmt_d: Dict[str,Format]) -> None:
-        """Add a header to the store."""
+        """Add a format to the store."""
         # append to the Format list
         for code in strval.split(":"):
             self.add_format(fmt_d[code])
 
-    def add_format_from_header(self, header: Header) -> None:
-        """Add the format from a Header)."""
-        self.add_format(Format(header.id, header.type, header.number))
-
-    def add_format_from_header_index(self, code: str, headerindex: HeaderIndex) -> None:
-        """Add the format from a Header)."""
-        self.add_format_from_header(headerindex.get("FORMAT", code))
-
     def init_stores(self, n_samples: int) -> None:
         """Initialize stores for n samples."""
         self.stores = []
-        for _ in range(n_samples):
+        for _ in range(0, n_samples):
             self.stores.append(ValueStore())
 
     def add_sample_data(self, sidx: int, strdata: str) -> None:
         """Add data for a sample in from strings."""
 
         # check whether the sample is present
-        if sidx < len(self.stores):
-            raise ValueError("only {0} samples defined not  {1}", len(self.stores), sidx)
+        if sidx >= len(self.stores):
+            raise ValueError("only {0} samples defined not {1}", len(self.stores), sidx)
 
         # check the number of fields
         data = strdata.split(":")
@@ -117,7 +108,7 @@ class FormatStore:
         for idx, fmt in enumerate(self.format):
             self.stores[sidx].add_str(fmt.code, data[idx], fmt.valueparser)
 
-    def to_str(self) -> str:
+    def __str__(self) -> str:
         """Represent the data in the store as a string."""
         fmtbase = ":".join([fmt.code for fmt in self.format])
         smpstrs = [st.to_format_str() for st in self.stores]
@@ -141,12 +132,17 @@ class InfoStore:
 
     def add_data(self, strval: str) -> None:
         """Add data to the store."""
+        if strval == ".":
+            return
         parts = [p for p in quote_tokenizer(strval, sep=";")]
         for part in parts:
-            [code, value] = part.split("=", 1)
-            self.store.add(code, value, self.info[code].valueparser)
+            if "=" in part:
+                [code, value] = part.split("=", 1)
+                self.store.add_str(code, value, self.info[code].valueparser)
+            else:
+                self.store.add_str(code, ".", self.info[code].valueparser)
 
-    def to_str(self) -> str:
+    def __str__(self) -> str:
         """Convert the data to a str."""
         if not self.store.storage:
             return "."

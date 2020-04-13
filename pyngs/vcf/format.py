@@ -1,10 +1,13 @@
-from .utils import VCFTYPES, VCFNUMBERS
-from .values import ParseVcfTypes, ReprVcfTypes, VcfValue
+from typing import TypeVar
+from .values import ParseVcfTypes, ReprVcfTypes, VcfValue, VCFTYPES, VCFNUMBERS
 from .meta import Meta
+
+
+F = TypeVar("F")
 
 class Format:
 
-    def __init__(self, code: str, vtype: [str], number: str) -> None:
+    def __init__(self, code: str, vtype: str, number: str) -> None:
         """Initialize a new Format object."""
         # check the type
         if vtype not in VCFTYPES:
@@ -24,18 +27,21 @@ class Format:
         self.representer = ReprVcfTypes[self.type]
 
     @classmethod
-    def from_header(cls, header: Header) -> Format:
-        """Create a Format object from a Header."""
-        return Format(header.id, header.type, header.number)
-
-    @classmethod
-    def from_meta(cls, meta: Meta) -> Format:
+    def from_meta(cls: F, meta: Meta) -> F:
         """Create a Format line from a format meta object."""
-        if meta.key != "format":
-            raise ValueError("key is {0} not format".format(meta.key))
+        if meta.key.lower() != "format":
+            raise ValueError("key is {0} not a format field".format(meta.key))
 
-        return Format(
+        mtype = None
+        mnumber = None
+        for pair in meta.value.content:
+            if pair[0] == "Type":
+                mtype = pair[1]
+            if pair[0] == "Number":
+                mnumber = pair[1]
+
+        return cls(
             meta.value.id,
-            meta.value.content["Type"],
-            meta.value.content["Number"])
+            mtype,
+            mnumber)
 

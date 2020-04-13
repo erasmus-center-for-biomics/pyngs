@@ -1,11 +1,12 @@
-from .utils import VCFTYPES, VCFNUMBERS
-from .values import ParseVcfTypes, ReprVcfTypes, VcfValue
-from .header import Header
+from typing import TypeVar
+from .values import ParseVcfTypes, ReprVcfTypes, VcfValue, VCFTYPES, VCFNUMBERS
 from .meta import Meta
+
+I = TypeVar("I")
 
 class Info:
 
-    def __init__(self, code: str, vtype: [str], number: str) -> None:
+    def __init__(self, code: str, vtype: str, number: str) -> None:
         """Initialize a new Info object."""
         # check the type
         if vtype not in VCFTYPES:
@@ -25,17 +26,19 @@ class Info:
         self.representer = ReprVcfTypes[self.type]
 
     @classmethod
-    def from_header(cls, header: Header) -> Format:
-        """Create a Info object from a Header."""
-        return Info(header.id, header.type, header.number)
-
-    @classmethod
-    def from_meta(cls, meta: Meta) -> Format:
+    def from_meta(cls: I, meta: Meta) -> I:
         """Create a Info line from a format meta object."""
-        if meta.key != "info":
-            raise ValueError("key is {0} not format".format(meta.key))
+        if meta.key.lower() != "info":
+            raise ValueError("key is {0} not an INFO field".format(meta.key))
 
-        return Info(
+        mtype = None
+        mnumber = None
+        for pair in meta.value.content:
+            if pair[0] == "Type":
+                mtype = pair[1]
+            if pair[0] == "Number":
+                mnumber = pair[1]
+        return cls(
             meta.value.id,
-            meta.value.content["Type"],
-            meta.value.content["Number"])
+            mtype,
+            mnumber)

@@ -1,6 +1,7 @@
-from typing import Dict, Tuple
+from typing import Dict, Tuple, List, TypeVar, Union
 from .utils import quote_tokenizer
-from .format import Format
+
+S = TypeVar("S")
 
 class Structured:
 
@@ -10,7 +11,7 @@ class Structured:
         self.content = content
 
     @classmethod
-    def from_str(cls, strval: str) -> Info:
+    def from_str(cls: S, strval: str) -> S:
         """Get structured information from a string."""
         parts = [p for p in quote_tokenizer(strval, ",")]
 
@@ -23,13 +24,16 @@ class Structured:
                 idval = tokens[1]
             else:
                 content.append((tokens[0], tokens[1]))
-        return Structured(idval, content)
+        return cls(idval, content)
 
-    def __repr__(self) -> str:
+    def __str__(self) -> str:
         """Represent the data as a string."""
         parts = ["{0}={1}".format(v[0], v[1]) for v in self.content]
         return "<ID={0},{1}>".format(self.id, ",".join(parts))
 
+
+
+M = TypeVar("M")
 
 class Meta:
 
@@ -40,16 +44,18 @@ class Meta:
         self.value = value
 
     @classmethod
-    def from_str(cls, strval: str) -> Meta:
+    def from_str(cls: M, strval: str) -> M:
         """Get a meta line from a string."""
         [key, value] = strval.rstrip()[2:].split("=", 1)
 
-        if value.startswith("<") and value.endswith(">"):
-            value = Structured.from_str(value.lstrip("<").rstrip(">"))
+        if value.startswith("<"):
+            if value.endswith(">"):
+                value = value.rstrip(">")
+            value = Structured.from_str(value.lstrip("<"))
 
-        return Meta(key, value)
+        return cls(key, value)
 
-    def __repr__(self) -> str:
-        return "##{key}={value}".format(
-            repr(self.key),
-            repr(self.value))
+    def __str__(self) -> str:
+        return "##{key}={value}\n".format(
+            str(self.key),
+            str(self.value))

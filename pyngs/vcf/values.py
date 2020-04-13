@@ -1,11 +1,15 @@
 from typing import List, Union, Optional, Callable, Dict
 from .utils import quote_tokenizer
 
-# possible values in a VCF
-VcfValue = Union[None, bool, List[str], List[float], List[int]]
+# the types in a VCF file
+VCFTYPES = ("Flag", "Character", "String", "Float", "Integer")
+VCFNUMBERS = (".", "G", "R", "A")
 
+# possible python types from a VCF
+VcfValue = Union[None, bool, List[str], List[float], List[int]]
 VcfPrintable = Union[None, List[str], List[float], List[int]]
 VcfBaseValues = Union[None, str, float, int]
+
 
 def parse_types(convert: Callable[[str], Union[bool, str, float, int]]) -> Callable[[str], VcfPrintable]:
     """Parse types from a string to a list."""
@@ -27,7 +31,8 @@ ParseVcfTypes: Dict[str, Callable[[str], VcfValue]] = {
     "Flag": lambda x: True
 }
 
-def repr_types(convert: Callable[[VcfBaseValues], str]) -> Callable[[VcfValue], str]:
+
+def to_str_types(convert: Callable[[VcfBaseValues], str]) -> Callable[[VcfValue], str]:
     """Represent data types for VCF."""
     def inner(values: VcfValue):
         if values is None:
@@ -40,10 +45,10 @@ def repr_types(convert: Callable[[VcfBaseValues], str]) -> Callable[[VcfValue], 
 
 # A dict with VCF type writers
 ReprVcfTypes = {
-    "String": repr_types(str),
-    "Character": repr_types(lambda x: x[0]),
-    "Integer": repr_types(str),
-    "Float": repr_types(str),
+    "String": to_str_types(str),
+    "Character": to_str_types(lambda x: x[0]),
+    "Integer": to_str_types(str),
+    "Float": to_str_types(str),
     "Flag": lambda x: ""
 }
 

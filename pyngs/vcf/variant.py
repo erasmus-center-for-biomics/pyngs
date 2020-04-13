@@ -1,19 +1,20 @@
-from typing import List, Union, Tuple, Optional, Dict
+from typing import List, Union, Tuple, Optional, Dict, TypeVar
 from collections import namedtuple
 
-from .utils import quote_tokenizer, genotypes, VCFTYPES, VCFNUMBERS
-from .values import ParseVcfTypes, ReprVcfTypes, VcfValue
-from .row import Row
+from .utils import genotypes
+from .values import ParseVcfTypes, ReprVcfTypes, VcfValue,  VCFTYPES, VCFNUMBERS
 from .format import Format
-from .stores import ValueStore, FormatStore, InfoStore
+from .info import Info
+from .stores import FormatStore, InfoStore
 
 
+V = TypeVar("V")
 
 class Variant:
 
     def __init__(self,
             chrom: str, pos: int, ids: str, ref: str, alt: List[Optional[str]],
-            qual: Optional[float], filters: List[Optional[str]],
+            qual: Optional[float], filters: Optional[List[str]],
             infostore: InfoStore, formatstore: FormatStore) -> None:
         self.chrom = chrom
         self.position = pos
@@ -22,11 +23,11 @@ class Variant:
         self.alternates = alt
         self.quality = qual
         self.filter = filters
-        self.info = infostore
-        self.format = formatstore
+        self.istore = infostore
+        self.fstore = formatstore
 
     @classmethod
-    def from_str(cls, strval: str, info_dct: Dict[str,Info], format_dct: Dict[str,Format]) -> Variant:
+    def from_str(cls: V, strval: str, info_dct: Dict[str,Info], format_dct: Dict[str,Format]) -> V:
         """Parse a Variant from a string."""
         fields = strval.rstrip().split("\t")
 
@@ -51,7 +52,7 @@ class Variant:
                 formatstore.add_sample_data(sidx, value)
 
         # return the variant
-        return Variant(
+        return cls(
             chrom=fields[0],
             pos=int(fields[1]),
             ids=fields[2],
@@ -62,6 +63,20 @@ class Variant:
             infostore=infostore,
             formatstore=formatstore)
 
+    def __str__(self) -> str:
+        """Create a str from the variant."""
+        fields = [
+            self.chrom,
+            str(self.position),
+            self.ids,
+            self.ref,
+            ",".join(alternates),
+            str(self.quality) if self.quality is not None else ".",
+            ",".join(self.filter) if self.filter is not None else ".",
+            str(self.istore)]
+        if self.fstore.format:
+            fields.append(str(self.fstore))
+        return "\t".join(fields) + "\n"
 
     def genotypes(self, ploidy: int=2) -> List[List[str]]:
         """Get the genotypes for the current variant."""
