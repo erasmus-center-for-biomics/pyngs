@@ -1,3 +1,4 @@
+from collections import OrderedDict
 from typing import List, Dict, Callable
 
 from .values import VcfValue
@@ -6,59 +7,13 @@ from .info import Info
 from .utils import quote_tokenizer
 
 
-class ValueStore:
-
-    def __init__(self) -> None:
-        super().__init__()
-        self.storage: Dict[str, VcfValue] = {}
-
-    def add(self, code: str, value: VcfValue) -> None:
-        """Add or set a value to the per store."""
-        self.storage[code] = value
-
-    def add_str(self, code: str, value: str, converter: Callable[[str], VcfValue]) -> None:
-        """Add or set a value based on a str."""
-        self.add(code, converter(value))
-
-    def get(self, code: str) -> VcfValue:
-        """Get the value for field code."""
-        try:
-            return self.storage[code]
-        except KeyError:
-            return None
-
-    def to_format_str(self, formats: List[Format]) -> str:
-        """Convert the stored values to a valid format string."""
-        values = []
-        for fmt in formats:
-            value = self.get(fmt.code)
-            values.append(fmt.representer(value))
-        return ":".join(values)
-
-    def to_info_str(self, info: List[Info]):
-        """Convert the stored values to a valid info string."""
-        parts = []
-        for fld in info:
-            value = self.get(fld.code)
-            if fld.type == "Flag":
-                if value:
-                    parts.append(fld.code)
-            else:
-                strval = fld.representer(value)
-                parts.append("{-}={1}".format(fld.code, strval))
-        return ";".join(parts)
-
-    def __bool__(self) -> bool:
-        """Check if the store is empty."""
-        return bool(self.storage)
-
 class FormatStore:
     """A store to represent and hold the values for samples."""
 
     def __init__(self) -> None:
         """Initialize the object."""
         self.format: List[Format] = []
-        self.stores: List[ValueStore] = []
+        self.stores: List[Dict[str, VcfValue]] = []
         self.__changed__ = False
         self.__tags__ = set()
 
@@ -90,7 +45,7 @@ class FormatStore:
         """Initialize stores for n samples."""
         self.stores = []
         for _ in range(0, n_samples):
-            self.stores.append(ValueStore())
+            self.stores.append({})
 
     def add_sample_data(self, sidx: int, strdata: str) -> None:
         """Add data for a sample in from strings."""
@@ -106,12 +61,20 @@ class FormatStore:
 
         # add the data to the store
         for idx, fmt in enumerate(self.format):
-            self.stores[sidx].add_str(fmt.code, data[idx], fmt.valueparser)
+            self.stores[sidx][fmt.code] = fmt.valueparser(data[idx])
+
+    def __sample_str__(self, store) -> str:
+        """Convert the stored values to a valid format string."""
+        values = []
+        for fmt in self.format:
+            value = store[fmt.code]
+            values.append(fmt.representer(value))
+        return ":".join(values)
 
     def __str__(self) -> str:
         """Represent the data in the store as a string."""
         fmtbase = ":".join([fmt.code for fmt in self.format])
-        smpstrs = [st.to_format_str() for st in self.stores]
+        smpstrs = [self.__sample_str__(st) for st in self.stores]
         return "{0}\t{1}".format(fmtbase, "\t".join(smpstrs))
 
 
@@ -119,18 +82,18 @@ class InfoStore:
 
     def __init__(self) -> None:
         super().__init__()
-        self.info: Dict[str, Info] = {}
-        self.store: ValueStore = ValueStore()
+        self.info: Dict[str, Info] = OrderedDict()
+        self.data: Dict[str, VcfValue] = {}
 
     def __bool__(self) -> bool:
         """Check if the store is empty."""
-        return bool(self.store)
+        return bool(self.data)
 
-    def add_info(self, info: Info) -> None:
+    def add_info(self, info_p: Info) -> None:
         """Add an info parser to the obejct."""
-        self.info[info.code] = info
+        self.info[info_p.code] = info_p
 
-    def add_data(self, strval: str) -> None:
+    def add_data(self, strval: str, info_p: Dict[str, Info]) -> None:
         """Add data to the store."""
         if strval == ".":
             return
@@ -138,12 +101,22 @@ class InfoStore:
         for part in parts:
             if "=" in part:
                 [code, value] = part.split("=", 1)
-                self.store.add_str(code, value, self.info[code].valueparser)
+                self.add_info(info_p[code])
+                self.data[code] = self.info[code].valueparser(value)
             else:
-                self.store.add_str(code, ".", self.info[code].valueparser)
+                code = part
+                self.add_info(info_p[code])
+                self.data[code] = True
 
     def __str__(self) -> str:
         """Convert the data to a str."""
-        if not self.store.storage:
-            return "."
-        return self.store.to_info_str(self.info)
+        parts = []
+        for code, info_p in self.info.items():
+            if not code in self.data.keys():
+                continue
+            if info_p == "Flag":
+                parts.append(code)
+            else:
+                strval = info_p.representer(self.data[code])
+                parts.append("{0}={1}".format(code, strval))
+        return ";".join(parts)

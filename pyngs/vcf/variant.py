@@ -1,5 +1,5 @@
+from collections import namedtuple, OrderedDict
 from typing import List, Union, Tuple, Optional, Dict, TypeVar
-from collections import namedtuple
 
 from .utils import genotypes
 from .values import ParseVcfTypes, ReprVcfTypes, VcfValue,  VCFTYPES, VCFNUMBERS
@@ -27,7 +27,7 @@ class Variant:
         self.fstore = formatstore
 
     @classmethod
-    def from_str(cls: V, strval: str, info_dct: Dict[str,Info], format_dct: Dict[str,Format]) -> V:
+    def from_str(cls: V, strval: str, info_dct: Dict[str, Info], format_dct: Dict[str,Format]) -> V:
         """Parse a Variant from a string."""
         fields = strval.rstrip().split("\t")
 
@@ -38,9 +38,8 @@ class Variant:
 
         # prepare the info store
         infostore = InfoStore()
-        infostore.info = info_dct
         if fields[7] != ".":
-            infostore.add_data(fields[7])
+            infostore.add_data(fields[7], info_dct)
 
         # prepare the format store
         formatstore = FormatStore()

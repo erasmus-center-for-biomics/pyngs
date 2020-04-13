@@ -56,7 +56,7 @@ class TestReader(unittest.TestCase):
         self.assertEqual(len(reader.format.keys()), 10)
 
         # test the header info index
-        self.assertEqual(len(reader.info.keys()), 20)
+        self.assertEqual(len(reader.info), 20)
 
         # test the samples
         self.assertEqual(len(reader.samples), 1)

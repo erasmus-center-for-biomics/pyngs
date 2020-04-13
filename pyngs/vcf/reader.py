@@ -1,3 +1,4 @@
+from collections import OrderedDict
 from typing import TextIO, List, Dict, Generator
 
 from .variant import Variant
@@ -23,7 +24,8 @@ class Reader:
                     self.samples = tokens[9:]
                 break
         # add the help dictionaries for the variants
-        self.info: Dict[str, Info] = {}
+        self.info: OrderedDict[str, Info] = OrderedDict()
+        self.infokeys: Dict[str, int] = {}
         self.format: Dict[str, Format] = {}
         for meta in self.meta:
             if meta.key.lower() == "info":
