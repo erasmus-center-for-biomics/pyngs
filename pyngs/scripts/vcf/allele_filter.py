@@ -12,7 +12,6 @@ class FilterAlleles:
 
     def __init__(self, samples: List[str], alt:int = 0, freq: float=0.0, digits: int=5, ploidy: int=2) -> None:
         self.samples = [] if samples is None else samples
-        print(">>>>> %s", str(self.samples))
         self.alternate = alt
         self.frequency = freq
         self.afdigits = digits
@@ -47,7 +46,7 @@ class FilterAlleles:
             sindices = [i for i,v in enumerate(reader.samples) if v in self.samples]
         else:
             sindices = list(range(len(reader.samples)))
-
+        logging.warning(">>>>> %s", str(sindices))
         # for each variant
         for variant in reader:
             to_keep = []
