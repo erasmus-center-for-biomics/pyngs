@@ -117,7 +117,7 @@ class FilterAlt:
                 except TypeError:
                     logging.warning(
                         "Malformed field %s for variant %s, sample %d with value %s",
-                        code, variant.to_simple_repr(), sidx, str(value))
+                        fmt.code, variant.to_simple_repr(), sidx, str(value))
         alternates = [variant.alternates[i] for i in atokeep]
         if not alternates:
             alternates = ["."]
