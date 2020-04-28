@@ -81,14 +81,14 @@ class FilterAlt:
             nistore.add_info(info_p)
         for code, value in variant.istore.data.items():
             try:
-                if nistore.info[code].number == "G":
+                if value is None:
+                    nistore.data[code] = value
+                elif nistore.info[code].number == "G":
                     nistore.data[code] = [value[i] for i in genotokeep]
                 elif nistore.info[code].number == "R":
                     nistore.data[code] = [value[i] for i in rtokeep]
                 elif nistore.info[code].number == "A":
                     nistore.data[code] = [value[i] for i in atokeep]
-                elif value is None:
-                    nistore.data[code] = value
                 else:
                     nistore.data[code] = value
             except TypeError:
@@ -104,14 +104,14 @@ class FilterAlt:
             for sidx, store in enumerate(variant.fstore.stores):
                 value = store[fmt.code]
                 try:
-                    if fmt.number == "G":
+                    if value is None:
+                        nfstore.stores[sidx][fmt.code] = value
+                    elif fmt.number == "G":
                         nfstore.stores[sidx][fmt.code] = [value[i] for i in genotokeep]
                     elif fmt.number == "R":
                         nfstore.stores[sidx][fmt.code] = [value[i] for i in rtokeep]
                     elif fmt.number == "A":
                         nfstore.stores[sidx][fmt.code] = [value[i] for i in atokeep]
-                    elif value is None:
-                        nfstore.stores[sidx][fmt.code] = value
                     else:
                         nfstore.stores[sidx][fmt.code] = value
                 except TypeError:
