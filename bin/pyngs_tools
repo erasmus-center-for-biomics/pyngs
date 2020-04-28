@@ -1,5 +1,6 @@
 """A set of tools for working with NGS data in Python."""
 
+import logging
 import argparse
 import pyngs.scripts
 
