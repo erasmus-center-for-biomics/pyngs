@@ -1,3 +1,4 @@
+import logging
 from typing import List, Tuple, Optional
 import pyngs.vcf as vcf
 
@@ -79,14 +80,21 @@ class FilterAlt:
         for info_p in variant.istore.info.values():
             nistore.add_info(info_p)
         for code, value in variant.istore.data.items():
-            if nistore.info[code].number == "G":
-                nistore.data[code] = [value[i] for i in genotokeep]
-            elif nistore.info[code].number == "R":
-                nistore.data[code] = [value[i] for i in rtokeep]
-            elif nistore.info[code].number == "A":
-                nistore.data[code] = [value[i] for i in atokeep]
-            else:
-                nistore.data[code] = value
+            try:
+                if nistore.info[code].number == "G":
+                    nistore.data[code] = [value[i] for i in genotokeep]
+                elif nistore.info[code].number == "R":
+                    nistore.data[code] = [value[i] for i in rtokeep]
+                elif nistore.info[code].number == "A":
+                    nistore.data[code] = [value[i] for i in atokeep]
+                elif value is None:
+                    nistore.data[code] = value
+                else:
+                    nistore.data[code] = value
+            except TypeError:
+                logging.warning(
+                    "Malformed field %s for variant %s with value %s",
+                    code, variant.to_simple_repr(), str(value))
 
         # copy and filter the format
         nfstore = vcf.FormatStore()

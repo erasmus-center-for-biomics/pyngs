@@ -113,13 +113,7 @@ class FilterAlleles:
 
             # determine the alts to remove
             remove = [v for i,v in enumerate(variant.alternates) if i not in to_keep]
-            try:
-                nvariant = self.alternate_filter(variant, remove=remove)
-            except TypeError:
-                logging.warning(
-                    "An error occured while processing variant %s",
-                    variant.to_simple_repr())
-                continue
+            nvariant = self.alternate_filter(variant, remove=remove)
             writer.write(nvariant)
 
 
