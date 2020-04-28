@@ -12,6 +12,7 @@ class FilterAlleles:
 
     def __init__(self, samples: List[str], alt:int = 0, freq: float=0.0, digits: int=5, ploidy: int=2) -> None:
         self.samples = [] if samples is None else samples
+        logging.warning(self.samples)
         self.alternate = alt
         self.frequency = freq
         self.afdigits = digits
@@ -148,7 +149,7 @@ if __name__ == "__main__":
         help="The ploidy of the organism")
     sparser.add_argument(
         "-s", "--samples", dest="samples",
-        type=str, default=[],
+        type=str, nargs="*", default=[],
         help="The samples on which to base the filtering.")
     sparser.add_argument(
         "-a", "--alternate", dest="alternate",
