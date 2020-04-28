@@ -12,7 +12,7 @@ class FilterAlleles:
 
     def __init__(self, samples: List[str], alt:int = 0, freq: float=0.0, digits: int=5, ploidy: int=2) -> None:
         self.samples = [] if samples is None else samples
-        logging.info(">>>>> %s", str(self.samples))
+        print(">>>>> %s", str(self.samples))
         self.alternate = alt
         self.frequency = freq
         self.afdigits = digits
