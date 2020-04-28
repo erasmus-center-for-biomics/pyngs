@@ -47,6 +47,8 @@ class FilterAlleles:
             sindices = [i for i,v in enumerate(reader.samples) if v in self.samples]
         else:
             sindices = list(range(len(reader.samples)))
+        logging.warning(sindices)
+
         # for each variant
         for variant in reader:
             to_keep = []
