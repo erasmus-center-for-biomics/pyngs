@@ -46,7 +46,6 @@ class FilterAlleles:
             sindices = [i for i,v in enumerate(reader.samples) if v in self.samples]
         else:
             sindices = list(range(len(reader.samples)))
-        logging.warning(">>>>> %s", str(sindices))
         # for each variant
         for variant in reader:
             to_keep = []
@@ -149,7 +148,7 @@ if __name__ == "__main__":
         help="The ploidy of the organism")
     sparser.add_argument(
         "-s", "--samples", dest="samples",
-        type=str,
+        type=str, default=[],
         help="The samples on which to base the filtering.")
     sparser.add_argument(
         "-a", "--alternate", dest="alternate",
