@@ -1,7 +1,5 @@
 from collections import namedtuple, OrderedDict
 from typing import List, Union, Tuple, Optional, Dict, TypeVar
-
-from .utils import genotypes
 from .values import ParseVcfTypes, ReprVcfTypes, VcfValue,  VCFTYPES, VCFNUMBERS
 from .format import Format
 from .info import Info
@@ -81,6 +79,18 @@ class Variant:
         if self.fstore.format:
             fields.append(str(self.fstore))
         return "\t".join(fields) + "\n"
+
+    def to_simple_repr(self) -> str:
+        """Convert the variant to a simple string."""
+        return "{0}:{1}:{2}-{3}".format(
+            self.chrom,
+            str(self.position),
+            self.reference,
+            ",".join(self.alternates))
+
+    def samples(self) -> int:
+        """Return the number of samples."""
+        return len(self.fstore.stores)
 
     def genotypes(self, ploidy: int=2) -> List[List[str]]:
         """Get the genotypes for the current variant."""

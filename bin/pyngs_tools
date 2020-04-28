@@ -292,48 +292,43 @@ def main():
     #
     # Haplotype VCF files
     #
-    sparser = subparsers.add_parser(
-        "haplotype-vcf",
-        description="""Haplotype a VCf file based on the
-        child, father, mother relation.""")
-    sparser.add_argument(
-        "-v", "--vcf", dest="vcf",
-        type=str, nargs="?", default="stdin",
-        help="The input VCF file.")
-    sparser.add_argument(
-        "-o", "--output", dest="output",
-        type=str, nargs="?", default="stdout",
-        help="The output VCF file.")
-    sparser.add_argument(
-        "-r", "--relations", dest="relations",
-        type=str, nargs="?",
-        help="""A file with the trio relations in the
-        order child, father, mother.""")
-    sparser.add_argument(
-        "--offspring", dest="offspring",
-        type=str, nargs="*",
-        help="The sample names of the offspring.")
-    sparser.add_argument(
-        "--fathers", dest="fathers",
-        type=str, nargs="*",
-        help="The sample names of the fathers.")
-    sparser.add_argument(
-        "--mothers", dest="mothers",
-        type=str, nargs="*",
-        help="The sample names of the mothers.")
-    sparser.set_defaults(func=pyngs.scripts.haplotype_vcf)
+    # sparser = subparsers.add_parser(
+    #     "vcf-haplotype-vcf",
+    #     description="""Haplotype a VCf file based on the
+    #     child, father, mother relation.""")
+    # sparser.add_argument(
+    #     "-v", "--vcf", dest="vcf",
+    #     type=str, nargs="?", default="stdin",
+    #     help="The input VCF file.")
+    # sparser.add_argument(
+    #     "-o", "--output", dest="output",
+    #     type=str, nargs="?", default="stdout",
+    #     help="The output VCF file.")
+    # sparser.add_argument(
+    #     "-r", "--relations", dest="relations",
+    #     type=str, nargs="?",
+    #     help="""A file with the trio relations in the
+    #     order child, father, mother.""")
+    # sparser.add_argument(
+    #     "--offspring", dest="offspring",
+    #     type=str, nargs="*",
+    #     help="The sample names of the offspring.")
+    # sparser.add_argument(
+    #     "--fathers", dest="fathers",
+    #     type=str, nargs="*",
+    #     help="The sample names of the fathers.")
+    # sparser.add_argument(
+    #     "--mothers", dest="mothers",
+    #     type=str, nargs="*",
+    #     help="The sample names of the mothers.")
+    # sparser.set_defaults(func=pyngs.scripts.haplotype_vcf)
 
     #
     # VCF add alternate frequencies
     #
     sparser = subparsers.add_parser(
-        "mpileup-frequency-caller",
-        description="""Call variants based on the frequency of the
-        alternate allele.
-
-        Typically this script should be used between bcftools
-        mpileup and bcftools call --keep-alts to create a
-        proper VCF file with the lowly present variants included""")
+        "vcf-add-frequency",
+        description="""Add the variant frequencies to a VCF file.""")
     sparser.add_argument(
         "-i", "--input", dest="input",
         type=str, default="stdin",
@@ -343,14 +338,6 @@ def main():
         type=str, default="stdout",
         help="The output VCF file.")
     sparser.add_argument(
-        "-f", "--minimum-frequency", dest="minimum_frequency",
-        type=float, default=0.01,
-        help="""The minimum alternate allele frequency.""")
-    sparser.add_argument(
-        "-r", "--minimum-alternate-reads", dest="minimum_alternate",
-        type=int, default=0,
-        help="""The minimum number of reads supporting an alternate allele.""")
-    sparser.add_argument(
         "-t", "--input-tag", dest="input_tag",
         type=str, default="AD",
         help="""The format tag to parse for the reads per genotype.""")
@@ -358,14 +345,14 @@ def main():
         "-d", "--digits", dest="digits",
         type=int, default=5,
         help="""The number of digits in the frequency.""")
-    sparser.set_defaults(func=pyngs.scripts.mpileup_frequency_caller)
+    sparser.set_defaults(func=pyngs.scripts.add_frequency)
 
     #
-    # VCF clean caller
+    # VCF clean alternates
     #
     sparser = subparsers.add_parser(
-        "clean-frequencies",
-        description="""Clean the alternate allele frequencies after BCFtools call.""")
+        "vcf-clean-alt",
+        description="""Remove the <*> calls from mpileup output.""")
     sparser.add_argument(
         "-i", "--input", dest="input",
         type=str, default="stdin",
@@ -378,51 +365,43 @@ def main():
         "-t", "--input-tag", dest="input_tag",
         type=str, default="XAF",
         help="""The format tag to parse for the reads per genotype.""")
-    sparser.set_defaults(func=pyngs.scripts.clean_caller)
+    sparser.set_defaults(func=pyngs.scripts.clean_alt)
 
     #
-    # VCF add B-Allel Frequency
+    # VCF filter alleles not conforming to an alternate or frequency criterium
     #
     sparser = subparsers.add_parser(
-        "vcf-b-allel-frequency",
-        description="""Add the frequency of the reference
-        allele to a VCF file based on the allelic depth.""")
+        "vcf-allele-filter",
+        description="""Keep only alleles and variants which fit the contraints.""")
     sparser.add_argument(
-        "-v", "--vcf", dest="vcf",
-        type=str, nargs="?", default="stdin",
-        help="The input VCF file.")
-    sparser.add_argument(
-        "-o", "--output", dest="output",
-        type=str, nargs="?", default="stdout",
-        help="The output VCF file.")
-    sparser.add_argument(
-        "-t", "--tag", dest="tag", default="AD",
-        type=str, help="The allelic depth tag in the FORMAT field.")
-    sparser.set_defaults(func=pyngs.scripts.add_b_allel_frequency)
-
-    #
-    # VCF add Log R ratio
-    #
-    sparser = subparsers.add_parser(
-        "vcf-log-r-ratio",
-        description="""Add the Log R ratio to a VCF
-        file based on the allelic depth.""")
-    sparser.add_argument(
-        "-v", "--vcf", dest="vcf",
-        type=str, nargs="?", default="stdin",
-        help="The input VCF file.")
+        "-i", "--input", dest="input",
+        type=str, default="stdin",
+        help="""The input VCF file.""")
     sparser.add_argument(
         "-o", "--output", dest="output",
-        type=str, nargs="?", default="stdout",
+        type=str, default="stdout",
         help="The output VCF file.")
     sparser.add_argument(
-        "-t", "--tag", dest="tag", default="AD",
-        type=str, help="The allelic depth tag in the FORMAT field.")
+        "-p", "--ploidy", dest="ploidy",
+        type=int, default=2,
+        help="The ploidy of the organism")
     sparser.add_argument(
-        "-e", "--expected", dest="expected",
-        type=float, nargs="+", help="The allelic depth tag in the FORMAT field.")
-    sparser.set_defaults(func=pyngs.scripts.add_log_r_ratio)
-
+        "-s", "--samples", dest="samples",
+        type=str,
+        help="The samples on which to base the filtering.")
+    sparser.add_argument(
+        "-a", "--alternate", dest="alternate",
+        type=int, nargs="?", default=0,
+        help="The minimum number of alternate alleles.")
+    sparser.add_argument(
+        "-f", "--frequency", dest="frequency",
+        type=float, nargs="?", default=0.0,
+        help="The minimum frequency of alternate alleles.")
+    sparser.add_argument(
+        "-d", "--digits", dest="digits",
+        type=int, nargs="?", default=5,
+        help="The number of digits in the AF field.")
+    sparser.set_defaults(func=pyngs.scripts.allele_filter)
 
     # parse the argument and call the script
     args = parser.parse_args()
