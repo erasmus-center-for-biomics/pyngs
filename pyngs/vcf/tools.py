@@ -103,15 +103,21 @@ class FilterAlt:
             nfstore.add_format(fmt)
             for sidx, store in enumerate(variant.fstore.stores):
                 value = store[fmt.code]
-                if fmt.number == "G":
-                    nfstore.stores[sidx][fmt.code] = [value[i] for i in genotokeep]
-                elif fmt.number == "R":
-                    nfstore.stores[sidx][fmt.code] = [value[i] for i in rtokeep]
-                elif fmt.number == "A":
-                    nfstore.stores[sidx][fmt.code] = [value[i] for i in atokeep]
-                else:
-                    nfstore.stores[sidx][fmt.code] = value
-
+                try:
+                    if fmt.number == "G":
+                        nfstore.stores[sidx][fmt.code] = [value[i] for i in genotokeep]
+                    elif fmt.number == "R":
+                        nfstore.stores[sidx][fmt.code] = [value[i] for i in rtokeep]
+                    elif fmt.number == "A":
+                        nfstore.stores[sidx][fmt.code] = [value[i] for i in atokeep]
+                    elif value is None:
+                        nfstore.stores[sidx][fmt.code] = value
+                    else:
+                        nfstore.stores[sidx][fmt.code] = value
+                except TypeError:
+                    logging.warning(
+                        "Malformed field %s for variant %s, sample %d with value %s",
+                        code, variant.to_simple_repr(), sidx, str(value))
         alternates = [variant.alternates[i] for i in atokeep]
         if not alternates:
             alternates = ["."]
