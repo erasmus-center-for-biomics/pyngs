@@ -117,7 +117,7 @@ class FilterAlleles:
                 nvariant = self.alternate_filter(variant, remove=remove)
             except TypeError:
                 logging.warning(
-                    "An error occured while processing variant {0}",
+                    "An error occured while processing variant %s",
                     variant.to_simple_repr())
                 continue
             writer.write(nvariant)
