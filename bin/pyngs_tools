@@ -404,6 +404,74 @@ def main():
         help="The number of digits in the AF field.")
     sparser.set_defaults(func=pyngs.scripts.allele_filter)
 
+    #
+    # vcf-parse-annotations
+    #
+
+    sparser = subparsers.add_parser(
+        "vcf-parse-annotations",
+        description="""
+# Annotation parser: a parser for the ANN field from VCF files
+
+This parser is based on the explanation at http://snpeff.sourceforge.net/SnpEff_manual.html#ann.
+
+The parser can be used as a python library to parse individual ANN fields or as a stand-alone
+tool.
+
+The stand-alone tool supports VCF files. It putsthe selected fields in the VCF INFO
+field. For the VCF parsing the tool requires access to the pyngs library. In the default mode,
+the output fields are reported per alternative allele (A). If the snpEff tool was run in cancer mode,
+set the --unordered, so the tool will set the Number parameter in header as "." (instead of R).
+
+To select specific ANN fields, a syntax is used like bcftools annotations with the following fields.
+
+| Field | CLI identifier     | field in VCF           |
+|:------|:------------------:|:-----------------------|
+|  1    | allele             | ann_allele             |
+|  2    | annotation         | ann_annotation         |
+|  3    | impact             | ann_impact             |
+|  4    | gene_name          | ann_gene_name          |
+|  5    | gene_id            | ann_gene_id            |
+|  6    | feature_type       | ann_feature_type       |
+|  7    | feature_id         | ann_feature_id         |
+|  8    | transcript_biotype | ann_transcript_biotype |
+|  9    | rank               | ann_rank               |
+|  9    | total              | ann_total              |
+| 10    | hgvs_c             | ann_hgvs_c             |
+| 11    | hgvs_p             | ann_hgvs_p             |
+| 12    | cdna_pos           | ann_cdna_pos           |
+| 12    | cdna_len           | ann_cdna_len           |
+| 13    | cds_pos            | ann_cds_pos            |
+| 13    | cds_len            | ann_cds_len            |
+| 14    | prot_pos           | ann_prot_pos           |
+| 14    | prot_len           | ann_prot_len           |
+| 15    | dist_feaure        | ann_dist_feature       |
+| 16    | messages           | ann_messages           |
+
+""")
+    sparser.add_argument(
+        "-i", "--input", dest="input",
+        type=str, default="stdin",
+        help="""The input VCF file.""")
+    sparser.add_argument(
+        "-o", "--output", dest="output",
+        type=str, default="stdout",
+        help="The output VCF file.")
+    sparser.add_argument(
+        "-f", "--fields", dest="fields",
+        type=str, nargs="+", default=[],
+        help="The fields from the ANN field to select")
+    sparser.add_argument(
+        "--unordered", dest="unordered",
+        type=bool, default=False,
+        help="Do not match the output to the alternate alleles")
+    sparser.add_argument(
+        "--impacts", dest="impacts",
+        type=str, nargs="*", default=[],
+        help="Only report annotations with the specified impacts")
+    sparser.set_defaults(func=pyngs.scripts.parse_annotations)
+
+
     # parse the argument and call the script
     args = parser.parse_args()
     args.func(args)

@@ -22,6 +22,7 @@ from .sam.retrieve_tag_from_readname import retrieve_tag_from_readname
 from .vcf.clean_alt import clean_alt
 from .vcf.add_frequency import add_frequency
 from .vcf.allele_filter import allele_filter
+from .vcf.divide_ann import parse_annotations
 
 # Tabular methods
 from .extract_from_columns import extract_from_columns
