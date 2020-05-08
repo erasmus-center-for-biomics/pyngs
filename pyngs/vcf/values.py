@@ -6,10 +6,9 @@ VCFTYPES = ("Flag", "Character", "String", "Float", "Integer")
 VCFNUMBERS = (".", "G", "R", "A")
 
 # possible python types from a VCF
-VcfValue = Union[None, bool, List[str], List[float], List[int]]
-VcfPrintable = Union[None, List[str], List[float], List[int]]
+VcfValue = Union[None, bool, List[Optional[str]], List[Optional[float]], List[Optional[int]]]
+VcfPrintable = Union[None, List[Optional[str]], List[Optional[float]], List[Optional[int]]]
 VcfBaseValues = Union[None, str, float, int]
-
 
 def parse_types(convert: Callable[[str], Union[bool, str, float, int]]) -> Callable[[str], VcfPrintable]:
     """Parse types from a string to a list."""
@@ -17,7 +16,13 @@ def parse_types(convert: Callable[[str], Union[bool, str, float, int]]) -> Calla
         if value == ".":
             return None
         try:
-            return [convert(s) for s in quote_tokenizer(value, sep = ",")]
+            retval = []
+            for s in quote_tokenizer(value, sep = ","):
+                if s is ".":
+                    retval.append(None)
+                else:
+                    retval.append(convert(s))
+            return retval
         except ValueError:
             return None
     #
@@ -40,7 +45,12 @@ def to_str_types(convert: Callable[[VcfBaseValues], str]) -> Callable[[VcfValue]
         if values is None:
             return "."
 
-        fields = [convert(s) for s in values]
+        fields = []
+        for s in values:
+            if s is None:
+                fields.append(".")
+            else:
+                fields.append(convert(s))
         return ",".join(fields)
 
     return inner
