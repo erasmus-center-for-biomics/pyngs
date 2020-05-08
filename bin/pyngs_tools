@@ -425,28 +425,26 @@ set the --unordered, so the tool will set the Number parameter in header as "." 
 
 To select specific ANN fields, a syntax is used like bcftools annotations with the following fields.
 
-| Field | CLI identifier     | field in VCF           |
-|:------|:------------------:|:-----------------------|
-|  1    | allele             | ann_allele             |
-|  2    | annotation         | ann_annotation         |
-|  3    | impact             | ann_impact             |
-|  4    | gene_name          | ann_gene_name          |
-|  5    | gene_id            | ann_gene_id            |
-|  6    | feature_type       | ann_feature_type       |
-|  7    | feature_id         | ann_feature_id         |
-|  8    | transcript_biotype | ann_transcript_biotype |
-|  9    | rank               | ann_rank               |
-|  9    | total              | ann_total              |
-| 10    | hgvs_c             | ann_hgvs_c             |
-| 11    | hgvs_p             | ann_hgvs_p             |
-| 12    | cdna_pos           | ann_cdna_pos           |
-| 12    | cdna_len           | ann_cdna_len           |
-| 13    | cds_pos            | ann_cds_pos            |
-| 13    | cds_len            | ann_cds_len            |
-| 14    | prot_pos           | ann_prot_pos           |
-| 14    | prot_len           | ann_prot_len           |
-| 15    | dist_feaure        | ann_dist_feature       |
-| 16    | messages           | ann_messages           |
+    1    | allele - ann_allele
+    2    | annotation - ann_annotation
+    3    | impact - ann_impact
+    4    | gene_name - ann_gene_name
+    5    | gene_id - ann_gene_id
+    6    | feature_type - ann_feature_type
+    7    | feature_id - ann_feature_id
+    8    | transcript_biotype - ann_transcript_biotype
+    9    | rank - ann_rank
+    9    | total - ann_total
+    10    | hgvs_c - ann_hgvs_c
+    11    | hgvs_p - ann_hgvs_p
+    12    | cdna_pos - ann_cdna_pos
+    12    | cdna_len - ann_cdna_len
+    13    | cds_pos - ann_cds_pos
+    13    | cds_len - ann_cds_len
+    14    | prot_pos - ann_prot_pos
+    14    | prot_len - ann_prot_len
+    15    | dist_feaure - ann_dist_feature
+    16    | messages - ann_messages
 
 """)
     sparser.add_argument(
