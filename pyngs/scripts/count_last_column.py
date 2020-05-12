@@ -18,6 +18,7 @@ def count(instream):
         if pkey and key != pkey:
             yield pkey, score
             score = 0
+            pvalue = None
 
         if value is not pvalue:
             score += 1
