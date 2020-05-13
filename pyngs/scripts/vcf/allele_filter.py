@@ -108,6 +108,7 @@ class FilterAlleles:
             # if we do not keep any alleles, we do not have to write the variant
             if len(to_keep) == len(variant.alternates):
                 writer.write(variant)
+                continue
             elif not to_keep:
                 continue
 
