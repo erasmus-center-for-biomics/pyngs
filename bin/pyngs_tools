@@ -58,6 +58,26 @@ def main():
     sparser.set_defaults(func=pyngs.scripts.extract_subreads)
 
     #
+    # IUPAC subreads
+    #
+    sparser = subparsers.add_parser(
+        "iupac-subreads",
+        description="""Extract the subread after an IUPAC sequence.""")
+    sparser.add_argument(
+        "-i", "--input", dest="input",
+        type=str, default="stdin",
+        help="""The input FastQ file.""")
+    sparser.add_argument(
+        "-o", "--output", dest="output",
+        type=str, default="stdout",
+        help="The output FastQ file.")
+    sparser.add_argument(
+        "-s", "--iupac", dest="iupac",
+        type=str,
+        help="""The iupac sequence to search for.""")
+    sparser.set_defaults(func=pyngs.scripts.iupac_subreads)
+
+    #
     # Add UMIs to the readnames
     #
     sparser = subparsers.add_parser(

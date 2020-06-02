@@ -106,16 +106,16 @@ class FilterAlleles:
 
             # if we keep all alleles we do not need to filter. Otherwise,
             # if we do not keep any alleles, we do not have to write the variant
-            if len(to_keep) == len(variant.alternates):
+            if not to_keep:
+                continue
+            elif len(to_keep) == len(variant.alternates):
                 writer.write(variant)
                 continue
-            elif not to_keep:
-                continue
-
-            # determine the alts to remove
-            remove = [v for i,v in enumerate(variant.alternates) if i not in to_keep]
-            nvariant = self.alternate_filter(variant, remove=remove)
-            writer.write(nvariant)
+            else:
+                # determine the alts to remove
+                remove = [v for i,v in enumerate(variant.alternates) if i not in to_keep]
+                nvariant = self.alternate_filter(variant, remove=remove)
+                writer.write(nvariant)
 
 
 def allele_filter(args):

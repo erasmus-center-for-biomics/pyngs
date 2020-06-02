@@ -3,6 +3,7 @@
 from .fastq.trim import trim_fastq
 from .fastq.extract_subreads import extract_subreads
 from .fastq.add_umis import add_umis_to_readname
+from .fastq.iupac_subreads import iupac_subreads
 
 # SAM to BED methods
 from .cigar_to_bed import cigar_to_bed
