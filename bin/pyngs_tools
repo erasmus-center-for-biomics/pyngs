@@ -1,3 +1,4 @@
+#!/bin/env python3
 """A set of tools for working with NGS data in Python."""
 
 import logging
