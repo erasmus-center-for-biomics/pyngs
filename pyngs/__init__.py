@@ -4,9 +4,8 @@ from typing import TextIO
 from contextlib import contextmanager
 
 
-@contextmanager
-def open_stream(path: str, args="rt") -> TextIO:
-    """Open a stream or return the pipes."""
+def open_path(path: str, args="rt") -> TextIO:
+    """Open a stream and return the handle"""
     if path == "stdin":
         handle = sys.stdin
     elif path == "stdout":
@@ -17,6 +16,13 @@ def open_stream(path: str, args="rt") -> TextIO:
         handle = gzip.open(path, args)
     else:
         handle = open(path, args)
+    return handle
+
+
+@contextmanager
+def open_stream(path: str, args="rt") -> TextIO:
+    """Open a stream or return a context manager."""
+    handle = open_path(path, args)
     try:
         yield handle
     finally:
