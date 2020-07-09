@@ -1,17 +1,94 @@
 {
     "version": "1.0",
     "configurations": [
-
         {
-            "name": "remove_undetected_alt",
+            "name": "clean_alt",
             "type": "python",
             "request": "launch",
             "stopOnEntry": true,
-            "program": "${workspaceRoot}/pyngs/scripts/vcf/remove_undetected_alt.py",
+            "program": "${workspaceRoot}/pyngs/scripts/vcf/clean_alt.py",
             "args": [
                 "--input", "${workspaceRoot}/data/mpileup/mpl.vcf",
-                "--output", "${workspaceRoot}/data/mpileup/out.vcf",
+                "--output", "${workspaceRoot}/data/mpileup/cleaned.vcf",
                 "--ploidy", "2"
+            ],
+            "cwd": "${workspaceRoot}",
+            "console": "integratedTerminal",
+            "env": {
+                "PYTHONPATH":"${workspaceRoot}"
+            }
+        },
+        {
+            "name": "allele_filter",
+            "type": "python",
+            "request": "launch",
+            "stopOnEntry": true,
+            "program": "${workspaceRoot}/bin/pyngs_tools",
+            "args": [
+                "vcf-allele-filter",
+                "--input", "${workspaceRoot}/data/mpileup/mpl.vcf",
+                "--output", "${workspaceRoot}/data/mpileup/kept.vcf",
+                "--ploidy", "2",
+                "--alternate", "10",
+                "--frequency", "0.01",
+                "--sample", "I19-1402-01"
+
+            ],
+            "cwd": "${workspaceRoot}",
+            "console": "integratedTerminal",
+            "env": {
+                "PYTHONPATH":"${workspaceRoot}"
+            }
+        },
+        {
+            "name": "allele_filter (bughunt)",
+            "type": "python",
+            "request": "launch",
+            "stopOnEntry": true,
+            "program": "${workspaceRoot}/bin/pyngs_tools",
+            "args": [
+                "vcf-allele-filter",
+                "--input", "${workspaceRoot}/data/mpileup/I19-1402-01.subset.mpileup",
+                "--output", "${workspaceRoot}/data/mpileup/I19-1402-01.subset.vcf",
+                "--ploidy", "2",
+                "--alternate", "3",
+                "--frequency", "0",
+                "--sample", "I19-1402-01-consensus"
+
+            ],
+            "cwd": "${workspaceRoot}",
+            "console": "integratedTerminal",
+            "env": {
+                "PYTHONPATH":"${workspaceRoot}"
+            }
+        }
+        {
+            "name": "add_frequency",
+            "type": "python",
+            "request": "launch",
+            "stopOnEntry": true,
+            "program": "${workspaceRoot}/pyngs/scripts/vcf/add_frequency.py",
+            "args": [
+                "--input", "${workspaceRoot}/data/mpileup/cleaned.vcf",
+                "--output", "${workspaceRoot}/data/mpileup/frequency.vcf"
+            ],
+            "cwd": "${workspaceRoot}",
+            "console": "integratedTerminal",
+            "env": {
+                "PYTHONPATH":"${workspaceRoot}"
+            }
+        },
+        {
+            "name": "divide_ann",
+            "type": "python",
+            "request": "launch",
+            "stopOnEntry": true,
+            "program": "${workspaceRoot}/pyngs/scripts/vcf/divide_ann.py",
+            "args": [
+                "--input", "${workspaceRoot}/data/vcf/I19-1402-01.ann.vcf.gz",
+                "--output", "${workspaceRoot}/data/vcf/split.vcf",
+                "--fields", "annotation", "impact", "gene_name", "hgvs_p",
+                "--impact", "HIGH", "MODERATE"
             ],
             "cwd": "${workspaceRoot}",
             "console": "integratedTerminal",
