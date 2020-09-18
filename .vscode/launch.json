@@ -2,218 +2,99 @@
     "version": "1.0",
     "configurations": [
         {
-            "name": "Run tests",
+            "name": "clean_alt",
             "type": "python",
-            "pythonPath":"${config:python.pythonPath}",
             "request": "launch",
             "stopOnEntry": true,
-            "externalConsole":false,
-            "args": [],
-            "program": "${workspaceRoot}/tests/__init__.py",
-            "cwd": "${workspaceRoot}",
-            "env": {
-                "PYTHONPATH": "${workspaceRoot}"
-            },
-            "debugOptions": [
-                "WaitOnAbnormalExit",
-                "WaitOnNormalExit",
-                "RedirectOutput"
-            ]
-        },
-        {
-            "name": "AddUMI",
-            "type": "python",
-            "pythonPath":"${config:python.pythonPath}",
-            "request": "launch",
-            "stopOnEntry": true,
-            "externalConsole":false,
+            "program": "${workspaceRoot}/pyngs/scripts/vcf/clean_alt.py",
             "args": [
-                "--fastq", "data/test_R1_001.fastq.gz",
-                "--umi", "data/test_I2_001.fastq.gz",
-                "--output", "data/test_R1_001.umi.fastq.gz"
-                ],
-            "program": "${workspaceRoot}/scripts/add_umi_to_readname.py",
-            "cwd": "${workspaceRoot}",
-            "env": {
-                "PYTHONPATH": "${workspaceRoot}"
-            },
-            "debugOptions": [
-                "WaitOnAbnormalExit",
-                "WaitOnNormalExit",
-                "RedirectOutput"
-            ]
-        },
-        {
-            "name": "Consensus",
-            "type": "python",
-            "pythonPath":"${config:python.pythonPath}",
-            "request": "launch",
-            "stopOnEntry": true,
-            "externalConsole":false,
-            "args": [
-                "--sam", "data/I18-1196-01.tag.sam",
-                "--tag", "um",
-                "--output", "data/I18-1196-01.consensus.sam"
-                ],
-            "program": "${workspaceRoot}/scripts/umi_consensus.py",
-            "cwd": "${workspaceRoot}",
-            "env": {
-                "PYTHONPATH": "${workspaceRoot}"
-            },
-            "debugOptions": [
-                "WaitOnAbnormalExit",
-                "WaitOnNormalExit",
-                "RedirectOutput"
-            ]
-        },
-        {
-            "name": "Consensus_2",
-            "type": "python",
-            "pythonPath":"${config:python.pythonPath}",
-            "request": "launch",
-            "stopOnEntry": true,
-            "externalConsole":false,
-            "args": [
-                "--sam", "data/test_grouping.sam",
-                "--tag", "um",
-                "--distance", "100",
-                "--output", "data/test_grouping_b.sam"
-                ],
-            "program": "${workspaceRoot}/scripts/consensus.py",
-            "cwd": "${workspaceRoot}",
-            "env": {
-                "PYTHONPATH": "${workspaceRoot}"
-            },
-            "debugOptions": [
-                "WaitOnAbnormalExit",
-                "WaitOnNormalExit",
-                "RedirectOutput"
-            ]
-        },
-        {
-            "name": "Consensus_3",
-            "type": "python",
-            "pythonPath":"${config:python.pythonPath}",
-            "request": "launch",
-            "stopOnEntry": true,
-            "externalConsole":false,
-            "args": [
-                "--sam", "data/I18-1196-01.tag.sam",
-                "--tag", "um",
-                "--distance", "100",
-                "--output", "data/I18-1196-01.tag.cns.sam"
-                ],
-            "program": "${workspaceRoot}/scripts/consensus.py",
-            "cwd": "${workspaceRoot}",
-            "env": {
-                "PYTHONPATH": "${workspaceRoot}"
-            },
-            "debugOptions": [
-                "WaitOnAbnormalExit",
-                "WaitOnNormalExit",
-                "RedirectOutput"
-            ]
-        },
-        {
-            "name": "Filter consensus",
-            "type": "python",
-            "pythonPath":"${config:python.pythonPath}",
-            "request": "launch",
-            "stopOnEntry": true,
-            "externalConsole":false,
-            "args": [
-                "--sam", "data/I18-1196-01.consensus.sam",
-                "--tag", "rd",
-                "--type", "greater",
-                "--value", "2",
-                "--discard-absent", "true",
-                "--output", "data/I18-1196-01.consensus.flt.sam"
-                ],
-            "program": "${workspaceRoot}/scripts/filters/sam_tag.py",
-            "cwd": "${workspaceRoot}",
-            "env": {
-                "PYTHONPATH": "${workspaceRoot}"
-            },
-            "debugOptions": [
-                "WaitOnAbnormalExit",
-                "WaitOnNormalExit",
-                "RedirectOutput"
-            ]
-        },
-        {
-            "name": "Assign",
-            "type": "python",
-            "pythonPath":"${config:python.pythonPath}",
-            "request": "launch",
-            "stopOnEntry": true,
-            "externalConsole":false,
-            "args": [
-                "--file", "data/test_R1.fastq", "data/test_R2.fastq",
-                "--read", "0",
-                "--start", "0", 
-                "--end", "12",
-                "--prefix", "data/demux/",
-                "--suffix", "_R1.fastq", "_R2.fastq",
-                "--remove", "True"
-                ],
-            "program": "${workspaceRoot}/scripts/demultiplex.py",
-            "cwd": "${workspaceRoot}",
-            "env": {
-                "PYTHONPATH": "${workspaceRoot}"
-            },
-            "debugOptions": [
-                "WaitOnAbnormalExit",
-                "WaitOnNormalExit",
-                "RedirectOutput"
-            ]
-        },
-        {
-            "name": "quantify_transcript",
-            "type": "python",
-            "pythonPath":"${config:python.pythonPath}",
-            "request": "launch",
-            "stopOnEntry": true,
-            "externalConsole":false,
-            "args": [
-                "--input", "data/intersect.txt",
-                "--output", "data/quant.txt",
-                "--direction", "any",
-                "--partition", "sample", "bx",
-                "--type", "exon", "gene",
-                "--check-interval", "1000", 
-                "--grace", "10000000"
-                ],
-            "program": "${workspaceRoot}/scripts/quantify_transcripts.py",
-            "cwd": "${workspaceRoot}",
-            "env": {
-                "PYTHONPATH": "${workspaceRoot}"
-            },
-            "debugOptions": [
-                "WaitOnAbnormalExit",
-                "WaitOnNormalExit",
-                "RedirectOutput"
-            ]
-        },
-        {
-            "name": "Count Ns",
-            "type": "python",
-            "pythonPath":"${config:python.pythonPath}",
-            "request": "launch",
-            "stopOnEntry": true,
-            "externalConsole":false,
-            "args": [
-                "--input", "data/test_R1_001.fastq.gz"
+                "--input", "${workspaceRoot}/data/mpileup/mpl.vcf",
+                "--output", "${workspaceRoot}/data/mpileup/cleaned.vcf",
+                "--ploidy", "2"
             ],
-            "program": "${workspaceRoot}/scripts/N_counter.py",
             "cwd": "${workspaceRoot}",
+            "console": "integratedTerminal",
             "env": {
-                "PYTHONPATH": "${workspaceRoot}"
-            },
-            "debugOptions": [
-                "WaitOnAbnormalExit",
-                "WaitOnNormalExit",
-                "RedirectOutput"
-            ]
+                "PYTHONPATH":"${workspaceRoot}"
+            }
+        },
+        {
+            "name": "allele_filter",
+            "type": "python",
+            "request": "launch",
+            "stopOnEntry": true,
+            "program": "${workspaceRoot}/bin/pyngs_tools",
+            "args": [
+                "vcf-allele-filter",
+                "--input", "${workspaceRoot}/data/mpileup/mpl.vcf",
+                "--output", "${workspaceRoot}/data/mpileup/kept.vcf",
+                "--ploidy", "2",
+                "--alternate", "10",
+                "--frequency", "0.01",
+                "--sample", "I19-1402-01"
+
+            ],
+            "cwd": "${workspaceRoot}",
+            "console": "integratedTerminal",
+            "env": {
+                "PYTHONPATH":"${workspaceRoot}"
+            }
+        },
+        {
+            "name": "allele_filter (bughunt)",
+            "type": "python",
+            "request": "launch",
+            "stopOnEntry": true,
+            "program": "${workspaceRoot}/bin/pyngs_tools",
+            "args": [
+                "vcf-allele-filter",
+                "--input", "${workspaceRoot}/data/mpileup/I19-1402-01.subset.mpileup",
+                "--output", "${workspaceRoot}/data/mpileup/I19-1402-01.subset.vcf",
+                "--ploidy", "2",
+                "--alternate", "3",
+                "--frequency", "0",
+                "--sample", "I19-1402-01-consensus"
+
+            ],
+            "cwd": "${workspaceRoot}",
+            "console": "integratedTerminal",
+            "env": {
+                "PYTHONPATH":"${workspaceRoot}"
+            }
         }
-    ]    
+        {
+            "name": "add_frequency",
+            "type": "python",
+            "request": "launch",
+            "stopOnEntry": true,
+            "program": "${workspaceRoot}/pyngs/scripts/vcf/add_frequency.py",
+            "args": [
+                "--input", "${workspaceRoot}/data/mpileup/cleaned.vcf",
+                "--output", "${workspaceRoot}/data/mpileup/frequency.vcf"
+            ],
+            "cwd": "${workspaceRoot}",
+            "console": "integratedTerminal",
+            "env": {
+                "PYTHONPATH":"${workspaceRoot}"
+            }
+        },
+        {
+            "name": "divide_ann",
+            "type": "python",
+            "request": "launch",
+            "stopOnEntry": true,
+            "program": "${workspaceRoot}/pyngs/scripts/vcf/divide_ann.py",
+            "args": [
+                "--input", "${workspaceRoot}/data/vcf/I19-1402-01.ann.vcf.gz",
+                "--output", "${workspaceRoot}/data/vcf/split.vcf",
+                "--fields", "annotation", "impact", "gene_name", "hgvs_p",
+                "--impact", "HIGH", "MODERATE"
+            ],
+            "cwd": "${workspaceRoot}",
+            "console": "integratedTerminal",
+            "env": {
+                "PYTHONPATH":"${workspaceRoot}"
+            }
+        }
+    ]
 }

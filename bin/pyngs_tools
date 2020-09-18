@@ -1,0 +1,502 @@
+#!/bin/env python3
+"""A set of tools for working with NGS data in Python."""
+
+import logging
+import argparse
+import pyngs.scripts
+
+
+def main():
+    """Run the program."""
+    parser = argparse.ArgumentParser(
+        prog="pyngs_tools",
+        description=""".""")
+    subparsers = parser.add_subparsers(help="sub-command help")
+
+    #
+    # Shorten FastQ
+    #
+    sparser = subparsers.add_parser(
+        "trim-fastq",
+        help="""Shorten the reads in a FastQ file
+        to the specified length.""")
+    sparser.add_argument(
+        "-i", "--input", dest="input",
+        type=str, default="stdin",
+        help="""The input FastQ file.""")
+    sparser.add_argument(
+        "-o", "--output", dest="output",
+        type=str, default="stdout",
+        help="The output FastQ file.")
+    sparser.add_argument(
+        "-l", "--length", dest="length",
+        type=int, default=50,
+        help="""The size to trim the reads to.""")
+    sparser.set_defaults(func=pyngs.scripts.trim_fastq)
+
+    #
+    # Extract a sub read from a FastQ file
+    #
+    sparser = subparsers.add_parser(
+        "extract-subread-from-fastq",
+        help="""Extract a subread from a FastQ file.""")
+    sparser.add_argument(
+        "-i", "--input", dest="input",
+        type=str, default="stdin",
+        help="""The input FastQ file.""")
+    sparser.add_argument(
+        "-o", "--output", dest="output",
+        type=str, default="stdout",
+        help="The output FastQ file.")
+    sparser.add_argument(
+        "-s", "--start", dest="start",
+        type=int, default=0,
+        help="""The start of the sub-read.""")
+    sparser.add_argument(
+        "-e", "--end", dest="end",
+        type=int, default=-1,
+        help="""The end of the sub-read.""")
+    sparser.set_defaults(func=pyngs.scripts.extract_subreads)
+
+    #
+    # IUPAC subreads
+    #
+    sparser = subparsers.add_parser(
+        "iupac-subreads",
+        description="""Extract the subread after an IUPAC sequence.""")
+    sparser.add_argument(
+        "-i", "--input", dest="input",
+        type=str, default="stdin",
+        help="""The input FastQ file.""")
+    sparser.add_argument(
+        "-o", "--output", dest="output",
+        type=str, default="stdout",
+        help="The output FastQ file.")
+    sparser.add_argument(
+        "-s", "--iupac", dest="iupac",
+        type=str,
+        help="""The iupac sequence to search for.""")
+    sparser.set_defaults(func=pyngs.scripts.iupac_subreads)
+
+    #
+    # Add UMIs to the readnames
+    #
+    sparser = subparsers.add_parser(
+        "add-umis-to-fastq",
+        help="""Add UMIs to the read names in a FastQ file.""")
+    sparser.add_argument(
+        "-i", "--input", dest="input",
+        type=str, default="stdin",
+        help="""The input FastQ file.""")
+    sparser.add_argument(
+        "-o", "--output", dest="output",
+        type=str, default="stdout",
+        help="The output FastQ file.")
+    sparser.add_argument(
+        "-u", "--umis", dest="umis",
+        type=str,
+        help="""The FastQ with the UMIs.""")
+    sparser.add_argument(
+        "-t", "--tag", dest="tag",
+        type=str, default="umi",
+        help="""The tag to use for the UMI sequence""")
+    sparser.set_defaults(func=pyngs.scripts.add_umis_to_readname)
+
+    #
+    # Extract information from the read names
+    #
+    sparser = subparsers.add_parser(
+        "extract-tags",
+        help="""Extract information from the read names
+        and add them as tags in a SAM file.""")
+    sparser.add_argument(
+        "-i", "--input", dest="input",
+        type=str, default="stdin",
+        help="""The input SAM file.""")
+    sparser.add_argument(
+        "-o", "--output", dest="output",
+        type=str, default="stdout",
+        help="The output SAM file.")
+    sparser.add_argument(
+        "-t", "--tags", dest="tags",
+        type=str, nargs="+",
+        help="""The tags to extract from the read name""")
+    sparser.add_argument(
+        "-s", "--sam-tag", dest="samtags",
+        type=str, nargs="+",
+        help="""The tag to deposit in the SAM file""")
+    sparser.set_defaults(func=pyngs.scripts.retrieve_tag_from_readname)
+
+    #
+    # cigar-to-bed command
+    #
+    sparser = subparsers.add_parser(
+        "cigar-to-bed",
+        help="""Generate BED entries for bases
+        covered by the specified CIGAR operation in a SAM
+        file.""")
+    sparser.add_argument(
+        "-s", "--sam", dest="sam",
+        type=str, nargs="?", default="stdin",
+        help="""The SAM file of which the CIGAR entries will
+                be converted to BED entries.""")
+    sparser.add_argument(
+        "-b", "--bed", dest="bed",
+        type=str, nargs="?", default="stdout",
+        help="The path to the output BED file.")
+    sparser.add_argument(
+        "-c", "--cigar-operations", dest="operations",
+        type=str, nargs="+",
+        help="The CIGAR operations to convert to BED entries.")
+    sparser.add_argument(
+        "-t", "--tags", dest="tags",
+        type=str, nargs="*",
+        help="""The BAM tags to add to the comment column in the
+                BED entries. Use the keyword __sample__ to add the
+                sample as a comment.""")
+    sparser.add_argument(
+        "-m", "--merge-entries", dest="merge_entries",
+        type=bool, default=False,
+        help="""Merge BED entries from the same read to a single entry""")
+    sparser.set_defaults(func=pyngs.scripts.cigar_to_bed)
+
+    #
+    # merge bed entries
+    #
+    sparser = subparsers.add_parser(
+        "merge-bed-entries",
+        help="""Merge BED entries that represent the same DNA fragment.
+        """)
+    sparser.add_argument(
+        "-i", "--input", dest="input",
+        type=str, nargs="?", default="stdin",
+        help="""The BED file with the entries to process.""")
+    sparser.add_argument(
+        "-o", "--output", dest="output",
+        type=str, nargs="?", default="stdout",
+        help="The path to the BED with the merged entries.")
+    sparser.add_argument(
+        "-t", "--tag", dest="tag",
+        type=str, nargs="?", default="READNAME",
+        help="The tag on which to merge the entries.")
+    sparser.set_defaults(func=pyngs.scripts.merge_bed_entries)
+
+    #
+    # consensus
+    #
+    sparser = subparsers.add_parser(
+        "umi-consensus",
+        help="""
+        Generate consensus alignments for alignments with the
+        same UMI.
+        """)
+    sparser.add_argument(
+        "-s", "--sam", dest="sam",
+        type=str, default="stdin",
+        help="""The input SAM file sorted on the tag
+        with samtools sort -t {tag}.""")
+    sparser.add_argument(
+        "-t", "--tag", dest="tag",
+        type=str, default="um",
+        help="The tag-name for the UMI tag.")
+    sparser.add_argument(
+        "-r", "--discard", dest="discard",
+        type=bool, default=False,
+        help="Will non consensus alignments be discarded.")
+    sparser.add_argument(
+        "-d", "--distance", dest="distance",
+        type=int,  default=20,
+        help="""The allowed distance between the start postion of
+        alignments with the same UMI.""")
+    sparser.add_argument(
+        "-w", "--workers", dest="workers",
+        type=int, default=8,
+        help="""The number of workers for the consensus alignments.""")
+    sparser.add_argument(
+        "-q", "--queue", dest="queue_size",
+        type=int, default=100,
+        help="""The number of objects to hold in the Queues.""")
+    sparser.add_argument(
+        "-o", "--output", dest="out",
+        type=str, default="stdout",
+        help="The output SAM file with the consensus sequences.")
+    sparser.set_defaults(func=pyngs.scripts.run_consensus)
+
+    #
+    # filter-by-samtag
+    #
+    sparser = subparsers.add_parser(
+        "filter-by-samtag",
+        help="""
+        Filter a SAM file by sam-tag.
+        """)
+    sparser.add_argument(
+        "-s", "--sam", dest="sam",
+        type=str, nargs="?", default="stdin",
+        help="The SAM file with the alignments to filter.")
+    sparser.add_argument(
+        "-o", "--output", dest="out",
+        type=str, nargs="?", default="stdout",
+        help="The output SAM file.")
+    sparser.add_argument(
+        "-t", "--tag", dest="tag",
+        type=str, help="The tag-name to filter on.")
+    sparser.add_argument(
+        "-y", "--type", dest="type",
+        choices=["equals", "greater", "less"], default="equals",
+        type=str, help="The type of filter to use.")
+    sparser.add_argument(
+        "-v", "--value", dest="value",
+        type=str, help="The value to filter on.")
+    sparser.add_argument(
+        "--discard-absent", dest="discard", default=False,
+        type=bool,
+        help="Discard entries for which the tag could not be found.")
+    sparser.set_defaults(func=pyngs.scripts.filter_by_samtag)
+
+    #
+    # Extract BED overlaps
+    #
+    sparser = subparsers.add_parser(
+        "extract-from-columns",
+        help="""
+        Parses tabular data like that from
+        bedtools intersect -wao -sorted -a [file] -b [file]
+        """)
+    sparser.add_argument(
+        "-i", "--input", dest="input",
+        type=str, nargs="?", default="stdin",
+        help="A tab-delimited input file.")
+    sparser.add_argument(
+        "-o", "--output", dest="output",
+        type=str, nargs="?", default="stdout",
+        help="The output tab-delimited text file.")
+    sparser.add_argument(
+        "--columns", dest="columns",
+        nargs="+", type=int,
+        help="The columns to parse from the input stream.")
+    sparser.add_argument(
+        "--fields", dest="fields",
+        nargs="+", type=str,
+        help="""The field to extract per column. If multiple fields
+        should be extracted per column, commas can be used to
+        separate the values.
+
+        If the column has no encoding any string can be specified
+        as long as it is not empty.
+
+        If a field is not present in a column, __NA__ will be printed.""")
+    sparser.add_argument(
+        "--encodings", dest="encodings", choices=["none", "gff", "gtf"],
+        nargs="+", type=str,
+        help="""The encoding in the columns.""")
+    sparser.set_defaults(func=pyngs.scripts.extract_from_columns)
+
+    #
+    # Count columns
+    #
+    sparser = subparsers.add_parser(
+        "count-last-column",
+        help="""Count the number of
+        different entries in the last column from a sorted
+        tab-delimited text file.
+        """)
+    sparser.add_argument(
+        "-i", "--input", dest="input",
+        type=str, nargs="?", default="stdin",
+        help="A tab-delimited text file.")
+    sparser.add_argument(
+        "-o", "--output", dest="output",
+        type=str, nargs="?", default="stdout",
+        help="The output tab-delimited text file.")
+    sparser.set_defaults(func=pyngs.scripts.count_last_column)
+
+    #
+    # Haplotype VCF files
+    #
+    # sparser = subparsers.add_parser(
+    #     "vcf-haplotype-vcf",
+    #     description="""Haplotype a VCf file based on the
+    #     child, father, mother relation.""")
+    # sparser.add_argument(
+    #     "-v", "--vcf", dest="vcf",
+    #     type=str, nargs="?", default="stdin",
+    #     help="The input VCF file.")
+    # sparser.add_argument(
+    #     "-o", "--output", dest="output",
+    #     type=str, nargs="?", default="stdout",
+    #     help="The output VCF file.")
+    # sparser.add_argument(
+    #     "-r", "--relations", dest="relations",
+    #     type=str, nargs="?",
+    #     help="""A file with the trio relations in the
+    #     order child, father, mother.""")
+    # sparser.add_argument(
+    #     "--offspring", dest="offspring",
+    #     type=str, nargs="*",
+    #     help="The sample names of the offspring.")
+    # sparser.add_argument(
+    #     "--fathers", dest="fathers",
+    #     type=str, nargs="*",
+    #     help="The sample names of the fathers.")
+    # sparser.add_argument(
+    #     "--mothers", dest="mothers",
+    #     type=str, nargs="*",
+    #     help="The sample names of the mothers.")
+    # sparser.set_defaults(func=pyngs.scripts.haplotype_vcf)
+
+    #
+    # VCF add alternate frequencies
+    #
+    sparser = subparsers.add_parser(
+        "vcf-add-frequency",
+        description="""Add the variant frequencies to a VCF file.""")
+    sparser.add_argument(
+        "-i", "--input", dest="input",
+        type=str, default="stdin",
+        help="""The input VCF file.""")
+    sparser.add_argument(
+        "-o", "--output", dest="output",
+        type=str, default="stdout",
+        help="The output VCF file.")
+    sparser.add_argument(
+        "-t", "--input-tag", dest="input_tag",
+        type=str, default="AD",
+        help="""The format tag to parse for the reads per genotype.""")
+    sparser.add_argument(
+        "-d", "--digits", dest="digits",
+        type=int, default=5,
+        help="""The number of digits in the frequency.""")
+    sparser.set_defaults(func=pyngs.scripts.add_frequency)
+
+    #
+    # VCF clean alternates
+    #
+    sparser = subparsers.add_parser(
+        "vcf-clean-alt",
+        description="""Remove the <*> calls from mpileup output.""")
+    sparser.add_argument(
+        "-i", "--input", dest="input",
+        type=str, default="stdin",
+        help="""The input VCF file.""")
+    sparser.add_argument(
+        "-o", "--output", dest="output",
+        type=str, default="stdout",
+        help="The output VCF file.")
+    sparser.add_argument(
+        "-t", "--input-tag", dest="input_tag",
+        type=str, default="XAF",
+        help="""The format tag to parse for the reads per genotype.""")
+    sparser.set_defaults(func=pyngs.scripts.clean_alt)
+
+    #
+    # VCF filter alleles not conforming to an alternate or frequency criterium
+    #
+    sparser = subparsers.add_parser(
+        "vcf-allele-filter",
+        description="""Keep only alleles and variants which fit the contraints.""")
+    sparser.add_argument(
+        "-i", "--input", dest="input",
+        type=str, default="stdin",
+        help="""The input VCF file.""")
+    sparser.add_argument(
+        "-o", "--output", dest="output",
+        type=str, default="stdout",
+        help="The output VCF file.")
+    sparser.add_argument(
+        "-p", "--ploidy", dest="ploidy",
+        type=int, default=2,
+        help="The ploidy of the organism")
+    sparser.add_argument(
+        "-s", "--samples", dest="samples",
+        type=str, nargs="*", default=[],
+        help="The samples on which to base the filtering.")
+    sparser.add_argument(
+        "-a", "--alternate", dest="alternate",
+        type=int, nargs="?", default=0,
+        help="The minimum number of alternate alleles.")
+    sparser.add_argument(
+        "-f", "--frequency", dest="frequency",
+        type=float, nargs="?", default=0.0,
+        help="The minimum frequency of alternate alleles.")
+    sparser.add_argument(
+        "-d", "--digits", dest="digits",
+        type=int, nargs="?", default=5,
+        help="The number of digits in the AF field.")
+    sparser.set_defaults(func=pyngs.scripts.allele_filter)
+
+    #
+    # vcf-parse-annotations
+    #
+
+    sparser = subparsers.add_parser(
+        "vcf-parse-annotations",
+        description="""
+# Annotation parser: a parser for the ANN field from VCF files
+
+This parser is based on the explanation at http://snpeff.sourceforge.net/SnpEff_manual.html#ann.
+
+The parser can be used as a python library to parse individual ANN fields or as a stand-alone
+tool.
+
+The stand-alone tool supports VCF files. It putsthe selected fields in the VCF INFO
+field. For the VCF parsing the tool requires access to the pyngs library. In the default mode,
+the output fields are reported per alternative allele (A). If the snpEff tool was run in cancer mode,
+set the --unordered, so the tool will set the Number parameter in header as "." (instead of R).
+
+To select specific ANN fields, a syntax is used like bcftools annotations with the following fields.
+
+    1    | allele - ann_allele
+    2    | annotation - ann_annotation
+    3    | impact - ann_impact
+    4    | gene_name - ann_gene_name
+    5    | gene_id - ann_gene_id
+    6    | feature_type - ann_feature_type
+    7    | feature_id - ann_feature_id
+    8    | transcript_biotype - ann_transcript_biotype
+    9    | rank - ann_rank
+    9    | total - ann_total
+    10    | hgvs_c - ann_hgvs_c
+    11    | hgvs_p - ann_hgvs_p
+    12    | cdna_pos - ann_cdna_pos
+    12    | cdna_len - ann_cdna_len
+    13    | cds_pos - ann_cds_pos
+    13    | cds_len - ann_cds_len
+    14    | prot_pos - ann_prot_pos
+    14    | prot_len - ann_prot_len
+    15    | dist_feaure - ann_dist_feature
+    16    | messages - ann_messages
+
+""")
+    sparser.add_argument(
+        "-i", "--input", dest="input",
+        type=str, default="stdin",
+        help="""The input VCF file.""")
+    sparser.add_argument(
+        "-o", "--output", dest="output",
+        type=str, default="stdout",
+        help="The output VCF file.")
+    sparser.add_argument(
+        "-f", "--fields", dest="fields",
+        type=str, nargs="+", default=[],
+        help="The fields from the ANN field to select")
+    sparser.add_argument(
+        "--unordered", dest="unordered",
+        type=bool, default=False,
+        help="Do not match the output to the alternate alleles")
+    sparser.add_argument(
+        "--impacts", dest="impacts",
+        type=str, nargs="*", default=[],
+        help="Only report annotations with the specified impacts")
+    sparser.set_defaults(func=pyngs.scripts.parse_annotations)
+
+
+    # parse the argument and call the script
+    args = parser.parse_args()
+    args.func(args)
+
+
+if __name__ == "__main__":
+
+    # run the main program loop
+    main()
