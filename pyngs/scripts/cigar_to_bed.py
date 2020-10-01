@@ -53,7 +53,7 @@ def to_bed(instream, outstream, operations, tags, merge_entries=False):
                     else:
                         taglst.append("__sample__=None")
                 else:
-                    tagres = tagfnd[idx] if tagfnd[idx] else "None"
+                    tagres = tagfnd[idx] if tagfnd[idx] else (tagname, "", "None")
                     taglst.append("{tag}={result}".format(
                         tag=tagname,
                         result=tagres[2]))
