@@ -35,7 +35,7 @@ class FilterAlleles:
 
         # add the AF tag if not present
         if "AF" not in reader.format.keys():
-            afstr = """##FORMAT=<ID=AF,Type=Float,Number=R,Description="The allele frequencies of the alleles">"""
+            afstr = """##FORMAT=<ID=AF,Number=R,Type=Float,Description="The allele frequencies of the alleles">"""
             afmeta = vcf.Meta.from_str(afstr)
             afformat = vcf.Format.from_meta(afmeta)
             metas.append(afmeta)
